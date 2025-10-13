@@ -1,0 +1,98 @@
+🔹 Yhteenveto: mitä tapahtuu kokonaisuutena
+Komento	Toiminto
+git checkout main	Vaihdat päähaaraan
+git pull	Päivität mainin ajantasalle GitHubista
+git checkout -b feature/uusi-juttu	Luot uuden haaran mainin pohjalta ja siirryt siihen
+
+git checkout main
+git pull
+git checkout -b feature/uusi-juttu
+
+Paikallinen ajo PC:ssä
+
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
+pip install -r requirements.txt
+
+export FLASK_APP=kynttilat.wsgi:application
+export FLASK_ENV=development
+flask run --reload
+
+
+
+
+🔹 Vaihe 1: varmista, että kaikki on tallessa ja pushattu
+
+Jos olet tehnyt muutoksia vain paikallisesti:
+git add .
+git commit -m "Lisätty uusi juttu"
+git push -u origin feature/uusi-juttu
+
+→ Tämä vie uuden haaran GitHubiin, jolloin siitä voi tehdä Pull Requestin
+
+
+Hienoa 👍 — käydään läpi, miten viet uuden haaran muutokset takaisin mainiin oikeaoppisesti ja turvallisesti.
+
+🔹 Tilanne nyt
+
+Sinulla on uusi kehityshaara:
+git add .
+git commit -m "Lisätty uusi juttu kommettina"
+git push -u origin feature/uusi-juttu
+
+→ Tämä vie uuden haaran GitHubiin, jolloin siitä voi tehdä Pull Requestin.
+
+Vaihe 2: tee Pull Request GitHubissa
+
+1. Mene GitHubiin reposi sivulle.
+2. Näet ilmoituksen tyyliin:
+   Compare & pull request
+
+
+Klikkaa sitä.
+
+3: Varmista, että:
+
+base branch = main
+
+compare branch = feature/uusi-juttu
+
+4. Kirjoita kuvaus muutoksista → Create pull request.
+
+5. Tarkista, että kaikki näyttää hyvältä → Merge pull request.
+
+Tämän jälkeen GitHub yhdistää haarasi mainiin.
+
+Vaihe 3: päivitä paikallinen main
+
+Kun PR on hyväksytty ja yhdistetty:
+git checkout main
+git pull
+
+→ Nyt paikallinen main sisältää myös ne uudet muutokset.
+
+Vaihe 4: poista vanha kehityshaara (valinnainen)
+
+Kun ominaisuus on yhdistetty ja testattu, voit siivota vanhan haaran:
+
+GitHubissa:
+
+Klikkaa “Delete branch” PR:n yhteydessä
+
+Paikallisesti:
+git branch -d feature/uusi-juttu
+
+jos jostain syystä haara ei vielä ole yhdistetty, ja haluat poistaa sen väkisin:
+
+git branch -D feature/uusi-juttu
+
+
+Vaihtoehto komentorivillä (ilman PR:ää)
+
+Jos työskentelet yksin tai haluat yhdistää haaran manuaalisesti:
+git checkout main
+git pull
+git merge feature/uusi-juttu
+git push
+

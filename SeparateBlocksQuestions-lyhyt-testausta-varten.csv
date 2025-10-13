@@ -1,0 +1,34 @@
+﻿/* tämä on kommenttirivin aloitusmerkki;;
+;;
+/* Tässä tiedosssa on väittämiä testausta varten;;
+/* Tässä väittämiä testausta varten;;
+;;
+"/* A1 -tagilla merkityt rivit on 4-tyyppiväittämiä,johon mahdollinen 4-tyyppi reagoi myönteisesti, ""kyllä"" vastauksella";;
+/* A11 -tagilla merkityt rivit on samanlaisia 4-tyyppiväittämiä,jmutta nämä ovat lisäkysymyksiä, jos ensimmäisilleä kysymyksillä ei saada selkeää tulosta;;
+/* B, C ja D tagit ovat vastaavasti koodattuja. B tarkoittaa 3,7,8 väittämiä, C tarkoittaa 2,6,9 väittämiä ja D tarkoittaa 1,5,6 väittämiä;;
+;;
+/* Huom! Tyyppi 6 on tarkoituksella mukna C ja D väittämissä;;
+;;
+/* Huom! Perusväittämiä voi olla maksimissaan 32 kpl (eli 8 per ryhmä) ja lisäkysymyksiä 6 (eli 3 per ryhmä);;
+/* Kopioitu EG testikansiosta 15.9 ;;
+/* Nyt  näitä on 9 peruskysymystä ja 3 lisäkysymystä - tavoite on 6+3;;
+;;
+;;
+;;
+;;
+A1;1;4 Ajatellaan, että olet onnistunut liittymään johonkin ryhmään tai vaikka työyhteisöön, jossa voit hyvin. Kun sinulta kysyttäisiin, miksi olet tyytyväinen tähän ryhmään kuulumisesta, kuinka luontevasti vastauksesi voisi olla: Vaikka ryhmässä on välillä voimakkaitakin erilaisia mielipiteitä, se tuntuu aidosti erilaiselta. Ihmiset ovat luovia ja syviä ja arvostavat yksilöllisyyttä.
+/*A1;2;4 Minun on vaikea teeskennellä olevani hyväntuulinen, jos oikeasti en ole.
+A11;3;TB 4 Luulen että tunteeni ovat syvempiä, tai monimutkaisempia, kuin ihmisllä keskimäärin.
+A11;4;TB4 Minulle on tyypillistä, että ilmaisen tunteitani ja persoonallisuuttani luovalla ja omaperäisellä tavalla.
+B1;5;378 Jos jotakin asiaa pitäisi edistää,  ja se edellyttäisi tuntemattomalle ihmiselle soittamista, minä kuulun niihin, jotka eivät koe asiassa mitään epämukavaa. 
+/*B1;6;"378 Minulle on luontevaa tarttua tilaisuuteen heti, vaikka en olisi täysin valmistautunut. Luotan siihen, että onnistun luovimaan onnistuneesti ""maaliin""."
+B11;7;"TB 378Minulla on hyvä kyky muuttaa valittua harkittuakin suunnitelmaa ""lennosta"", jos näin päästään nopeammin tai varmemmin tavoitteeseen."
+B11;8;TB 378 Joskus on ihan ok oikaista vähän säännöistä, jos se auttaa saavuttamaan tärkeän tavoitteen.
+C1;9;156  Pidän usein mielipiteeni itselläni, jos sen ilmaiseminen voisi horjuttaa hyvää ilmapiiriä .
+/*C1;10;156 Minusta on helpompi mukautua ryhmän päätökseen, kuin yrittää saada muut näkemään asiat minun tavallani.
+C11;11;TB 156 Minusta on helpompi mukautua ryhmän päätökseen, kuin yrittää saada muut näkemään asiat minun tavallani.
+C11;12;TB156 Pidän usein mielipiteeni itselläni, jos sen ilmaiseminen voisi horjuttaa hyvää ilmapiiriä .
+/*D1;13;269 Minusta on tärkeää valmistautua kunnolla etukäteen, jotta voin olla varma onnistumisesta.
+D1;14;269 Pysähdyn usein miettimään seurauksia ennen kuin toimin, koska en halua tehdä virheitä.
+D11;15;TB 269 Minusta tuntuu erittäin epämukavalta, jos joudun improvisoimaan tärkeässä tilanteessa ilman etukäteisvalmistautumista
+D11;16;TB 269 Haluan mieluummin varmistaa asian oikeellisuuden useasta lähteestä, kuin luottaa kuulemaani tietoon.

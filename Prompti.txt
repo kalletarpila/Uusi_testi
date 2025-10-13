@@ -1,0 +1,198 @@
+touch kynttilat/__init__.py kynttilat/models.py kynttilat/routes.py kynttilat.py .env .gitignore
+
+https://chatgpt.com/share/68e124da-ea24-800d-baba-88558c167ac1
+
+
+
+****
+NYT TOIMII
+Firefox - ei toimi, jos osoitteessa on HTTP eikä HTTPS
+***********
+Tehty
+Tämä hyvä. Tehdään vielä palautteenanto mahdollisuus, eli viimeiselle sivulle yksipainonappi lisää (samalla riville kuin kaksi muutakin painonappia. Painonapissa lukee "Anna palautetta" ja kun sitä painaa, niin aukeaa samalle sivulle tekstilaatikko, johon käyttäjä voi kirjoittaa tekstiä ja lähettää palautteen "Lähetä"-napilla. Tällöin annettu teksti lähetetään sähköpostissa osoitteeseen "eg-testi.palaute@enneagrammitesti.fi". Laita viesitiin myös palautteen antajan nimimerkki.  Jos käyttäjä on jo antanut palautetta, niin hänelle ei anneta uutta mahdollisuutta ja nappi poistetaan viimeiseltä sivulta. tee viimeisen sivun painonapeista samankokoisen ja näköiset, myös "Lähetä" painonappi.
+
+************''
+tehty 
+Muuta vielä INDEX ohjelman palautekäsittelyä niin, että 1) Jos käyttäjä on jo antanut palautetta, niin hänelle ei anneta uutta mahdollisuutta ja nappi poistetaan viimeiseltä sivulta, 2) Palaute läheteään osoitteeseen eg-testi.palaute@enneagrammitesti.fi, 3) tee viimeisen sivun painonapeista samankokoisen ja näköiset, myös "Lähetä" painonappi. Anna minulle koko koodi ruudulla ja ladattavana tiedostona
+
+***************
+INVITE (kutsulomake)
+
+Sivulla täytetään kutsujan nimi, kutsuttavan nimi ja sähköposti, sekä halutessa oma veikkaus kutsuttavan enneagrammityylistä (1–9) ja sen todennäköisyys. Kutsujalta voi myös lisätä lyhyet saatesanat.
+
+Ohjelma luo kutsulle turvallisen linkin ja varakoodin, tallettaa tiedon kutsulistaan ja lähettää sähköpostikutsun kutsuttavalle.
+Lähettäjänä näkyy muotoa: “Kutsujan nimi via Enneagrammitesti”.
+
+Jos syöttöön jää virheitä (esim. sähköposti puuttuu), sivu kertoo niistä ja säilyttää annetut tiedot, jotta niitä ei tarvitse kirjoittaa uudelleen. Onnistuneen lähetyksen jälkeen kentät tyhjenevät.
+
+Taustalle jää loki, johon kirjataan aikaleiman kanssa tärkeät tapahtumat ja mahdolliset virheet (helpottaa vianetsintää).
+
+INDEX (varsinainen testi)
+
+Tämä on kaksivaiheinen kysely, joka arvioi vastaajan enneagrammityyppiä.
+
+Vaihe 1: sarja väittämiä, joihin vastataan asteikolla 1–6. Jos kärkituloksissa tulee tasapeli, kysytään lisäkysymyksiä tasoihin menneistä ryhmistä.
+
+Vaihe 2: (jos tyyppi ei ollut selkeästi 4) vertaillaan kahta vaihtoehtoa kerrallaan asteikolla 0–4 (0 = kumpikaan ei kuvaa, 4 = täysin samaa mieltä toisen kanssa). Jos tässäkin tulee tasapeli, tehdään lyhyt lisävertailu tasoissa olevien välillä.
+
+Testiin voi tulla joko kutsulinkin kautta (tunnistetaan automaattisesti) tai syöttämällä kutsukoodin etusivun kenttään. Nimimerkki on vapaaehtoinen. Jos ei tiedä omaa tyyppiään, valinta on valmiiksi “en tiedä”.
+
+Lopuksi näytetään tulos ja sen lyhyt kuvaus, joka luetaan valmiista tyyppikuvauksia sisältävästä tiedostosta.
+Samalla sivulla on nappi “Anna palautetta”, joka avaa tekstikentän. Lähetetty palaute menee sähköpostiin eg-testi.palaute@enneagrammi.fi
+****************
+
+DONE : Katsoin tämän ohjelma lokia ja sen mukaan ohjema lataa kovin usein SeparateBlocks ja TypeDescptions-tiedostot. Jos näin niin miksi?   
+
+9.9 muutospyyntö
+
+Tässä vielä muutamia muutoksia INDEX.PHP tiedostoon 
+
+1) Etusivulle Älä näytä "Onko sinulle lähetetty kutsu? Syötä koodi" pyyntöä, jos vastaaja on tullut INVITEn kautta tokenin kanssa
+2) Jos vastaaja antaa koodin, niin älä pyydä häntä sitä erikseen tarkastamaan sitä omalla painonapilla (Liitä Kutsu), vaan lue koodi ja tarkasta se samalla kun käyttäjä painaa "aloita kysely" 
+3) Näytä etusivulla suoraan syöttöruutu koodille ilman että käyttäjä joutuu sen erikseen klikkaamaan
+4) Älä pakota antamaan nimimerkkiä vaan hyväksy myös tyhjä vastaus
+5) Laita oletusarvoiseksi valinnaksi enneagrammityyliksi "en tiedä" ja kirjoita yhteen sana "enneagrammityyli" ensimmäisellä sivulla
+6) Yksinkertaisuuden vuoksi, ota pois näppäimistö oikotievalinnat
+7) Vaiheessa 1 , älä levitä painonappeja ruudun levyiseksi, vaan keskitä ne ruudun keskelle silti yhdelle riville. Vaihe 2 tiebreak, ota pois väliotsikon "Tiebreak" -sana
+8) Viimeisellä sivulla,kun tulostetaan "Enneagrammityylisi tämän testin perusteella vaikuttaisi olevan TYYLI" ja muuttujan arvo, niin laita alle vielä lyhyt kuvaus tästä enneagrammityylistä.
+Kaikki tyylit on esitelty CSV-tiedostossa "TypeDescriptions" niin, että ensimmäisessä sarakkeessa on tyyppinumero ja seuraavassa sarakkeessa on tyyppikuvaus.Kirjoita ruudulle tyyppikuvaus.
+9) poista näytöltä testimoodi päällä/pois -kytkemisvaihtoehto, ellei ohjelmaa käynnistetä parametrillä "?showtestmode"
+
+9.9 seuraava muutospyyntö  TEHTY
+Kiitos - tee vielä seuraavat muutokset ja anna minulle koko koodi:
+1) Laita kutsukoodin syöttöruudun jälkeen yksi tyhjä rivi, jotta nimimerkkiä pyydetään vasta seuraavalla rivillä ja poista sulkeissa oleva "vapaaehtoinen" sana pois. 
+2) Lisää admin moodin myös TypeDescriptions.cvc tiedoston luku ja varmista, että tässäkin tiedostossa kommentit alakavat /* merkinnällä, 3) Nyt viimeiselle sivulle ei tulostu tyypin kuvaus, joka luetaan TypeDescriptions tiedostosta. Katso tämä tarkemmin ja jos et ymmärrä logiikkaa, niin kysy se minulta vielä
+
+9.9 kolmas
+1) Muuta etusivun tekstit "jossa arvioit tilanteita kahden vaihtoehdon välillä asteikolla −4 … 0 … +4." tekstiksi "jossa arvioit tilanteita kahden vaihtoehdon välillä asteikolla  0 … 4."
+2) Vaihe 1 ja Vaihe 2 ; kun kysytään lisäkysymyksiä, niin älä kerro sitä loppukäyttäjälle, vaan näytä vain otsikkona "Vaihe 1", tai "Vaihe 2"
+
+8.9 muutospyyntö
+Jatketaan ... Lisää mahdollisuus, että sisään luettavissa CSV-tiedostoissa on kommenttiricejä. Ne alkavat merkinnällä /*. Kirjoita lokiin vielä yksi sarake loppuun ja laita siihen sen muuttujan arvo, joka tuli vastaajalle testin lopputuloksena. Muutetaan InsideBlockQuestions tagitystä seuraavasti niin, että tilannekuvauksessa on jo ilmaistu vertailtavat tyypit, esimerkiksi kun tilannekuvauksen B2 tagitys muuttuu tagiksi B2-2vs6 tarkoittaa se että tässä tapauksessa vertaillaan tyyppejä 2 ja 6. Sama muutos koskee taget C2 ja D2 sekä sekä tiebreak-tilanteita TB2, TC2 ja TD2. Käytä tätä uutta vaiheen 2 tagistystä hyväksi niin, että tiebreak tapauksssa (vaihe 2) kysytään lisäkysymykset vain koskien niitä kahta jäljelle jäännyttä tyyppiä. Tee näiden ohjeiden perusteella uusi kokonainen PHP ohjelma
+**
+
+
+Muutoksia
+
+
+
+Prompti
+
+1) Käynnistä PowerShell "kansiohaku" sivulta 
+powershell
+
+@echo off
+cd "C:\Users\Kalle\Dropbox\Enneagrammi\EG_TESTI_dataa\uusi_testi"
+
+
+pause
+
+PHP:n saa sammutettua Shellissä Control-C:llä
+
+Käynnistä ohjelma selaimessa
+
+http://localhost:8000/?fresh=1&?test=1
+http://localhost:8000/?fresh=1&?test=0
+
+********
+Muutokset
+1) Älä kysy email osoitetta, se lisätään vasta myöhemmin
+2) Näytä "Itse valitsemasi enneagrammityyli" vasta viimeisellä sivulla
+3) Jos näyttäjä painaa nimimerkin antamisen jälkeen enteriä ja on antanut jo jotain, niin älä poista annettua tekstiä ja pyydä valitsemaan oma ennagrammityyli. 
+4) Omaa enneagrammityyliä valittaessa näytä "en tiedä" vaihtoehto ensimmäisenä
+5) Älä näytä sivun ylälaidassa "aloita täysin tyhjältä pöydältä" valintaa.
+6) Näytä logo testiruudun oikeassa yläkulmassa. Se löytyy tiedostosta logo.png
+7) laita testiruudun ulkopuolella oleva alue vaalean harmaaksi, siis se alue, missä joka jää ison pyöreäkulmaisen laatikob ulkopuolelle
+8) jätä pari tyhjää riviä progress barin ja kysymyslaatikon väliin 
+9) Tee ihan uusi aloitussivu, jossa on sama otsikko kuin muissa ja teksti kappale, jossa kerrotaan tästä testistä a) mitä haetaan eli vastaajan omaan enneagrammityyliä, b)miten testi etenee c) GRPR-lausunto ja loppuun painonappi "aloita tästä". Sivun alareunaan maininta "(C) Suomen Enneagrammiyhdisty, 2025"
+10) Vaiheen 2 alaotsikossa älä näytä tapauksen numeroa ja luokkaa ollenkaan, ellei olla testimoodissa
+11) Viimeisellä sivulla älä käytä boldia tekstissä "Enneagrammityylisi ..."
+12) Lisää viimeiselle sivulle vielä yksi painonappi "Lue lisää enneagrammista" ja laita tämä osoittamaan sivulle "https://www.enneagram.fi/tietoa-enneagrammista/"
+
+
+Lisä muutoksia
+1) Ota pois teksti "Tietoja käytetään vain tämän testin yhteydessä." ja laita copyright merkintä jokaisen sivun alalaitaan
+2) Suurenna logo kaksinkertaiseksi
+3) Vaiheen 1 sivuilla, älä näytä kysymyksen nuemroa ja kysymysten määrää. eli siis näytä vain "Vaihe 1"
+4) Vaihe 1: Näytä ohjeteksti "Valitse asteikolta mielipidettäsi tai asennettasi parhaiten kuvaava vaihtoehto. 1=täysin eri mieltä … 6=täysin samaa mieltä" painonappien alapuolella
+5) Jätä pois viimeiseltä sivulta "Itse valitsemasi ...", sitä ei tarvita lainkaan
+6) Laita takaisin viimeiselle sivulle kolmas painonappi, jossa voi aloittaa testi ihan alusta.
+7 Yhdistä aloitussivu ja esitietojen kysely sivu, niin että ensin tulee teksti osuus
+
+Lokiin vielä muutoksia: Jotta on mahdollista selvittää mihin kysymykseen vastaaja on vastannut mitäkin (vaihe 1), niin numeroi sisäisesti kysymykset alkaen ykkösestö ja tee vaiheen 1 lokimerkinnät vastuksista juuri tässä kysymysnumerojärjestyksessä. Laita otsikkoon kysymysluokka ja kysymyksen numero
+
+
+Ja tässä vielä yksi lokipyyntö:
+Laita vaiheen 1 kyllä" vastausten (eli numerot 4-6) määrä per luokka lokiin ja vaiheen kaksi kunkin muuttujan muuttujasummat 
+
+
+********
+Olen tekemässä lomakepohjaista kyselyä.  Kysymykset ovat cvs-tiedossa nimeltään "SeparateBlocksQuestions".
+kysymyksillä on luokka A1, B1, C1 tai D1 ja luokka on annettu ennen kysymystä samalla rivillä kuin itse kysymys. 
+
+Tee PHP-ohjelma jossa koodin testausta helpottavia piirteitä (kuten välitulostuksia ja selvennyksiä), jotka saan käyttöön antamalla jonkun käynnistysparametrin. 
+
+Ohjelma tekee seuraavaa:
+
+Ohjelma lukee kysymykset ja ensimmäisen vaiheessa osiossa kysyy ne käyttäjältä satunnaisessa järjestyksessä. Vastausvaihtoehto on joku numeroista 1-6 ja näytä kaikki numerovaihtoehdot vaakarivillä. Vastaus annetaan painamalla numeroa kuvaavaa painonappia. Laita selkeyden vuoksi pystyviiva painonappien 3 ja 4 väliin  niin, että 1-3 painonappien täyteväri on vaalean punainen ja 4-6 painonappien täyteväri on vaalean vihreä. Keskitä painonapit ruudulla.
+
+Älä näytä käyttäjälle kysymyksen luokkaa, mutta kysymyksen numeron voit näyttää ja teksti "Vaihe 1". Vastausvalinnan ohjeteksti on "valitse asteikolta mielipidettäsi tai asennettasi parhaiten kuvaava vaihtoehto. 1=täysin eri mieltä … 6=täysin samaa mieltä". 
+
+Vastaukset talletetaan niin, että lasketaan vastaajan pisteet kussakin luokassa, sillä se valinta ohjaa mihin jatkolomakkeeseen vastaaja ohjataan.  Pisteitä saa seuraavasti:
+Numero 1 antaa yhden pisteen, numero 2 antaa kaksi pistettä, numero 3 antaa kolme pistettä, numero 4 antaa neljä pistettä, numero 5 antaa 5 pistettä ja numero 6 antaa kuusi pistettä.
+
+Ennen kyselyn aloitusta kysy henkilöltä esitietoina hänen nimimerkkinsä ja sähköpostiosoite sekä kysymys "Mikä on sinun enneagrammi tyylisi?" ja anna vaihtoehdoksi numero 1-9 tai "en tiedä".  
+
+Kyselyn toisessa osassa on neljä vaihtoehtoa. Jos vastaaja on saanut eniten pisteitä luokassa A1, hänelle kerrotaan uudella puhtaalla sivulla, että "Enneagrammityylisi tämän testin perusteella vaikuttaisi olevan TYYLI 4".
+
+Jos vastaaja on saanut eniten pisteitä luokassa B1, häneltä kysytään uudet tilannekohtaiset case-tapaukset , jotka ovat InsideBlockQuestions CSV-tiedostossa ja alkavat merkinnällä B2 A-sarakkeessa. Yksi case-tapaus on esitetty kolmella rivillä CSV-tiedostossa. 
+
+Vastaavasti jos hän on saanut eniten pisteitä luokassa C1, kysytään case-tapaukset jotka alkavat C2-merkinnällä , ja jos hän on saanut eniten pisteitä luokassa D1, vastaavasti D2 casetapaukset. 
+
+Näihin toisen vaiheen kysymyksiin vastataan valitsemalla vaihtoehto 9-portaisesta asteikosta, jossa äärimmäinen vasenlaita antaa neljä pistettä X vaihtoehdolle ja keskipiste antaa nolla pistettä ja äärimmäinen oikea laita antaa neljä pistettä Y vaihtoehdolle.  Vaihtoehtojen ja lukusuoran yläpuolella on tekstikenttä, joka kuvaa tilannetta, johon on siis nuo kaksi vaihtoehtoa.
+
+B2, C2 ja D2 case-tapaukset ovat kuvattu kolmella rivillä InsideBlockQuestions-tiedostossa, 
+tässä esimerkki syntaksista: B2-rivillä on ensin tunnus B2 ja sitten tilannekuvaus tekstinä, seuraava rivi on B2a-<joku merkki> (esim B2a-7), ja tässä kuvataan vaihtoehto, joka on vasemman laidan vaihtoehto ja kolmas rivi on B2b-<joku merkki>, esim. B2b-3). C2 ja D2 on esitetty samalla tavalla.
+
+Esitä case-tapaus vastaajalle niin, että lukusuoran yläpuolella on tilannekuvaus, sitten on lukusuora, jossa on pystyviivat nolla-vaihtoehdon kummallakin puolella. Vasen vaihtoehtoa esitetään ruudun vasemmassa reunassa ilman tekstiä "vasen" ja muuttujan arvoa, vastaavasti tehdään oikeanpuolen vaihtoehdon esittämisessä. Käytä vaihtoehdoille samaa fonttia ja fonttikokoa kuin tilannekuvauksen esittämisessä. Älä jaa lukusuoran painonappeja usealla riville ellei ole aivan pakko. Tasaa vaihtoehdot niin, että vaihtoehtojen tekstit ovat oman puolen painonappien alla siis välillä 1-4. Laita ohjetekstiksi "Valitse kumman laidan vaihtoehto kuvaa sinua ja kuinka hyvin se kuvaa sinua (4=täysin samaa mieltä, 1=hiukan samaa mieltä, 0=kumpikaan ei kuvaa minua")
+
+Aloita vaihtoehtojen kuvaus lukusuoran alapuolelta. 
+
+Tee vielä selkeyden vuoksi niin, että vasemman puoleinen teksti on pyöreäkulmaisessa laatikossa (kuten painonapit),jonka täyteväri on vaalean keltainen ja käytä samaa väriä tämän vaihtoehtojen painonapeissa.
+
+Tee vastaavasti oikean puolen tekstille ja painonapeille, täyteväri vaalean sininen.
+
+Jos vaihtoehtojen tekstikuvaukset ovat pitkiä, eli menevät yli Yksi-painonapin, niin jaa teksti usealla riville.
+
+Tämän kakkosvaiheen otsikkona ona "Vaihe 2" ja sen perään ", tapaus X", jossa X on casekuvauksen numero.
+
+Toisen vaiheen vastausten perustella lasketaan myös pisteitä, mutta nyt on kolme muuttujaa, joille annetaan pisteitä. Muuttujan nimi on ilmoitettu vaihtoehdon tunnuskoodissa väliviivan jälkeen. Esimerkiksi tunnuskoodi B2a-7 tarkoittaa muuttujaa "7" (tekstimerkki ei numero) ja on esitetty vasemmassa laidassa. Vastaavasti tunnuskoodi B2b-8 tarkoittaa muuttujaa "8", joka on esitetty oikeassa laidassa.
+
+Muuttujan arvoa kasvatetaan vastaajan antaman vaihtoehdon itseisarvon verran.   Esimerkiksi, jos vastaaja valitsee lukusuoralta kohdan 3, kasvatetaan sitä muuttujaa kolmella, joka on valitun laidan (vasen tai oikea) muuttuja
+
+C2 ja D2 kysymykset on merkitty samalla syntaksilla ja niitä käsitellään vastaavasti.
+
+
+Kun käyttäjä on vastannut kaikkiin toisen vaiheen kysymyksiin. 
+
+Joka tapauksessa tulosta ruudulle otsikko "ENNEGRAMMITESTI-pilotti" ja sen alle  tieto "Itse valitsemasi enneagrammityyli" ja anna sen perään käyttäjän antama vastaus omasta enneagrammityylistänsä.
+
+Tulosta sen alla isolla fontilla teksti "Enneagrammityylisi tämän testin perusteella vaikuttaisi olevan TYYLI " ja perään muuttujan nimi.
+
+Anna tee myös painonappi, josta testin voi aloittaa uudestaan ilman, että esitietoja kysytään uudestaan. Tämä tulee ykkösvaiheen jälkeen, jos kakkosvaihetta ei tule. Jos tulee kakkosvaihe, niin silloin aloituspainonappiatulee vain kakkosvaiheen jälkeen.
+
+Jos ohjelma on testausmoodissa, niin ykkösvaiheesta  tulosta ruudulle lopuksi montako "kyllä" - vastausta on annettu kussakin luokassa ja paljonko pisteitä vastaaja sai kussakin luokassa. ja kakkosvaiheesta
+tulosta niiden muuttujien arvo, joka on suurempi kuin nolla.
+
+Lisäksi tee koodiin PHP-session kovatyhjennys ja selaimen välimuistin esto, jotta uusi PHP-sessio voi alkaa tyhjältä pöydältä. 
+
+Näytä käyttäjälle etenemispalkki kummassakin vaiheessa.
+
+Tässä vielä kuvaus lokitiedostoon kirjoitetavasta tiedosta
+1) Tee sarakkeiden otsikot
+2) Kirjaa taustatiedot, eli testin ajankohta (päivämäärä ja kellon aika), nimimerkki, vastaus kysymykseen "Mikä on sinun enneagrammi tyylisi? 
+3) Ykkösvaiheen tulokset seuraavasti: pisteet kussakin luokassa sekä mikä oli annettu vastaus kussakin kysymyksessä. Tässä viimeisessä riittää vain annettu numerovaihtoehto, siis tyyliin 1;2;4; jne
+4) kakkosvaiheen tulokset seuraavasti:  Kirjoita ensin "Tyyli ", sitten muuttuja sitten väliviiva ja lopuksi pisteet, esimerkiksi 7-4 tarkoittaa että muuttuja 7 sain neljä pistettä. Erottele vastaukset puolipisteellä. 
+
+
+

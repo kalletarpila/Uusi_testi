@@ -1,0 +1,2941 @@
+<?php declare(strict_types=1);
+
+/**
+ * ENNEAGRAMMITESTI-PILOTTI
+ * 
+ * Kaksivaiheinen ennegrammitest, joka määrittää käyttäjän persoonallisuustyypin
+ * laajan kysymyssarjan ja algoritmin avulla. Integroituu kutsujärjestelmään.
+ * 
+ * OMINAISUUDET:
+ * - Kaksivaiheinen testausjärjestelmä (vaihe 1: perustyyppien kartoitus, vaihe 2: tarkentava analyysi)
+ * - Tiebreak-kierrokset tasatilanteissa
+ * - CSV-pohjainen kysymystietokanta välimuistituksella
+ * - Kutsulinkkien integraatio invite.php:n kanssa
+ * - Kattava lokitus ja virheenkäsittely
+ * - Responsiivinen käyttöliittymä ripple-efekteillä
+ * - Turvallinen session-hallinta
+ * 
+ * ARKITEHTUURIPERIAATTEET:
+ * - Single responsibility principle: Jokainen funktio tekee yhden asian
+ * - DRY (Don't Repeat Yourself): Toisteisuus minimoitu HTML-generointifunktioilla
+ * - Error handling: Keskitetty virheenkäsittely try-catch-lohkoilla
+ * - Caching: CSV-data ladataan vain kerran session aikana
+ * - Security: Session-validointi, input-sanitointi, CSRF-suojaus
+ * 
+ * TIEDOSTORAKENNE:
+ * - /quiz1.csv: Vaiheen 1 kysymykset (A1, B1, C1, D1 kategoriat)
+ * - /quiz_phase2_*.csv: Vaiheen 2 kysymykset rateittain (B2, C2, D2)
+ * - /types.csv: Persoonallisuustyyppien kuvaukset
+ * - /logs/: Tulosloki CSV-muodossa
+ * 
+ * TEKIJÄ: Refaktoroitu GitHub Copilotin toimesta (2024)
+ * VERSIO: 2.0 (refaktoroitu)
+ * PHP: 8.0+
+ */
+
+/* ========= Perusasetukset ========= */
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+date_default_timezone_set('Europe/Helsinki');
+
+/* Sessioevästeet kovennettuina */
+session_set_cookie_params([
+  'lifetime' => 0,
+  'path'     => '/',
+  'secure'   => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+  'httponly' => true,
+  'samesite' => 'Lax',
+]);
+// Session aloitetaan session_initialize() funktiossa myöhemmin
+
+/* Välimuistin esto */
+header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+header('Pragma: no-cache');
+header('Expires: 0');
+
+/* Kovennusotsikot */
+$nonce = base64_encode(random_bytes(16));
+header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'nonce-$nonce'; frame-src 'self' https://www.youtube.com; base-uri 'self'; form-action 'self'; frame-ancestors 'none';");
+header('X-Frame-Options: DENY');
+header('X-Content-Type-Options: nosniff');
+header('Referrer-Policy: no-referrer');
+header('Permissions-Policy: geolocation=(), camera=(), microphone=()');
+
+/* ========= Konfiguraatio ========= */
+const PHASE1_FILE_BASE   = 'SeparateBlocksQuestions';
+const PHASE2_FILE_BASE   = 'InsideBlockQuestions';
+const TYPEDESC_FILE_BASE = 'TypeDescriptions'; // tyyppikuvaukset
+
+const YES_MIN     = 4;
+const YES_MAX     = 6;
+
+const Q1_MAX      = 40;
+const TB_MAX      = 40;
+const VARPAIR_MAX = 40;
+const TB2_MAX     = 40;
+
+const INVITES_ENABLED = true;
+
+/* Palautteen lähetys */
+const FEEDBACK_TO  = 'eg-testi.palaute@enneagrammitesti.fi';
+const FROM_NAME    = 'Enneagrammitesti';
+const FROM_EMAIL   = 'no-reply@enneagrammitesti.fi';
+
+/* ====== TIEDOSTOPOLUT JA LOKITUS ====== */
+
+/**
+ * Hakee tai luo data-hakemiston polun
+ * Yrittää ensin hakemistoa ylätasolta, sitten nykyisestä hakemistosta
+ * 
+ * @return string Absoluuttinen polku data-hakemistoon
+ */
+function data_dir(): string {
+    $pref = realpath(__DIR__ . '/../') !== false ? (__DIR__ . '/../data') : (__DIR__ . '/data');
+    if (!is_dir($pref)) @mkdir($pref, 0700, true);
+    return $pref;
+}
+
+/**
+ * Hakee sovelluksen lokitiedoston polun kuukauden mukaan
+ * 
+ * @return string Lokitiedoston polku muodossa '/data/index_app_YYYY-MM.log'
+ */
+function index_app_log_path(): string { 
+    return data_dir() . '/index_app_' . date('Y-m') . '.log'; 
+}
+
+/**
+ * Kirjoittaa lokiviestin sovelluksen lokitiedostoon IP-osoitteella ja aikaleimalla
+ * 
+ * @param string $msg Lokitettava viesti
+ * @return void
+ */
+function index_log(string $msg): void {
+    $ts = (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    @file_put_contents(index_app_log_path(), '['.$ts.']['.$ip.'] '.$msg.PHP_EOL, FILE_APPEND | LOCK_EX);
+}
+
+/* ====== SÄHKÖPOSTIFUNKTIOT ====== */
+
+/**
+ * Lähettää sähköpostiviestin käyttäen PHP:n mail()-funktiota
+ * Enkoodaa aihekenttä UTF-8 BASE64-muodossa Unicode-yhteensopivuuteen
+ * 
+ * @param string $to Vastaanottajan sähköpostiosoite
+ * @param string $subject Viestin aihe (enkoodataan automaattisesti UTF-8)
+ * @param string $body Viestin sisältö (plain text)
+ * @return bool True jos lähetys onnistui, false muuten
+ */
+function send_mail(string $to, string $subject, string $body): bool {
+    $headers = [];
+    $headers[] = 'From: '.FROM_NAME.' <'.FROM_EMAIL.'>';
+    $headers[] = 'Reply-To: '.FROM_EMAIL;
+    $headers[] = 'MIME-Version: 1.0';
+    $headers[] = 'Content-Type: text/plain; charset=UTF-8';
+    $headers_str = implode("\r\n", $headers);
+    $subjectEnc = '=?UTF-8?B?'.base64_encode($subject).'?=';
+    return @mail($to, $subjectEnc, $body, $headers_str);
+}
+
+/* ====== KUTSUJÄRJESTELMÄN INTEGRAATIO ====== */
+
+/**
+ * Hakee kutsujen JSON-tiedoston polun
+ * 
+ * @return string Absoluuttinen polku invites.json tiedostoon
+ */
+function invites_path(): string {
+    return data_dir() . '/invites.json';
+}
+
+/**
+ * Lataa kutsut JSON-tiedostosta tiedostolukolla
+ * 
+ * @return array Lista kutsuista tai tyhjä array jos tiedosto puuttuu tai on virheellinen
+ */
+function invites_load(): array {
+    $p = invites_path();
+    if (!file_exists($p) || filesize($p) === 0) return [];
+    $fp = fopen($p, 'r');
+    if (!$fp) return [];
+    flock($fp, LOCK_SH);
+    $json = stream_get_contents($fp);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+    $data = json_decode($json, true);
+    return is_array($data) ? $data : [];
+}
+
+/**
+ * Tallentaa kutsulistan JSON-tiedostoon tiedostolukolla
+ * 
+ * @param array $items Lista kutsuista tallennettavaksi
+ * @return bool True jos tallennus onnistui, false muuten
+ */
+function invites_save(array $items): bool {
+    $p = invites_path();
+    $fp = fopen($p, 'c+');
+    if (!$fp) return false;
+    flock($fp, LOCK_EX);
+    ftruncate($fp, 0);
+    rewind($fp);
+    $ok = fwrite($fp, json_encode($items, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT)) !== false;
+    fflush($fp);
+    flock($fp, LOCK_UN);
+    fclose($fp);
+    return $ok;
+}
+
+/**
+ * Etsii kutsun token-merkkijonon perusteella
+ * 
+ * @param array $items Lista kutsuista
+ * @param string $token Etsittävä token
+ * @return array|null Kutsu tai null jos ei löydy
+ */
+function invite_find_by_token(array $items, string $token): ?array {
+    foreach ($items as $it) if (($it['token'] ?? null) === $token) return $it;
+    return null;
+}
+
+/**
+ * Etsii kutsun koodin perusteella (case-insensitive)
+ * 
+ * @param array $items Lista kutsuista
+ * @param string $code Etsittävä koodi
+ * @return array|null Kutsu tai null jos ei löydy
+ */
+function invite_find_by_code(array $items, string $code): ?array {
+    $code = strtoupper($code);
+    foreach ($items as $it) if (strtoupper($it['code'] ?? '') === $code) return $it;
+    return null;
+}
+
+/**
+ * Päivittää kutsun statuksen ID:n perusteella
+ * 
+ * @param string $id Kutsun tunniste
+ * @param string $status Uusi status (esim. 'sent', 'accepted', 'completed')
+ * @return void
+ */
+function invite_update_status(string $id, string $status): void {
+    $items = invites_load();
+    $ch = false;
+    foreach ($items as &$it) {
+        if (($it['id'] ?? '') === $id) {
+            $it['status'] = $status;
+            if ($status === 'accepted') $it['accepted_at']  = (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
+            if ($status === 'completed') $it['completed_at'] = (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
+            $ch = true;
+            break;
+        }
+    }
+    unset($it);
+    if ($ch) invites_save($items);
+}
+
+/* ====== LOKITIEDOSTOJEN HALLINTA ====== */
+
+/**
+ * Hakee tuloslokin CSV-tiedoston polun
+ * 
+ * @return string Polku kuukausittaiseen tuloslokiin muodossa '/data/survey_log_YYYY-MM.csv'
+ */
+function log_path(): string {
+    return data_dir() . '/survey_log_' . date('Y-m') . '.csv';
+}
+
+/* ====== TESTIMOODI JA KONFIGURAATIO ====== */
+
+// Testimoodi: näyttää lisätietoja kehittäjälle
+if (isset($_GET['test'])) {
+    $_SESSION['test_mode'] = ($_GET['test'] === '1');
+}
+$TEST_MODE = !empty($_SESSION['test_mode']);
+$SHOW_TEST_TOGGLE = isset($_GET['showtestmode']); // näytä kytkin vain jos parametri
+
+/**
+ * Performs a complete session reset while preserving specific test parameters
+ * 
+ * This function clears all session data and cookies while preserving the 'test'
+ * and 'showtestmode' GET parameters for development and testing purposes.
+ * 
+ * @return void
+ */
+function hard_reset(): void {
+    error_log("HARD_RESET: Function called");
+    echo '<p>HARD_RESET: Starting...</p>';
+    flush();
+    
+    $keep = [];
+    if (isset($_GET['test'])) $keep['test'] = $_GET['test'];
+    if (isset($_GET['showtestmode'])) $keep['showtestmode'] = $_GET['showtestmode'];
+    
+    error_log("HARD_RESET: Session status = " . session_status());
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        error_log("HARD_RESET: Destroying active session");
+        $_SESSION = [];
+        if (ini_get('session.use_cookies')) {
+            $p = session_get_cookie_params();
+            setcookie(session_name(), '', time()-42000, $p['path'], $p['domain'] ?? '', $p['secure'] ?? false, $p['httponly'] ?? true);
+        }
+        session_destroy();
+        error_log("HARD_RESET: Session destroyed");
+    }
+    
+    $base = strtok($_SERVER['REQUEST_URI'], '?');
+    $qs   = $keep ? ('?' . http_build_query($keep)) : '';
+    $redirectUrl = $base . $qs;
+    
+    error_log("HARD_RESET: Preparing redirect to: " . $redirectUrl);
+    error_log("HARD_RESET: Headers sent status: " . (headers_sent() ? 'YES' : 'NO'));
+    
+    echo '<p>HARD_RESET: Redirecting to: ' . htmlspecialchars($redirectUrl) . '</p>';
+    echo '<p>Headers sent: ' . (headers_sent() ? 'YES' : 'NO') . '</p>';
+    flush();
+    
+    // Kokeillaan ensin HTTP header
+    if (!headers_sent()) {
+        error_log("HARD_RESET: Sending HTTP header redirect");
+        header('Location: ' . $redirectUrl);
+        echo '<p>HARD_RESET: HTTP header redirect sent</p>';
+    } else {
+        // Jos header ei onnistu, käytetään JavaScript redirect
+        error_log("HARD_RESET: Headers already sent, using JavaScript redirect");
+        echo '<p>HARD_RESET: Headers already sent, using JavaScript redirect</p>';
+        echo '<script>
+        console.log("JavaScript redirect to: ' . $redirectUrl . '");
+        setTimeout(function() {
+            window.location.href = ' . json_encode($redirectUrl) . ';
+        }, 2000);
+        </script>';
+        echo '<noscript><meta http-equiv="refresh" content="3;url=' . htmlspecialchars($redirectUrl) . '"></noscript>';
+        echo '<p>Redirecting in 2 seconds... <a href="' . htmlspecialchars($redirectUrl) . '">Click here if not redirected</a></p>';
+    }
+    
+    error_log("HARD_RESET: About to call exit()");
+    exit;
+}
+
+/* Aputyökalut */
+
+/**
+ * HTML escape function for secure output rendering
+ * 
+ * Safely escapes HTML special characters to prevent XSS attacks.
+ * Converts input to string and applies comprehensive HTML entity encoding.
+ * 
+ * @param mixed $s The value to escape (will be converted to string)
+ * @return string Safely escaped HTML string
+ */
+function h($s): string { return htmlspecialchars((string)$s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); }
+
+/**
+ * Resolves CSV file path with multiple extension support
+ * 
+ * Attempts to locate a CSV file by checking multiple possible extensions
+ * in order: exact path, .csv extension, .cvc extension.
+ * 
+ * @param string $base Base file path without extension
+ * @return string Full path to existing CSV file or empty string if not found
+ */
+function csv_path(string $base): string {
+    if (file_exists($base)) return $base;
+    if (file_exists($base . '.csv')) return $base . '.csv';
+    if (file_exists($base . '.cvc')) return $base . '.cvc';
+    return '';
+}
+
+/**
+ * Universal CSV reader with robust parsing and error handling
+ * 
+ * Reads CSV files with flexible delimiter support (semicolon or comma),
+ * automatic BOM removal, comment line filtering (lines starting with "/*"),
+ * and comprehensive error handling with fallback to empty array.
+ * 
+ * @param string $base Base file path to CSV file (resolved via csv_path())
+ * @return array<array{string, string}> Array of [tag, text] pairs from CSV rows
+ */
+function read_tag_text_rows(string $base): array {
+    try {
+        $path = csv_path($base);
+        if ($path === '') { 
+            handle_error('CSV_LOAD', "CSV not found: $base", null, false);
+            return []; 
+        }
+        
+        // Käytä file locking:ia myös lukemisessa varmuuden vuoksi
+        $fp = @fopen($path, 'r');
+        if ($fp === false) { 
+            handle_error('CSV_LOAD', "CSV open fail: $path", null, false);
+            return []; 
+        }
+        
+        flock($fp, LOCK_SH); // Shared lock lukemiseen
+        $content = stream_get_contents($fp);
+        flock($fp, LOCK_UN);
+        fclose($fp);
+        
+        if ($content === false) {
+            handle_error('CSV_LOAD', "CSV read fail: $path", null, false);
+            return [];
+        }
+        
+        $lines = explode("\n", str_replace(["\r\n", "\r"], "\n", $content));
+        $lines = array_filter($lines, function($line) { return trim($line) !== ''; });
+        
+        $rows = [];
+        foreach ($lines as $i => $line) {
+            if ($i === 0) $line = preg_replace('/^\xEF\xBB\xBF/', '', $line); // BOM
+            $trim = ltrim($line);
+            if ($trim === '' || strpos($trim, '/*') === 0) continue; // kommenttirivi
+            $parts = str_getcsv($line, ';', '"', '\\');
+            if (count($parts) < 2) $parts = str_getcsv($line, ',', '"', '\\');
+            if (count($parts) < 2) continue;
+            $tag  = trim((string)$parts[0]);
+            $text = trim(implode(' ', array_slice($parts, 1)));
+            if ($tag === '' || $text === '') continue;
+            $rows[] = [$tag, $text];
+        }
+        index_log("CSV loaded: $base rows=" . count($rows));
+        return $rows;
+        
+    } catch (Exception $e) {
+        handle_error('CSV_LOAD', "Exception in read_tag_text_rows for base: $base", $e, false);
+        return [];
+    }
+}
+
+/* ========= Datan luku ========= */
+
+/**
+ * Loads phase 1 questions from CSV data for enneagram test
+ * 
+ * Parses CSV rows to extract questions matching pattern [A-D]1 for the initial
+ * personality assessment phase. Assigns sequential IDs and normalizes class names.
+ * 
+ * @param string $base Base file path to CSV file containing questions
+ * @return array<array{class: string, text: string, id: int}> Phase 1 questions with metadata
+ */
+function load_phase1_questions(string $base): array {
+    $rows = read_tag_text_rows($base);
+    $out = []; $id = 1;
+    foreach ($rows as $csv_row => [$tag, $text]) {
+        if (!preg_match('/^([ABCD])1$/i', $tag, $m)) continue;
+        // Extract question number from column 2 (assuming format like "156 Question text")
+        $question_number = 'unknown';
+        $clean_text = $text;
+        if (preg_match('/^(\d+)\s+(.+)/', $text, $matches)) {
+            $question_number = $matches[1];
+            $clean_text = $matches[2]; // Remove number from display text
+        }
+        $out[] = ['class' => strtoupper($m[1].'1'), 'text' => $clean_text, 'id' => $id++, 'question_number' => $question_number];
+    }
+    return $out;
+}
+
+/**
+ * Loads tiebreaker questions for phase 1 result resolution
+ * 
+ * Organizes CSV data into tiebreaker categories (A11, B11, C11, D11) for
+ * resolving tied scores in the initial enneagram assessment phase.
+ * 
+ * @param string $base Base file path to CSV file containing tiebreaker questions
+ * @return array<string, array<string>> Tiebreaker questions grouped by category
+ */
+function load_tiebreak_questions(string $base): array {
+    $rows = read_tag_text_rows($base);
+    $tb = ['A11'=>[], 'B11'=>[], 'C11'=>[], 'D11'=>[]];
+    foreach ($rows as $csv_row => [$tag, $text]) {
+        $u = strtoupper($tag);
+        if (isset($tb[$u])) {
+            // Extract question number from column 2 start (same as Phase 1)
+            $question_number = 'unknown';
+            $clean_text = $text;
+            if (preg_match('/^(\d+)\s+(.+)/', $text, $matches)) {
+                $question_number = $matches[1];
+                $clean_text = $matches[2]; // Remove number from display text
+            }
+            $tb[$u][] = ['class' => substr($u, 0, 2), 'text' => $clean_text, 'question_number' => $question_number];
+        }
+    }
+    // Shuffle kysymykset jokaisessa luokassa
+    foreach ($tb as $key => $questions) {
+        shuffle($tb[$key]);
+    }
+    return $tb;
+}
+
+/**
+ * Loads phase 2 question blocks for detailed enneagram assessment
+ * 
+ * Parses CSV data into structured blocks for phase 2 testing, supporting
+ * both simple blocks (B2, C2, D2) and comparison blocks with 'vs' syntax
+ * for detailed personality differentiation.
+ * 
+ * @param string $base Base file path to CSV file containing phase 2 blocks
+ * @return array<string, array<array{title: string, questions: array<string>}>> Phase 2 question blocks by category
+ */
+function load_phase2_blocks(string $base): array {
+    $rows = read_tag_text_rows($base);
+    $cases = ['B2'=>[], 'C2'=>[], 'D2'=>[]];
+    $n = count($rows);
+    for ($i=0; $i<$n; $i++) {
+        [$tag, $desc] = $rows[$i];
+        if (preg_match('/^([BCD])2(?:-([A-Za-z0-9]+)vs([A-Za-z0-9]+))?$/i', $tag, $m)) {
+            $letter = strtoupper($m[1]);
+            $pairL = $m[2] ?? null; $pairR = $m[3] ?? null;
+            if (!isset($rows[$i+1], $rows[$i+2])) continue;
+            [$tag2, $leftText]  = $rows[$i+1];
+            [$tag3, $rightText] = $rows[$i+2];
+            if (!preg_match('/^'.$letter.'2a-([A-Za-z0-9_\-]+)$/i', $tag2, $mA)) continue;
+            if (!preg_match('/^'.$letter.'2b-([A-Za-z0-9_\-]+)$/i', $tag3, $mB)) continue;
+            $leftVar  = (string)$mA[1];
+            $rightVar = (string)$mB[1];
+            if ($pairL === null || $pairR === null) { $pairL = $leftVar; $pairR = $rightVar; }
+            
+            // Extract question number from desc (column 2)
+            $question_number = 'unknown';
+            $clean_desc = $desc;
+            if (preg_match('/^(\d+)\s+(.+)/', $desc, $matches)) {
+                $question_number = $matches[1];
+                $clean_desc = $matches[2]; // Remove number from display text
+            }
+            
+            // Clean numbers from left and right texts too
+            $clean_leftText = $leftText;
+            $clean_rightText = $rightText;
+            if (preg_match('/^(\d+)\s*(.*)/', $leftText, $matches) && !empty($matches[2])) {
+                $clean_leftText = $matches[2];
+            }
+            if (preg_match('/^(\d+)\s*(.*)/', $rightText, $matches) && !empty($matches[2])) {
+                $clean_rightText = $matches[2];
+            }
+            
+            $cases[$letter.'2'][] = [
+                'desc'       => $clean_desc,
+                'left_text'  => $clean_leftText,
+                'left_var'   => $leftVar,
+                'right_text' => $clean_rightText,
+                'right_var'  => $rightVar,
+                'pair'       => [$pairL, $pairR],
+                'question_number' => $question_number,
+            ];
+            $i += 2;
+        }
+    }
+    return $cases;
+}
+
+/**
+ * Loads phase 2 tiebreaker questions for detailed result resolution
+ * 
+ * Organizes CSV data into tiebreaker groups (TB2, TC2, TD2) with support
+ * for both simple and 'vs' comparison formats for resolving phase 2 ties.
+ * 
+ * @param string $base Base file path to CSV file containing phase 2 tiebreakers
+ * @return array<string, array<array{title: string, left: string, right: string, pair?: array{string, string}}>> Phase 2 tiebreaker groups
+ */
+function load_phase2_tiebreak_all(string $base): array {
+    $rows = read_tag_text_rows($base);
+    $out = ['TB2'=>[], 'TC2'=>[], 'TD2'=>[]];
+    $n = count($rows);
+    for ($i=0; $i<$n; $i++) {
+        [$tag, $desc] = $rows[$i];
+        if (preg_match('/^T([BCD])2(?:-([A-Za-z0-9]+)vs([A-Za-z0-9]+))?$/i', $tag, $m)) {
+            $letter = strtoupper($m[1]);
+            $pairL = $m[2] ?? null; $pairR = $m[3] ?? null;
+            $group = 'T'.$letter.'2';
+            if (!isset($rows[$i+1], $rows[$i+2])) continue;
+            [$tag2, $leftText]  = $rows[$i+1];
+            [$tag3, $rightText] = $rows[$i+2];
+            if (!preg_match('/^T'.$letter.'2a-([A-Za-z0-9_\-]+)$/i', $tag2, $mA)) continue;
+            if (!preg_match('/^T'.$letter.'2b-([A-Za-z0-9_\-]+)$/i', $tag3, $mB)) continue;
+            $leftVar  = (string)$mA[1];
+            $rightVar = (string)$mB[1];
+            if ($pairL === null || $pairR === null) { $pairL = $leftVar; $pairR = $rightVar; }
+            // Extract question number from description (column 2 start)
+            $question_number = 'unknown';
+            $clean_desc = $desc;
+            if (preg_match('/^(\d+)\s+(.+)/', $desc, $matches)) {
+                $question_number = $matches[1];
+                $clean_desc = $matches[2]; // Remove number from display text
+            }
+            
+            // Clean numbers from left and right texts too
+            $clean_leftText = $leftText;
+            $clean_rightText = $rightText;
+            if (preg_match('/^(\d+)\s*(.*)/', $leftText, $matches) && !empty($matches[2])) {
+                $clean_leftText = $matches[2];
+            }
+            if (preg_match('/^(\d+)\s*(.*)/', $rightText, $matches) && !empty($matches[2])) {
+                $clean_rightText = $matches[2];
+            }
+            
+            $out[$group][] = [
+                'desc'       => $clean_desc,
+                'left_text'  => $clean_leftText,
+                'left_var'   => $leftVar,
+                'right_text' => $clean_rightText,
+                'right_var'  => $rightVar,
+                'pair'       => [$pairL, $pairR],
+                'question_number' => $question_number,
+            ];
+            $i += 2;
+        }
+    }
+    return $out;
+}
+
+/**
+ * Loads enneagram type descriptions for result presentation
+ * 
+ * Creates a mapping of type identifiers to their descriptive text
+ * for displaying detailed personality type information to users.
+ * 
+ * @param string $base Base file path to CSV file containing type descriptions
+ * @return array<string, string> Type identifier to description mapping
+ */
+function load_type_descriptions(string $base): array {
+    $rows = read_tag_text_rows($base);
+    $map = [];
+    foreach ($rows as [$tag, $text]) {
+        $key = trim((string)$tag);
+        if ($key === '') continue;
+        $map[$key] = $text;
+    }
+    return $map;
+}
+
+/* ====== CSV-DATAN VÄLIMUISTITUS ====== */
+
+/**
+ * Loads and caches all required quiz data into session for performance
+ * 
+ * Preloads phase 1 questions, tiebreakers, phase 2 blocks, and type descriptions
+ * into session cache to avoid repeated file I/O during quiz execution.
+ * 
+ * @return void
+ */
+function load_and_cache_quiz_data(): void {
+    // Lataa vain jos ei ole vielä välimuistissa
+    if (!isset($_SESSION['cached_quiz_data'])) {
+        $_SESSION['cached_quiz_data'] = [
+            'phase1_questions' => load_phase1_questions(PHASE1_FILE_BASE),
+            'tiebreak_questions' => load_tiebreak_questions(PHASE1_FILE_BASE),
+            'phase2_blocks' => load_phase2_blocks(PHASE2_FILE_BASE),
+            'phase2_tiebreaks' => load_phase2_tiebreak_all(PHASE2_FILE_BASE),
+            'type_descriptions' => load_type_descriptions(TYPEDESC_FILE_BASE),
+            'loaded_at' => time()
+        ];
+        index_log('CSV_CACHE: All quiz data loaded and cached');
+    }
+}
+
+/**
+ * Retrieves cached phase 1 questions from session
+ * 
+ * Returns preloaded phase 1 questions for the enneagram test, ensuring
+ * data is cached before access for optimal performance.
+ * 
+ * @return array<array{class: string, text: string, id: int}> Cached phase 1 questions
+ */
+function get_cached_phase1_questions(): array {
+    load_and_cache_quiz_data();
+    return $_SESSION['cached_quiz_data']['phase1_questions'] ?? [];
+}
+
+/**
+ * Retrieves cached tiebreaker questions from session
+ * 
+ * Returns preloaded tiebreaker questions organized by category for
+ * resolving phase 1 scoring ties.
+ * 
+ * @return array<string, array<string>> Cached tiebreaker questions grouped by type
+ */
+function get_cached_tiebreak_questions(): array {
+    load_and_cache_quiz_data();
+    return $_SESSION['cached_quiz_data']['tiebreak_questions'] ?? [];
+}
+
+/**
+ * Hakee välimuistitetut phase2 kysymyslohkot
+ * 
+ * @return array Phase2 kysymyslohkot rateittain
+ */
+function get_cached_phase2_blocks(): array {
+    load_and_cache_quiz_data();
+    return $_SESSION['cached_quiz_data']['phase2_blocks'] ?? [];
+}
+
+/**
+ * Hakee välimuistitetut phase2 tiebreak kysymykset
+ * 
+ * @return array Phase2 tiebreak kysymykset
+ */
+function get_cached_phase2_tiebreaks(): array {
+    load_and_cache_quiz_data();
+    return $_SESSION['cached_quiz_data']['phase2_tiebreaks'] ?? [];
+}
+
+/**
+ * Hakee välimuistitetut tyyppi-kuvaukset
+ * 
+ * @return array Tyyppi-kuvaukset avain-arvo pareina
+ */
+function get_cached_type_descriptions(): array {
+    load_and_cache_quiz_data();
+    return $_SESSION['cached_quiz_data']['type_descriptions'] ?? [];
+}
+
+/**
+ * Tyhjentää CSV-datan välimuistin (esim. debuggausta varten)
+ * 
+ * @return void
+ */
+function clear_quiz_data_cache(): void {
+    unset($_SESSION['cached_quiz_data']);
+    index_log('CSV_CACHE: Cache cleared');
+}
+
+/* ====== HTML-GENEROINTIFUNKTIOT ====== */
+
+/**
+ * Generoi progress bar -HTML:n
+ * 
+ * @param int $current Nykyinen sijainti
+ * @param int $total Kokonaismäärä
+ * @param string $label Aria-label teksti
+ * @return string Progress bar HTML
+ */
+function generate_progress_bar(int $current, int $total, string $label = 'Eteneminen'): string {
+    $percentage = $total > 0 ? round(($current / $total) * 100) : 0;
+    return '<div class="progress" aria-label="' . htmlspecialchars($label) . '" title="' . $percentage . '%">' .
+           '<div class="progress-bar" style="width:' . $percentage . '%"></div>' .
+           '</div>';
+}
+
+/**
+ * Generoi valintanapin phase1 ja tiebreak kysymyksille
+ * 
+ * @param int $value Napin arvo (1-6)
+ * @param string $side Puoli ('left' tai 'right')
+ * @param string $type Tyyppi ('choice' tai 'tb-choice')
+ * @return string Nappi HTML
+ */
+function generate_phase1_button(int $value, string $side, string $type = 'choice'): string {
+    $cssClass = 'btn btn-p1-' . $side . ' ' . $type . '-btn ripple';
+    $dataAttr = $type === 'tb-choice' ? 'data-choice' : 'data-choice';
+    
+    return '<button class="' . $cssClass . '" type="submit" ' .
+           'aria-label="Valinta ' . $value . '" ' .
+           $dataAttr . '="' . $value . '">' . $value . '</button>';
+}
+
+/**
+ * Generoi valintanapin phase2 kysymyksille
+ * 
+ * @param int $value Napin arvo (-2, -1, 0, 1, 2)
+ * @param string $side Puoli ('left', 'right' tai 'zero')
+ * @param string $text Napin teksti
+ * @param bool $isRipple Käytetäänkö ripple-efektiä
+ * @return string Nappi HTML
+ */
+function generate_phase2_button(int $value, string $side, string $text, bool $isRipple = true): string {
+    $cssClass = 'btn btn-' . $side;
+    if ($isRipple && $side !== 'zero') {
+        $cssClass .= ' choice2-btn ripple';
+    }
+
+    return '<button class="' . $cssClass . '" type="submit" ' .
+           'aria-label="Valinta ' . $value . '" ' .
+           'data-choice2="' . $value . '">' . htmlspecialchars($text) . '</button>';
+}
+
+/**
+ * Generoi phase2 formin side+value järjestelmällä
+ */
+function generate_phase2_form(int $value, string $side, string $text, string $formType = 'choice2', bool $isRipple = true, string $customClass = ''): string {
+    $cssClass = 'btn';
+    if ($customClass !== '') {
+        $cssClass .= ' ' . $customClass;
+    } elseif ($side === 'neutral') {
+        $cssClass .= ' btn-zero';
+    } else {
+        // Erilliset CSS-luokat vahvuuden mukaan
+        if ($value === 2) {
+            $cssClass .= ' btn-' . $side . '-strong'; // Selvästi samaa mieltä
+        } else {
+            $cssClass .= ' btn-' . $side . '-mild';   // Lievästi samaa mieltä
+        }
+    }
+    
+    if ($isRipple && $side !== 'zero' && $side !== 'neutral') {
+        $cssClass .= ' choice2-btn ripple';
+    }
+    
+    $valueField = $formType . '_value';
+    $sideField = $formType . '_side';
+    $formClass = $formType . '-form';
+    $formStyle = ($side === 'neutral') ? 'width:100%;' : 'display:inline-block';
+    
+    return '<form method="post" style="' . $formStyle . '" class="' . $formClass . '">' .
+           '<input type="hidden" name="' . $valueField . '" value="' . $value . '">' .
+           '<input type="hidden" name="' . $sideField . '" value="' . $side . '">' .
+           '<button class="' . $cssClass . '" type="submit" aria-label="Valinta ' . $value . '">' . 
+           htmlspecialchars($text) . '</button></form>';
+}/**
+ * Generoi kortti-divven sisällölle
+ * 
+ * @param string $content Kortin sisältö HTML:nä
+ * @param string $additionalClasses Lisäluokat
+ * @return string Kortti HTML
+ */
+function generate_card(string $content, string $additionalClasses = ''): string {
+    $class = 'card' . ($additionalClasses ? ' ' . $additionalClasses : '');
+    return '<div class="' . $class . '">' . $content . '</div>';
+}
+
+/**
+ * Generoi yksinkertaisen submit-napin
+ * 
+ * @param string $name Napin name-attribuutti
+ * @param string $value Napin value-attribuutti
+ * @param string $text Napin teksti
+ * @param string $cssClass CSS-luokka (oletus: 'btn')
+ * @return string Nappi HTML
+ */
+function generate_submit_button(string $name, string $value, string $text, string $cssClass = 'btn'): string {
+    return '<button class="' . $cssClass . '" type="submit" ' .
+           'name="' . htmlspecialchars($name) . '" ' .
+           'value="' . htmlspecialchars($value) . '">' . 
+           htmlspecialchars($text) . '</button>';
+}
+
+/**
+ * Generoi phase2 valintanapit yhdessä ryhmässä
+ * 
+ * @param bool $withRipple Käytetäänkö ripple-efektiä
+ * @return array Assosiaatioarray napeista: ['left_strong' => '...', 'left_mild' => '...', jne]
+ */
+function generate_phase2_button_group(bool $withRipple = true): array {
+    return [
+        'left_mild' => generate_phase2_form(1, 'left', 'Lievästi samaa mieltä', 'choice2', $withRipple),
+        'left_strong' => generate_phase2_form(2, 'left', 'Selvästi samaa mieltä', 'choice2', $withRipple),
+        'neutral' => generate_phase2_form(0, 'neutral', 'EOS', 'choice2', false, 'btn-eos'),
+        'right_mild' => generate_phase2_form(1, 'right', 'Lievästi samaa mieltä', 'choice2', $withRipple),
+        'right_strong' => generate_phase2_form(2, 'right', 'Selvästi samaa mieltä', 'choice2', $withRipple)
+    ];
+}
+
+/**
+ * Generoi phase2 tiebreak button groupin
+ */
+function generate_phase2_tiebreak_button_group(): array {
+    return [
+        'left_mild' => generate_phase2_form(1, 'left', 'Lievästi samaa mieltä', 'tb2', true),
+        'left_strong' => generate_phase2_form(2, 'left', 'Selvästi samaa mieltä', 'tb2', true),
+        'neutral' => generate_phase2_form(0, 'neutral', 'EOS', 'tb2', false, 'btn-eos'),
+        'right_mild' => generate_phase2_form(1, 'right', 'Lievästi samaa mieltä', 'tb2', true),
+        'right_strong' => generate_phase2_form(2, 'right', 'Selvästi samaa mieltä', 'tb2', true)
+    ];
+}
+
+/* ====== SESSION-HALLINTA ====== */
+
+/**
+ * Alustaa session-muuttujat turvallisesti
+ * 
+ * @return void
+ */
+function session_initialize(): void {
+    try {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        
+        // Alusta perustilat jos puuttuu
+        if (!isset($_SESSION['state'])) {
+            $_SESSION['state'] = 'intro';
+        }
+        
+        // Validoi tila
+        session_validate_state();
+        
+        // Alusta log_row jos puuttuu
+        if (!isset($_SESSION['log_row'])) {
+            $_SESSION['log_row'] = [
+                'date' => date('Y-m-d'),
+                'time' => date('H:i:s'),
+                'nick' => '',
+                'kutsuttu' => 'Ei',
+                'ennea' => '',
+                'confidence' => ''
+            ];
+        }
+        
+        index_log('SESSION: Initialized (state=' . $_SESSION['state'] . ', session_id=' . session_id() . ')');
+        
+    } catch (Exception $e) {
+        handle_error('SESSION', 'Failed to initialize session', $e);
+        // Pakota uudelleenaloitus
+        session_regenerate_id(true);
+        $_SESSION = [];
+        $_SESSION['state'] = 'intro';
+    }
+}
+
+/**
+ * Validoi session-tilan ja korjaa jos virheellinen
+ * 
+ * @return void
+ */
+function session_validate_state(): void {
+    $validStates = ['intro', 'quiz1', 'tiebreak', 'a1_result', 'phase2', 'phase2_tb', 'done2'];
+    $currentState = $_SESSION['state'] ?? 'intro';
+    
+    if (!in_array($currentState, $validStates, true)) {
+        index_log('STATE: Invalid state "' . $currentState . '" reset to intro');
+        $_SESSION['state'] = 'intro';
+    }
+}
+
+/**
+ * Puhdistaa session-tiedot testin päättyessä
+ * 
+ * @param bool $keepResults Säilytetäänkö tulokset (default: true)
+ * @return void
+ */
+function session_cleanup(bool $keepResults = true): void {
+    try {
+        $preserveKeys = ['state', 'error_messages'];
+        
+        if ($keepResults) {
+            $preserveKeys = array_merge($preserveKeys, [
+                'log_row', 'topClass', 'RefGuessType', 'RefGuessProb', 'InviteId'
+            ]);
+        }
+        
+        $preservedData = [];
+        foreach ($preserveKeys as $key) {
+            if (isset($_SESSION[$key])) {
+                $preservedData[$key] = $_SESSION[$key];
+            }
+        }
+        
+        // Tyhjennä session
+        $_SESSION = [];
+        
+        // Palauta säilytettävät tiedot
+        foreach ($preservedData as $key => $value) {
+            $_SESSION[$key] = $value;
+        }
+        
+        index_log('SESSION: Cleaned up (preserved: ' . implode(', ', array_keys($preservedData)) . ')');
+        
+    } catch (Exception $e) {
+        handle_error('SESSION', 'Failed to cleanup session', $e);
+    }
+}
+
+/**
+ * Turvallinen session-avaimen asetus validoinnilla
+ * 
+ * @param string $key Session-avain
+ * @param mixed $value Asetettava arvo
+ * @param array $allowedKeys Lista sallituista avaimista (tyhjä = kaikki sallittu)
+ * @return bool Onnistuiko asetus
+ */
+function session_set_safe(string $key, mixed $value, array $allowedKeys = []): bool {
+    try {
+        // Tarkista että avain on sallittu
+        if (!empty($allowedKeys) && !in_array($key, $allowedKeys, true)) {
+            handle_error('VALIDATION', "Session key '$key' not in allowed keys");
+            return false;
+        }
+        
+        $_SESSION[$key] = $value;
+        return true;
+        
+    } catch (Exception $e) {
+        handle_error('SESSION', "Failed to set session key: $key", $e);
+        return false;
+    }
+}
+
+/**
+ * Turvallinen session-avaimen haku oletusarvolla ja tyypintarkistuksella
+ * 
+ * @param string $key Session-avain
+ * @param mixed $default Oletusarvo jos avain puuttuu
+ * @param string|null $expectedType Odotettu tyyppi ('string', 'int', 'array', jne)
+ * @return mixed Session-arvo tai oletusarvo
+ */
+function session_get_safe(string $key, mixed $default = null, ?string $expectedType = null): mixed {
+    $value = $_SESSION[$key] ?? $default;
+    
+    // Tyypintarkistus jos määritelty
+    if ($expectedType !== null && $value !== $default) {
+        $actualType = gettype($value);
+        if ($actualType !== $expectedType) {
+            index_log("SESSION: Type mismatch for key '$key': expected $expectedType, got $actualType");
+            return $default;
+        }
+    }
+    
+    return $value;
+}
+
+/**
+ * Tarkistaa onko session voimassa ja data ehyt
+ * 
+ * @return bool Onko session kunnossa
+ */
+function session_is_valid(): bool {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        return false;
+    }
+    
+    // Tarkista että perustiedot on olemassa
+    $requiredKeys = ['state'];
+    foreach ($requiredKeys as $key) {
+        if (!isset($_SESSION[$key])) {
+            return false;
+        }
+    }
+    
+    // Tarkista tilan validius
+    $validStates = ['intro', 'quiz1', 'tiebreak', 'a1_result', 'phase2', 'phase2_tb', 'done2'];
+    return in_array($_SESSION['state'], $validStates, true);
+}
+
+/* ====== VIRHEENHALLINTA ====== */
+
+/**
+ * Keskitetty virheenkäsittelijä lokitukselle ja käyttäjäpalautteelle
+ * 
+ * @param string $errorType Virheen tyyppi (esim. 'CSV_LOAD', 'SESSION', 'DATABASE')
+ * @param string $message Virheen kuvaus
+ * @param Exception|null $exception Poikkeus jos käytettävissä
+ * @param bool $showToUser Näytetäänkö virhe käyttäjälle
+ * @return void
+ */
+function handle_error(string $errorType, string $message, ?Exception $exception = null, bool $showToUser = true): void {
+    // Loki virhe
+    $logMessage = $errorType . ': ' . $message;
+    if ($exception) {
+        $logMessage .= ' (' . $exception->getMessage() . ' in ' . $exception->getFile() . ':' . $exception->getLine() . ')';
+    }
+    index_log('ERROR: ' . $logMessage);
+    
+    // Käyttäjälle näytettävä virheilmoitus
+    if ($showToUser) {
+        if (!isset($_SESSION['error_messages'])) {
+            $_SESSION['error_messages'] = [];
+        }
+        
+        $userMessage = match($errorType) {
+            'CSV_LOAD' => 'Kysymystiedostojen lataus epäonnistui. Yritä uudelleen hetken kuluttua.',
+            'SESSION' => 'Istunnon tietojen käsittelyssä tapahtui virhe. Yritä aloittaa uudelleen.',
+            'DATABASE' => 'Tietojen tallennuksessa tapahtui virhe. Tietosi saattavat olla hävinneet.',
+            'VALIDATION' => 'Syöttämissäsi tiedoissa on virhe. Tarkista ja yritä uudelleen.',
+            'FILE_IO' => 'Tiedostojen käsittelyssä tapahtui virhe. Yritä uudelleen.',
+            default => 'Tapahtui odottamaton virhe. Yritä uudelleen tai ota yhteyttä ylläpitoon.'
+        };
+        
+        $_SESSION['error_messages'][] = $userMessage;
+    }
+}
+
+/**
+ * Turvallinen CSV-tiedoston lataus virheenkäsittelyllä
+ * 
+ * @param string $filePath Tiedoston polku
+ * @param string $errorContext Konteksti virhelogiin
+ * @return array|null CSV-data tai null virhetilanteessa
+ */
+function safe_load_csv(string $filePath, string $errorContext): ?array {
+    try {
+        if (!file_exists($filePath)) {
+            handle_error('CSV_LOAD', "File not found: $filePath in context: $errorContext");
+            return null;
+        }
+        
+        if (!is_readable($filePath)) {
+            handle_error('CSV_LOAD', "File not readable: $filePath in context: $errorContext");
+            return null;
+        }
+        
+        $lines = @file($filePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        if ($lines === false) {
+            handle_error('CSV_LOAD', "Failed to read file: $filePath in context: $errorContext");
+            return null;
+        }
+        
+        $rows = [];
+        foreach ($lines as $i => $line) {
+            if ($i === 0) $line = preg_replace('/^\xEF\xBB\xBF/', '', $line); // BOM
+            $trim = ltrim($line);
+            if ($trim === '' || strpos($trim, '/*') === 0) continue; // kommenttirivi
+            $parts = str_getcsv($line, ';', '"', '\\');
+            if (count($parts) >= 2) {
+                $tag = trim((string)$parts[0]);
+                $text = trim((string)$parts[1]);
+                $rows[] = [$tag, $text];
+            }
+        }
+        
+        return $rows;
+        
+    } catch (Exception $e) {
+        handle_error('CSV_LOAD', "Exception loading $filePath in context: $errorContext", $e);
+        return null;
+    }
+}
+
+/**
+ * Turvallinen session-avaimen haku oletusarvolla
+ * 
+ * @param string $key Session-avain
+ * @param mixed $default Oletusarvo jos avain puuttuu
+ * @return mixed Session-arvo tai oletusarvo
+ */
+function safe_session_get(string $key, mixed $default = null): mixed {
+    return $_SESSION[$key] ?? $default;
+}
+
+/**
+ * Turvallinen session-avaimen asetus virheenkäsittelyllä
+ * 
+ * @param string $key Session-avain
+ * @param mixed $value Asetettava arvo
+ * @return bool Onnistuiko asetus
+ */
+function safe_session_set(string $key, mixed $value): bool {
+    try {
+        $_SESSION[$key] = $value;
+        return true;
+    } catch (Exception $e) {
+        handle_error('SESSION', "Failed to set session key: $key", $e);
+        return false;
+    }
+}
+
+/**
+ * Näyttää virheviestit käyttäjälle ja tyhjentää ne
+ * 
+ * @return string HTML-koodi virheviesteille
+ */
+function display_error_messages(): string {
+    $messages = $_SESSION['error_messages'] ?? [];
+    if (empty($messages)) {
+        return '';
+    }
+    
+    // Tyhjennä viestit näyttämisen jälkeen
+    unset($_SESSION['error_messages']);
+    
+    $html = '<div class="error-messages">';
+    foreach ($messages as $message) {
+        $html .= '<div class="error-message">';
+        $html .= '<strong>Virhe:</strong> ' . htmlspecialchars($message);
+        $html .= '</div>';
+    }
+    $html .= '</div>';
+    
+    return $html;
+}
+
+/* ========= Loki – vakiokolumnit ========= */
+/*
+function build_q1_fixed_values(): array {
+    $answersById = $_SESSION['answers1_by_id'] ?? [];
+    $vals = [];
+    for ($id=1; $id<=Q1_MAX; $id++) $vals[] = isset($answersById[$id]) ? (string)$answersById[$id] : '';
+    return $vals;
+}
+function tb_fixed_headers(): array { return ['TB1','TB2','TB3','TB4','TB5','TB6']; }
+function tb_fixed_values(): array {
+    $vals = array_fill(0, TB_MAX, '');
+    $log  = $_SESSION['tiebreak_log'] ?? [];
+    $i=0; foreach ($log as $item) { if ($i>=TB_MAX) break; $vals[$i] = (string)($item['value'] ?? ''); $i++; }
+    return $vals;
+}
+function varcode_fixed_headers(): array {
+    return ['VarCode_1','VarSum_1','VarCode_2','VarSum_2','VarCode_3','VarSum_3'];
+}
+function varcode_fixed_values(): array {
+    $codes = $_SESSION['varCodes'] ?? [];
+    $codes = array_values($codes);
+    $codes = array_slice($codes, 0, 3);
+    while (count($codes) < 3) $codes[] = '';
+    $vp = $_SESSION['varPoints'] ?? [];
+    $sums = [];
+    foreach ($codes as $c) $sums[] = ($c === '') ? '0' : (string)(int)($vp[$c] ?? 0);
+    return [$codes[0], $sums[0], $codes[1], $sums[1], $codes[2], $sums[2]];
+}
+function varpair_case_headers(): array { $hdrs=[]; for ($i=1; $i<=VARPAIR_MAX; $i++) $hdrs[]='VarPair'.$i; return $hdrs; }
+function varpair_case_values(): array {
+    $pairs = $_SESSION['pairs2'] ?? [];
+    if (count($pairs) < VARPAIR_MAX) $pairs = array_merge($pairs, array_fill(0, VARPAIR_MAX - count($pairs), ''));
+    else $pairs = array_slice($pairs, 0, VARPAIR_MAX);
+    return $pairs;
+}
+function tb2_fixed_headers(): array { return ['TB2_1','TB2_2','TB2_3']; }
+function tb2_fixed_values(): array {
+    $vals = $_SESSION['tb2_pairs'] ?? [];
+    if (count($vals) < TB2_MAX) $vals = array_merge($vals, array_fill(0, TB2_MAX - count($vals), ''));
+    else $vals = array_slice($vals, 0, TB2_MAX);
+    return $vals;
+}
+*/
+
+/* Uusi survey log: 25 kiinteää kolumnia + kysymyskohtaiset vastaukset */
+function ensure_log_header(): void {
+    $lp = log_path();
+    if (!file_exists($lp)) {
+        // 25 kiinteää kolumnia
+        $cols = [
+            'date', 'time', 'session_id', 'nick', 'user_guess', 'user_confidence',
+            'invited', 'ref_guess', 'ref_prob', 'invite_id', 'final_type',
+            'top_variable_1', 'top_variable_1_points', 'top_variable_2', 'top_variable_2_points',
+            'A1_points', 'B1_points', 'C1_points', 'D1_points',
+            'A1_yes_count', 'B1_yes_count', 'C1_yes_count', 'D1_yes_count',
+            'Phase1_tb', 'Phase2_tb'
+        ];
+        
+        // Lisää kysymyskolumnit järjestyksessä
+        // Phase 1 kysymykset Q1-Q40 (kolumnit 26-65)
+        for ($i = 1; $i <= 40; $i++) {
+            $cols[] = "Q{$i}";
+        }
+        
+        // Phase 1 tiebreak kysymykset TB1-TB10 (kolumnit 66-75)
+        for ($i = 1; $i <= 10; $i++) {
+            $cols[] = "TB{$i}";
+        }
+        
+        // Phase 2 case kysymykset Case1-Case20 (kolumnit 76-95)
+        for ($i = 1; $i <= 20; $i++) {
+            $cols[] = "Case{$i}";
+        }
+        
+        // Phase 2 tiebreak kysymykset TB2_1-TB2_10 (kolumnit 96-105)
+        for ($i = 1; $i <= 10; $i++) {
+            $cols[] = "TB2_{$i}";
+        }
+        
+        file_put_contents($lp, implode(';', $cols).PHP_EOL, FILE_APPEND | LOCK_EX);
+    }
+}
+function write_full_log_row(array $row): void {
+    try {
+        // 25 kiinteää kolumnia
+        $parts = [
+            (string)($row['date'] ?? date('Y-m-d')),
+            (string)($row['time'] ?? date('H:i:s')),
+            (string)($_SESSION['sessionId'] ?? session_id()),
+            (string)($row['nick'] ?? ''),
+            (string)($row['ennea'] ?? ''),  // user_guess
+            (string)($row['confidence'] ?? ''),  // user_confidence
+            (string)($row['kutsuttu'] ?? 'Ei'),  // invited
+            (string)($_SESSION['RefGuessType'] ?? ''),  // ref_guess
+            (string)($_SESSION['RefGuessProb'] ?? ''),  // ref_prob
+            (string)($_SESSION['InviteId'] ?? ''),  // invite_id
+            (string)($row['finalVar'] ?? ''),  // final_type
+            (string)($row['top_var_1'] ?? ''),  // top_variable_1
+            (string)($row['top_var_1_pts'] ?? ''),  // top_variable_1_points
+            (string)($row['top_var_2'] ?? ''),  // top_variable_2
+            (string)($row['top_var_2_pts'] ?? ''),  // top_variable_2_points
+            (string)($row['A1'] ?? ''),  // A1_points
+            (string)($row['B1'] ?? ''),  // B1_points
+            (string)($row['C1'] ?? ''),  // C1_points
+            (string)($row['D1'] ?? ''),  // D1_points
+            (string)($row['A1_yes'] ?? 0),  // A1_yes_count
+            (string)($row['B1_yes'] ?? 0),  // B1_yes_count
+            (string)($row['C1_yes'] ?? 0),  // C1_yes_count
+            (string)($row['D1_yes'] ?? 0),  // D1_yes_count
+            isset($_SESSION['tiebreak_ord']) && !empty($_SESSION['tiebreak_ord']) ? 'Kyllä' : 'Ei',  // Phase1_tb
+            isset($_SESSION['tb2_pairs']) && !empty($_SESSION['tb2_pairs']) ? 'Kyllä' : 'Ei'  // Phase2_tb
+        ];
+        
+        // Q1-Q40 (positiot 26-65) - Phase 1 kysymykset vastausjärjestyksessä
+        $answers1 = $_SESSION['answers1'] ?? [];
+        for ($i = 1; $i <= 40; $i++) {
+            $answer = '';
+            if (isset($answers1[$i-1])) {
+                $q_data = $answers1[$i-1];
+                if (isset($q_data['class']) && isset($q_data['question_number']) && isset($q_data['value'])) {
+                    $answer = $q_data['class'] . '-' . $q_data['question_number'] . '-' . $q_data['value'];
+                }
+            }
+            $parts[] = $answer;
+        }
+        index_log('DEBUG: After Phase1 Q1-Q40, parts count=' . count($parts) . ' (should be 65: 25 fixed + 40 Q)');
+        index_log('DEBUG: Q1-Q4 samples: [' . ($parts[25] ?? 'empty') . ',' . ($parts[26] ?? 'empty') . ',' . ($parts[27] ?? 'empty') . ',' . ($parts[28] ?? 'empty') . '] (format: class-qnum-value)');
+        
+        // Phase 1 tiebreak vastaukset TB1-TB10 - vastausjärjestyksessä
+        $tb_answers = $row['tiebreak_log'] ?? $_SESSION['tiebreak_log'] ?? [];
+        for ($i = 0; $i < 10; $i++) {
+            $answer = '';
+            if (isset($tb_answers[$i])) {
+                $log_entry = $tb_answers[$i];
+                if (isset($log_entry['class']) && isset($log_entry['question_number']) && isset($log_entry['value'])) {
+                    $answer = $log_entry['class'] . '-' . $log_entry['question_number'] . '-' . $log_entry['value'];
+                }
+            }
+            $parts[] = $answer;
+        }
+        index_log('DEBUG: After Phase1 TB1-TB10, parts count=' . count($parts) . ' (should be 75: 25 fixed + 40 Q + 10 TB)');
+        index_log('DEBUG: TB1-TB4 samples: [' . ($parts[65] ?? 'empty') . ',' . ($parts[66] ?? 'empty') . ',' . ($parts[67] ?? 'empty') . ',' . ($parts[68] ?? 'empty') . '] (format: class-qnum-value)');
+        
+        // Phase 2 case vastaukset Case1-Case20  
+        $pairs2 = $_SESSION['pairs2'] ?? [];
+        for ($i = 1; $i <= 20; $i++) {
+            // $pairs2 sisältää stringejä muodossa "variable-questionnumber-value"
+            $parts[] = isset($pairs2[$i-1]) ? (string)$pairs2[$i-1] : '';
+        }
+        index_log('DEBUG: After Phase2 Case1-Case20, parts count=' . count($parts) . ' (should be 95: 25+40+10+20)');
+        index_log('DEBUG: Case1-Case4 samples: [' . ($parts[75] ?? 'empty') . ',' . ($parts[76] ?? 'empty') . ',' . ($parts[77] ?? 'empty') . ',' . ($parts[78] ?? 'empty') . '] (format: var-qnum-value)');
+        
+        // Phase 2 tiebreak vastaukset TB2_1-TB2_10
+        $tb2_pairs = $_SESSION['tb2_pairs'] ?? [];
+        for ($i = 1; $i <= 10; $i++) {
+            // $tb2_pairs sisältää stringejä muodossa "variable-questionnumber-value"
+            $parts[] = isset($tb2_pairs[$i-1]) ? (string)$tb2_pairs[$i-1] : '';
+        }
+        index_log('DEBUG: Final parts count=' . count($parts) . ' (should be 105: 25+40+10+20+10)');
+        index_log('DEBUG: TB2_1-TB2_4 samples: [' . ($parts[95] ?? 'empty') . ',' . ($parts[96] ?? 'empty') . ',' . ($parts[97] ?? 'empty') . ',' . ($parts[98] ?? 'empty') . '] (format: var-qnum-value)');
+        
+        ensure_log_header();
+        
+        $logPath = log_path();
+        $csvLine = implode(';', $parts) . PHP_EOL;
+        
+        if (file_put_contents($logPath, $csvLine, FILE_APPEND | LOCK_EX) === false) {
+            handle_error('FILE_IO', "Failed to write log row to: $logPath");
+            return;
+        }
+        
+        index_log('CSV: Row written (finalVar="' . (string)($row['finalVar'] ?? '') . '", nick="' . ($row['nick'] ?? '') . '")');
+        
+    } catch (Exception $e) {
+        handle_error('FILE_IO', "Exception in write_full_log_row", $e);
+    }
+}
+
+/* ========= Tila ========= */
+// Käsittele session resetointi
+if (isset($_GET['reset']) || (isset($_POST['reset_session']))) {
+    error_log("SESSION RESET: Request received");
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+    $_SESSION = [];
+    if (ini_get('session.use_cookies')) {
+        $p = session_get_cookie_params();
+        setcookie(session_name(), '', time()-42000, $p['path'] ?? '/', $p['domain'] ?? '', $p['secure'] ?? false, $p['httponly'] ?? true);
+    }
+    if (session_status() === PHP_SESSION_ACTIVE) {
+        session_destroy();
+    }
+    error_log("SESSION RESET: Session destroyed, redirecting");
+    
+    // Ohjaa takaisin pääsivulle ilman parametreja
+    $baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' ? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . strtok($_SERVER['REQUEST_URI'], '?');
+    header('Location: ' . $baseUrl);
+    exit;
+}
+
+session_initialize();
+
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$state = session_get_safe('state', 'intro', 'string');
+
+index_log('REQUEST: ' . $_SERVER['REQUEST_METHOD'] . ' ' . $_SERVER['REQUEST_URI'] . ' (state=' . $state . ', session_id=' . session_id() . ')');
+
+/* ========================================================================
+   LOMAKEKÄSITTELY FUNKTIOT
+   ======================================================================== */
+
+/**
+ * Käsittelee intro-lomakkeen lähetyksen
+ * 
+ * Validoi syötteet, käsittelee kutsukoodit ja alustaa testin
+ * 
+ * @return array|null Paluttaa error viestin tai null jos onnistui
+ */
+function handle_intro_form(): ?string {
+    if (!isset($_POST['start'])) return null;
+    
+    $nick  = trim((string)($_POST['nickname'] ?? ''));
+    $ennea = trim((string)($_POST['ennea'] ?? ''));
+    $code  = strtoupper(trim((string)($_POST['invite_code'] ?? '')));
+
+    // Kutsukoodi validoidaan tässä, jos annettu ja ei jo token-claimia
+    if (INVITES_ENABLED && $code !== '' && empty($_SESSION['InviteId'])) {
+        $items = invites_load();
+        $inv = invite_find_by_code($items, $code);
+        if ($inv && (($inv['status'] ?? '') === 'sent' || ($inv['status'] ?? '') === 'accepted')) {
+            $_SESSION['RefGuessType'] = (string)($inv['guess_type'] ?? '');
+            $_SESSION['RefGuessProb'] = (string)($inv['guess_prob'] ?? '');
+            $_SESSION['InviteId']     = (string)($inv['id'] ?? '');
+            if (($inv['status'] ?? '') === 'sent') invite_update_status($_SESSION['InviteId'], 'accepted');
+            index_log('INVITE: Claimed by code="' . $code . '" (id=' . $_SESSION['InviteId'] . ')');
+        } else {
+            return 'Kutsukoodi ei kelpaa tai on vanhentunut.';
+        }
+    }
+
+    if ($ennea === '') $ennea = 'en tiedä'; // oletus
+    
+    index_log('INTRO: Form processing started');
+    initialize_phase1_session($nick, $ennea);
+    $_SESSION['state'] = 'quiz1';
+    index_log('INTRO: Processing form (nick="' . $nick . '", ennea="' . $ennea . '", code="' . $code . '")');
+    
+    return null;
+}
+
+/**
+ * Alustaa vaihe 1:n session-tiedot
+ * 
+ * @param string $nick Nimimerkki
+ * @param string $ennea Enneagrammityyli tai "en tiedä"
+ */
+function initialize_phase1_session(string $nick, string $ennea): void {
+    $phase1_all_preview = get_cached_phase1_questions();
+    $phase1_index = [];
+    foreach ($phase1_all_preview as $q) $phase1_index[(int)$q['id']] = $q['class'];
+    
+    // Rajoitetaan max 10 kysymystä per luokka (40 yhteensä)
+    $q1_by_class = ['A1'=>[],'B1'=>[],'C1'=>[],'D1'=>[]];
+    foreach ($phase1_all_preview as $q) {
+        $q1_by_class[$q['class']][] = $q;
+    }
+    $q1 = [];
+    foreach ($q1_by_class as $cls => $questions) {
+        shuffle($questions);
+        $q1 = array_merge($q1, array_slice($questions, 0, 10));
+    }
+    shuffle($q1);
+
+    $_SESSION['nickname'] = $nick;
+    $_SESSION['ennea']    = $ennea;
+    $_SESSION['phase1']        = $q1;
+    $_SESSION['phase1_index']  = $phase1_index;
+    $_SESSION['q1_index']      = 0;
+    $_SESSION['answers1_by_id']= [];
+    $_SESSION['yesCounts1']    = ['A1'=>0,'B1'=>0,'C1'=>0,'D1'=>0];
+    $_SESSION['points1']       = ['A1'=>0,'B1'=>0,'C1'=>0,'D1'=>0];
+    $_SESSION['tiebreak_log']  = [];
+    $_SESSION['tiebreak_ord']  = [];
+
+    $now = new DateTimeImmutable('now');
+    $confidence = ($_POST['confidence'] ?? null) !== null ? (int)$_POST['confidence'] : null;
+    $isInvited = (!empty($_SESSION['InviteId']) || !empty($_SESSION['token'])) ? 'Kyllä' : 'Ei';
+    
+    $_SESSION['log_row'] = [
+        'date'       => $now->format('Y-m-d'),
+        'time'       => $now->format('H:i:s'),
+        'nick'       => $nick,
+        'kutsuttu'   => $isInvited,
+        'ennea'      => $ennea,
+        'confidence' => $confidence,
+        'A1'      => 0, 'B1'=>0, 'C1'=>0, 'D1'=>0,
+        'A1_yes'  => 0, 'B1_yes'=>0, 'C1_yes'=>0, 'D1_yes'=>0,
+        'winner'  => '',
+        'track'   => '',
+        'finalVar'=> '',
+        'top_var_1' => '',
+        'top_var_1_pts' => 0,
+        'top_var_2' => '',
+        'top_var_2_pts' => 0,
+        'finalVar'=> ''
+    ];
+}
+
+/**
+ * Käsittelee vaihe 1:n vastauksen
+ * 
+ * @return void
+ */
+function handle_quiz1_answer(): void {
+    if (!isset($_POST['choice'])) return;
+    
+    $set = $_SESSION['phase1'] ?? []; 
+    $total = count($set);
+    index_log('QUIZ1: POST received (total_questions=' . $total . ', current_index=' . ($_SESSION['q1_index'] ?? 0) . ')');
+    
+    if ($total === 0 || !isset($_SESSION['ennea'])) {
+        $_SESSION['state'] = 'intro';
+        index_log('ERROR: quiz1 -> intro (missing session data)');
+        return;
+    }
+    
+    $n = (int)$_POST['choice'];
+    if ($n < 1 || $n > 6) return;
+    
+    $i = (int)($_SESSION['q1_index'] ?? 0);
+    if ($i < 0 || $i >= $total) { 
+        $i = 0; 
+        $_SESSION['q1_index'] = 0; 
+    }
+    
+    $q = $set[$i];
+    $cls = $q['class']; 
+    $qid = (int)$q['id'];
+    $question_number = $q['question_number'] ?? 'unknown';
+
+    $_SESSION['answers1_by_id'][$qid] = $n;
+    $_SESSION['points1'][$cls] = ($_SESSION['points1'][$cls] ?? 0) + $n;
+    if ($n >= YES_MIN) $_SESSION['yesCounts1'][$cls] = ($_SESSION['yesCounts1'][$cls] ?? 0) + 1;
+
+    // Store answer with class, question_number and value for logging in order
+    $_SESSION['answers1'][] = [
+        'class' => $cls,
+        'question_number' => $question_number,
+        'value' => $n
+    ];
+
+    $_SESSION['q1_index'] = $i + 1;
+    index_log('QUIZ1 ANSWER: q' . ($i+1) . '/' . $total . ' class=' . $cls . ' choice=' . $n . ' (next_index=' . $_SESSION['q1_index'] . ')');
+
+    if ($_SESSION['q1_index'] >= $total) {
+        handle_quiz1_completion();
+    }
+}
+
+/**
+ * Käsittelee vaihe 1:n loppuun saattamisen
+ */
+function handle_quiz1_completion(): void {
+    foreach (['A1','B1','C1','D1'] as $k) {
+        $_SESSION['log_row'][$k]      = (int)($_SESSION['points1'][$k] ?? 0);
+        $_SESSION['log_row'][$k.'_yes']= (int)($_SESSION['yesCounts1'][$k] ?? 0);
+    }
+
+    $pts = $_SESSION['points1']; 
+    arsort($pts);
+    $max = reset($pts);
+    $tops = array_keys(array_filter($pts, function($v) use ($max) { return $v === $max; }));
+
+    index_log('QUIZ1: Phase1 complete (scores: A1=' . ($pts['A1'] ?? 0) . ', B1=' . ($pts['B1'] ?? 0) . ', C1=' . ($pts['C1'] ?? 0) . ', D1=' . ($pts['D1'] ?? 0) . ', leaders=' . implode(',', $tops) . ')');
+
+    if (count($tops) === 1) {
+        handle_single_winner($tops[0]);
+    } else {
+        handle_quiz1_tie($tops);
+    }
+}
+
+/**
+ * Käsittelee tilanteen kun yksi luokka voittaa selkeästi
+ * 
+ * @param string $winner Voittajaluokka
+ */
+function handle_single_winner(string $winner): void {
+    $_SESSION['topClass'] = $winner;
+    $_SESSION['log_row']['winner'] = $winner;
+
+    if ($winner === 'A1') {
+        $_SESSION['log_row']['finalVar'] = '4';
+        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+        write_full_log_row($_SESSION['log_row']);
+        $_SESSION['state'] = 'a1_result';
+        index_log('STATE CHANGE: quiz1 -> a1_result (A1 winner, finalVar=4)');
+    } else {
+        initialize_phase2($winner);
+    }
+}
+
+/**
+ * Alustaa vaihe 2:n
+ * 
+ * @param string $winner Voittajaluokka vaiheesta 1
+ */
+function initialize_phase2(string $winner): void {
+    $_SESSION['cases_all'] = get_cached_phase2_blocks();
+    $track = $winner[0] . '2';
+    $_SESSION['track']     = $track;
+    $_SESSION['blocks2']   = $_SESSION['cases_all'][$track] ?? [];
+    $_SESSION['q2_index']  = 0;
+    $_SESSION['answers2']  = [];
+    $_SESSION['varPoints'] = [];
+    $_SESSION['pairs2']    = [];
+    $_SESSION['tb2_pairs'] = [];
+    $_SESSION['log_row']['track'] = $track;
+
+    $codes = []; 
+    foreach (($_SESSION['blocks2'] ?? []) as $b) { 
+        $codes[$b['left_var']] = true; 
+        $codes[$b['right_var']] = true; 
+    }
+    $codes = array_values(array_unique(array_keys($codes))); 
+    natsort($codes);
+    $_SESSION['varCodes'] = array_slice(array_values($codes), 0, 3);
+
+    $_SESSION['state'] = 'phase2';
+    index_log('STATE CHANGE: quiz1 -> phase2 (winner=' . $winner . ', track=' . $track . ', blocks=' . count($_SESSION['blocks2']) . ')');
+    index_log('PHASE2: Initialized (varCodes=' . implode(',', $_SESSION['varCodes']) . ')');
+}
+
+/**
+ * Käsittelee tasatilanteen vaiheessa 1
+ * 
+ * @param array $tops Tasapelissä olevat luokat
+ */
+function handle_quiz1_tie(array $tops): void {
+    if (count($tops) > 2) {
+        $order = ['A1','B1','C1','D1'];
+        usort($tops, function($a,$b) use ($order) { 
+            return array_search($a,$order,true) <=> array_search($b,$order,true); 
+        });
+        $tops = array_slice($tops, 0, 2);
+    }
+    
+    $_SESSION['tiebreak_classes'] = $tops;
+    $tbAll = get_cached_tiebreak_questions();
+    $tbPool = [];
+    
+    foreach ($tops as $clsTB) {
+        $tbKey = $clsTB[0].'11';
+        $arr = $tbAll[$tbKey] ?? [];
+        if ($arr) { 
+            // Käytetään kaikki kyseisen luokan tiebreak-kysymykset
+            foreach ($arr as $question_obj) {
+                $tbPool[] = $question_obj; // Already has class, text, csv_row
+            }
+        }
+    }
+    
+    shuffle($tbPool);
+    $_SESSION['tiebreak_set']   = $tbPool;
+    $_SESSION['tiebreak_index'] = 0;
+    $_SESSION['tiebreak_log']   = [];
+    $_SESSION['tiebreak_ord']   = [];
+    $_SESSION['state'] = 'tiebreak';
+    index_log('STATE CHANGE: quiz1 -> tiebreak (tied_classes=' . implode(',', $tops) . ', tb_questions=' . count($tbPool) . ')');
+    index_log('TIEBREAK: Initialized (classes=' . implode(',', $tops) . ', questions=' . count($tbPool) . ')');
+}
+
+/* ========================================================================
+   PALAUTTEEN KÄSITTELY
+   ======================================================================== */
+
+// Alusta palautemuuttujat
+$feedbackMsg = '';
+$feedbackErr = '';
+$oldFeedbackText = '';
+
+/* Palautteen näyttö/lähetys */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'done2' || ($_SESSION['state'] ?? '') === 'a1_result')) {
+    if (isset($_POST['show_feedback'])) {
+        // Tarkista onko palaute jo annettu
+        if (empty($_SESSION['feedback_given'])) {
+            $_SESSION['show_feedback'] = true;
+            index_log('FEEDBACK: Form opened (state=' . ($_SESSION['state'] ?? 'unknown') . ')');
+        }
+    } elseif (isset($_POST['send_feedback'])) {
+        $txt = trim((string)($_POST['feedback_text'] ?? ''));
+        $oldFeedbackText = $txt;
+        if ($txt === '') {
+            $feedbackErr = 'Kirjoita palautteesi.';
+        } else {
+            $nick   = (string)($_SESSION['nickname'] ?? '');
+            $result = (string)($_SESSION['log_row']['finalVar'] ?? '');
+            $body = "ENNEAGRAMMITESTI – palaute\n\n".
+                    "Nimimerkki: ".($nick !== '' ? $nick : '(ei annettu)')."\n".
+                    "Tyyppitulos: ".($result !== '' ? $result : '(ei saatavilla)')."\n\n".
+                    "Palaute:\n".$txt."\n";
+            $ok = send_mail(FEEDBACK_TO, 'Palautetta Enneagrammitestistä', $body);
+            if ($ok) {
+                $feedbackMsg = 'Kiitos palautteesta!';
+                $_SESSION['show_feedback'] = false;
+                $_SESSION['feedback_given'] = true; // Merkitse palaute annetuksi
+                $oldFeedbackText = '';
+                index_log('FEEDBACK: Sent successfully (nick="' . $nick . '", result="' . $result . '")');
+            } else {
+                $feedbackErr = 'Palautteen lähetys epäonnistui. Yritä hetken päästä uudelleen.';
+                index_log('FEEDBACK: Send failed (nick="' . $nick . '", result="' . $result . '")');
+            }
+        }
+    }
+}
+
+/* Lomakekäsittelijöiden kutsuminen */
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (($_SESSION['state'] ?? '') === 'intro') {
+        $error = handle_intro_form();
+    } elseif (($_SESSION['state'] ?? '') === 'quiz1' && isset($_POST['choice'])) {
+        handle_quiz1_answer();
+    }
+}
+
+/**
+ * Käsittelee tiebreak-vastauksen vaiheessa 1
+ * 
+ * @param int $choice Käyttäjän valinta (1-6)
+ * @return void
+ */
+function handle_tiebreak_answer(int $choice): void {
+    $n = $choice;
+    if ($n < 1 || $n > 6) return;
+    
+    $set = $_SESSION['tiebreak_set'] ?? [];
+    $i   = (int)($_SESSION['tiebreak_index'] ?? 0);
+    $blk = $set[$i] ?? null;
+    
+    if ($blk) {
+        $cls = $blk['class'];
+        $question_number = $blk['question_number'] ?? 'unknown';
+        $_SESSION['points1'][$cls] = ($_SESSION['points1'][$cls] ?? 0) + $n;
+        if ($n >= YES_MIN) $_SESSION['yesCounts1'][$cls] = ($_SESSION['yesCounts1'][$cls] ?? 0) + 1;
+
+        $ord = ($_SESSION['tiebreak_ord'][$cls] ?? 0) + 1;
+        $_SESSION['tiebreak_ord'][$cls] = $ord;
+        
+        // Store answer with class, question_number and value for logging
+        $_SESSION['tiebreak_log'][] = [
+            'class' => $cls,
+            'question_number' => $question_number,
+            'value' => $n
+        ];
+
+        $_SESSION['tiebreak_index'] = $i + 1;
+        index_log('TIEBREAK ANSWER: tb' . ($i+1) . '/' . count($set) . ' class=' . $cls . ' choice=' . $n . ' (next_index=' . $_SESSION['tiebreak_index'] . ')');
+
+        if ($_SESSION['tiebreak_index'] >= count($set)) {
+            handle_tiebreak_completion();
+        }
+    }
+}
+
+/**
+ * Käsittelee tiebreak-vaiheen loppuun saattamisen
+ */
+function handle_tiebreak_completion(): void {
+    foreach (['A1','B1','C1','D1'] as $k) {
+        $_SESSION['log_row'][$k]      = (int)($_SESSION['points1'][$k] ?? 0);
+        $_SESSION['log_row'][$k.'_yes']= (int)($_SESSION['yesCounts1'][$k] ?? 0);
+    }
+    
+    $pts = $_SESSION['points1']; 
+    arsort($pts);
+    $max = reset($pts);
+    $tops = array_keys(array_filter($pts, function($v) use ($max) { return $v === $max; }));
+    
+    if (count($tops) === 1) {
+        $top = $tops[0];
+    } else {
+        $yc = $_SESSION['yesCounts1'];
+        $best = $tops[0];
+        foreach ($tops as $c) if (($yc[$c]??0) > ($yc[$best]??0)) $best = $c;
+        $eq = array_filter($tops, function($c) use ($yc, $best) { return ($yc[$c]??0)===($yc[$best]??0); });
+        $top = !empty($eq) ? $eq[array_rand($eq)] : null;
+    }
+    
+    $_SESSION['topClass'] = $top;
+    $_SESSION['log_row']['winner'] = $top;
+
+    if ($top === 'A1') {
+        $_SESSION['log_row']['finalVar'] = '4';
+        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+        write_full_log_row($_SESSION['log_row']);
+        $_SESSION['state'] = 'a1_result';
+        index_log('STATE CHANGE: tiebreak -> a1_result (A1 winner after tiebreak, finalVar=4)');
+        index_log('TIEBREAK: Complete (final_winner=' . $top . ', final_scores: A1=' . ($_SESSION['points1']['A1'] ?? 0) . ', B1=' . ($_SESSION['points1']['B1'] ?? 0) . ', C1=' . ($_SESSION['points1']['C1'] ?? 0) . ', D1=' . ($_SESSION['points1']['D1'] ?? 0) . ')');
+    } else {
+        initialize_phase2($top);
+        index_log('TIEBREAK: Complete -> PHASE2 (final_winner=' . $top . ', track=' . ($_SESSION['track'] ?? '') . ', blocks=' . count($_SESSION['blocks2'] ?? []) . ')');
+    }
+}
+
+/**
+ * Käsittelee vaiheen 2 (lopullinen tyypittely) vastausta
+ * 
+ * @param int $choice Käyttäjän valinta (-2 = vahvasti vasemmalle, 0 = neutraali, 2 = vahvasti oikealle)
+ * @return void
+ */
+function handle_phase2_answer(int $value, string $side = ''): void {
+    // Jos side on tyhjä, käsitellään vanha choice-järjestelmä (taaksepäin yhteensopivuus)
+    if ($side === '' && ($value >= -2 && $value <= 2)) {
+        $side = ($value < 0) ? 'left' : (($value > 0) ? 'right' : 'neutral');
+        $value = abs($value);
+    }
+    
+    if ($value < 0 || $value > 2 || !in_array($side, ['left', 'right', 'neutral'])) {
+        index_log('PHASE2: Invalid choice value=' . $value . ' side=' . $side);
+        return;
+    }
+    
+    $index = (int)($_SESSION['q2_index'] ?? 0);
+    $block = $_SESSION['blocks2'][$index] ?? null;
+    
+    if (!$block) {
+        $_SESSION['log_row']['finalVar'] = '';
+        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+        write_full_log_row($_SESSION['log_row']);
+        $_SESSION['state'] = 'done2';
+        index_log('STATE CHANGE: phase2 -> done2 (missing block, finalVar=empty)');
+        return;
+    }
+    
+    // Tallennetaan vastaus
+    $entry = '';
+    $question_number = $block['question_number'] ?? 'unknown';
+    
+    if ($side !== 'neutral' && $value > 0) {
+        $variable = ($side === 'left') ? $block['left_var'] : $block['right_var'];
+        $_SESSION['varPoints'][$variable] = ($_SESSION['varPoints'][$variable] ?? 0) + $value;
+        $entry = 'x' . $variable . '-' . $question_number . '-' . $value; // Format: xvariable-questionnumber-value
+    } elseif ($side === 'neutral') {
+        // Neutral vastaukset tallennetaan myös
+        $entry = 'xNEUTRAL-' . $question_number . '-0'; // Format: xNEUTRAL-questionnumber-0
+    }
+    
+    $_SESSION['pairs2'][] = $entry;
+    $_SESSION['answers2'][] = ['side' => $side, 'value' => $value];
+    $_SESSION['q2_index'] = $index + 1;
+    
+    index_log('PHASE2 ANSWER: case' . ($index + 1) . '/' . count($_SESSION['blocks2']) . 
+              ' side=' . $side . ' value=' . $value . ' left=' . $block['left_var'] . ' right=' . $block['right_var'] . 
+              ' (next_index=' . $_SESSION['q2_index'] . ')');
+    
+    // Tarkistetaan onko vaihe 2 valmis
+    if ($_SESSION['q2_index'] >= count($_SESSION['blocks2'])) {
+        handle_phase2_completion();
+    }
+}
+
+/**
+ * Käsittelee vaiheen 2 valmistumisen ja siirtymisen tulossivulle tai tiebreakiin
+ * 
+ * @return void
+ */
+function handle_phase2_completion(): void {
+    $varPoints = $_SESSION['varPoints'] ?? [];
+    $leaders = [];
+    
+    if (!empty($varPoints)) {
+        arsort($varPoints);
+        $maxPoints = reset($varPoints);
+        $leaders = array_keys(array_filter($varPoints, function($points) use ($maxPoints) {
+            return $points === $maxPoints;
+        }));
+        
+        // Lisää top_variable tiedot log_row:hin
+        $sortedVars = array_keys($varPoints);
+        $_SESSION['log_row']['top_var_1'] = $sortedVars[0] ?? '';
+        $_SESSION['log_row']['top_var_1_pts'] = isset($sortedVars[0]) ? ($varPoints[$sortedVars[0]] ?? 0) : 0;
+        $_SESSION['log_row']['top_var_2'] = $sortedVars[1] ?? '';
+        $_SESSION['log_row']['top_var_2_pts'] = isset($sortedVars[1]) ? ($varPoints[$sortedVars[1]] ?? 0) : 0;
+    }
+    
+    $pointsStr = '';
+    foreach ($varPoints as $var => $points) {
+        $pointsStr .= $var . '=' . $points . ' ';
+    }
+    index_log('PHASE2: Complete (varPoints=' . trim($pointsStr) . ', leaders=' . implode(',', $leaders) . ')');
+    
+    if (count($leaders) <= 1) {
+        // Selvä voittaja tai ei pisteitä
+        $finalVar = $leaders ? $leaders[0] : '';
+        $_SESSION['log_row']['finalVar'] = $finalVar;
+        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+        write_full_log_row($_SESSION['log_row']);
+        $_SESSION['state'] = 'done2';
+        index_log('STATE CHANGE: phase2 -> done2 (finalVar=' . $finalVar . ', leaders=' . implode(',', $leaders) . ')');
+    } else {
+        // Tasatilanne - tiebreak
+        initialize_phase2_tiebreak($leaders);
+    }
+}
+
+/**
+ * Alustaa vaiheen 2 tiebreak-kierroksen tasatilanteessa
+ * 
+ * @param array $leaders Lista tasatilanteessa olevista muuttujista
+ * @return void
+ */
+function initialize_phase2_tiebreak(array $leaders): void {
+    natsort($leaders);
+    $pair = array_slice(array_values($leaders), 0, 2);
+    $_SESSION['tb2_pair'] = $pair;
+    
+    $allTiebreaks = get_cached_phase2_tiebreaks();
+    $track = $_SESSION['track'] ?? 'B2';
+    $letter = strtoupper($track[0]);
+    $group = 'T' . $letter . '2';
+    
+    $candidates = $allTiebreaks[$group] ?? [];
+    $filtered = [];
+    
+    foreach ($candidates as $candidate) {
+        $candidatePair = $candidate['pair'] ?? null;
+        if (!$candidatePair || count($candidatePair) < 2) continue;
+        
+        if (((string)$candidatePair[0] === (string)$pair[0] && (string)$candidatePair[1] === (string)$pair[1]) ||
+            ((string)$candidatePair[0] === (string)$pair[1] && (string)$candidatePair[1] === (string)$pair[0])) {
+            $filtered[] = $candidate;
+        }
+    }
+    
+    if (!empty($filtered)) {
+        shuffle($filtered);
+        $_SESSION['tb2_set'] = $filtered; // Käytetään kaikki löytyneet tiebreak-kysymykset
+        $_SESSION['tb2_pairs'] = [];
+        $_SESSION['tb2_index'] = 0;
+        $_SESSION['state'] = 'phase2_tb';
+        index_log('STATE CHANGE: phase2 -> phase2_tb (tie between ' . implode(',', $pair) . 
+                  ', tb_cases=' . count($_SESSION['tb2_set']) . ')');
+    } else {
+        // Ei tiebreak-kysymyksiä, arvotaan voittaja
+        $finalVar = $pair[array_rand($pair)];
+        $_SESSION['log_row']['finalVar'] = $finalVar;
+        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+        write_full_log_row($_SESSION['log_row']);
+        $_SESSION['state'] = 'done2';
+        index_log('STATE CHANGE: phase2 -> done2 (tie resolved randomly, finalVar=' . $finalVar . ')');
+    }
+}
+
+/**
+ * Käsittelee vaiheen 2 tiebreak-vastausta
+ * 
+ * @param int $choice Käyttäjän valinta (-2 = vahvasti vasemmalle, 0 = neutraali, 2 = vahvasti oikealle)
+ * @return void
+ */
+function handle_phase2_tiebreak_answer(int $value, string $side = ''): void {
+    // Jos side on tyhjä, käsitellään vanha choice-järjestelmä (taaksepäin yhteensopivuus)
+    if ($side === '' && ($value >= -2 && $value <= 2)) {
+        $side = ($value < 0) ? 'left' : (($value > 0) ? 'right' : 'neutral');
+        $value = abs($value);
+    }
+    
+    if ($value < 0 || $value > 2 || !in_array($side, ['left', 'right', 'neutral'])) {
+        index_log('PHASE2_TB: Invalid choice value=' . $value . ' side=' . $side);
+        return;
+    }
+    
+    $index = (int)($_SESSION['tb2_index'] ?? 0);
+    $block = $_SESSION['tb2_set'][$index] ?? null;
+    
+    if (!$block) {
+        index_log('PHASE2_TB: Missing block at index ' . $index);
+        return;
+    }
+    
+    $question_number = $block['question_number'] ?? 'unknown';
+    
+    // Tallennetaan vastaus
+    $entry = '';
+    if ($side !== 'neutral' && $value > 0) {
+        $variable = ($side === 'left') ? $block['left_var'] : $block['right_var'];
+        $_SESSION['varPoints'][$variable] = ($_SESSION['varPoints'][$variable] ?? 0) + $value;
+        $entry = 'x' . $variable . '-' . $question_number . '-' . $value; // Format: xvariable-questionnumber-value
+    } elseif ($side === 'neutral') {
+        // Neutral vastaukset tallennetaan myös
+        $entry = 'xNEUTRAL-' . $question_number . '-0'; // Format: xNEUTRAL-questionnumber-0
+    }
+    
+    $_SESSION['tb2_pairs'][] = $entry;
+    $_SESSION['tb2_index'] = $index + 1;
+    
+    index_log('PHASE2_TB ANSWER: tb' . ($index + 1) . '/' . count($_SESSION['tb2_set']) . 
+              ' side=' . $side . ' value=' . $value . ' left=' . $block['left_var'] . ' right=' . $block['right_var'] . 
+              ' (next_index=' . $_SESSION['tb2_index'] . ')');
+    
+    // Tarkistetaan onko tiebreak valmis
+    if ($_SESSION['tb2_index'] >= count($_SESSION['tb2_set'])) {
+        handle_phase2_tiebreak_completion();
+    }
+}
+
+/**
+ * Käsittelee vaiheen 2 tiebreak-kierroksen valmistumisen
+ * 
+ * @return void
+ */
+function handle_phase2_tiebreak_completion(): void {
+    $varPoints = $_SESSION['varPoints'] ?? [];
+    $leaders = [];
+    
+    if (!empty($varPoints)) {
+        arsort($varPoints);
+        $maxPoints = reset($varPoints);
+        $leaders = array_keys(array_filter($varPoints, function($points) use ($maxPoints) {
+            return $points === $maxPoints;
+        }));
+        
+        // Lisää top_variable tiedot log_row:hin
+        $sortedVars = array_keys($varPoints);
+        $_SESSION['log_row']['top_var_1'] = $sortedVars[0] ?? '';
+        $_SESSION['log_row']['top_var_1_pts'] = isset($sortedVars[0]) ? ($varPoints[$sortedVars[0]] ?? 0) : 0;
+        $_SESSION['log_row']['top_var_2'] = $sortedVars[1] ?? '';
+        $_SESSION['log_row']['top_var_2_pts'] = isset($sortedVars[1]) ? ($varPoints[$sortedVars[1]] ?? 0) : 0;
+    }
+    
+    $pointsStr = '';
+    foreach ($varPoints as $var => $points) {
+        $pointsStr .= $var . '=' . $points . ' ';
+    }
+    index_log('PHASE2_TB: Complete (varPoints=' . trim($pointsStr) . ', leaders=' . implode(',', $leaders) . ')');
+    
+    // Valitaan voittaja
+    $finalVar = '';
+    if (count($leaders) === 1) {
+        $finalVar = $leaders[0];
+    } elseif (count($leaders) > 1) {
+        $finalVar = $leaders[array_rand($leaders)];
+    }
+    
+    $_SESSION['log_row']['finalVar'] = $finalVar;
+    if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+    write_full_log_row($_SESSION['log_row']);
+    $_SESSION['state'] = 'done2';
+    index_log('STATE CHANGE: phase2_tb -> done2 (finalVar=' . $finalVar . ' after tiebreak)');
+}
+
+/* Tiebreak vastauksen käsittely */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'tiebreak') && isset($_POST['tb_choice'])) {
+    handle_tiebreak_answer((int)$_POST['tb_choice']);
+}
+
+/* Vaihe 2 vastauksen käsittely */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'phase2') && isset($_POST['choice2_value']) && isset($_POST['choice2_side'])) {
+    handle_phase2_answer((int)$_POST['choice2_value'], $_POST['choice2_side']);
+}
+
+/* Vaihe 2 tiebreak vastauksen käsittely */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'phase2_tb') && isset($_POST['tb2_value']) && isset($_POST['tb2_side'])) {
+    handle_phase2_tiebreak_answer((int)$_POST['tb2_value'], $_POST['tb2_side']);
+}
+
+/* ====== INVITE token auto-claim URL-parametrilla (intro-tilassa) ====== */
+if (INVITES_ENABLED && ($_SESSION['state'] ?? '') === 'intro' && isset($_GET['invite'])) {
+    $token = (string)$_GET['invite'];
+    if ($token !== '') {
+        $items = invites_load();
+        $inv = invite_find_by_token($items, $token);
+        if ($inv && (($inv['status'] ?? '') === 'sent' || ($inv['status'] ?? '') === 'accepted')) {
+            $_SESSION['RefGuessType'] = (string)($inv['guess_type'] ?? '');
+            $_SESSION['RefGuessProb'] = (string)($inv['guess_prob'] ?? '');
+            $_SESSION['InviteId']     = (string)($inv['id'] ?? '');
+            if (($inv['status'] ?? '') === 'sent') invite_update_status($_SESSION['InviteId'], 'accepted');
+            $_SESSION['invite_claim_info'] = 'Kutsu tunnistettu.';
+            index_log('INVITE: Token accepted (id=' . $_SESSION['InviteId'] . ')');
+        } else {
+            $_SESSION['invite_claim_info'] = 'Kutsulinkki ei kelpaa tai on vanhentunut.';
+            index_log('INVITE: Token invalid or expired');
+        }
+    }
+}
+
+?>
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes">
+<title>ENNEGRAMMITESTI-pilotti</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  --card-w: 800px;
+  --p1-left-bg:#ffe5ea; --p1-left-bd:#f5a8b5;
+  --p1-right-bg:#e6f7e6; --p1-right-bd:#9cd39c;
+  --left-bg:#fff7cc; --left-bd:#e6d88a;
+  --right-bg:#e8f1ff; --right-bd:#a6c0f3;
+  --left-mild-bg:#ede499; --left-strong-bg:#ede499;
+  --right-mild-bg:#b8d1ff; --right-strong-bg:#b8d1ff;
+}
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-animation 1.1s cubic-bezier(.4,0,.2,1);
+  background: rgba(220, 0, 60, 0.7); /* punainen, erottuvampi */
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes ripple-animation {
+  to {
+    transform: scale(4.5);
+    opacity: 0;
+  }
+}
+/* === PERUSTYYLIT === */
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:40px 24px 24px 24px;background:url('SEGRY_turkoositausta_1.png') repeat;color:#111;line-height:1.5;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-start;align-items:center}
+
+/* === LAYOUT-KOMPONENTIT === */
+.card{max-width:var(--card-w);width:100%;margin:0;padding:20px;border:1px solid #ddd;border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);background:#fff}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.block{padding:12px;border:1px solid #eee;border-radius:10px;background:#fcfcfc}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.footer{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+
+/* === PERUSTEKSTIT === */
+.lead{font-size:22px;margin:16px 0}
+.leadLarge{font-size:28px;margin:16px 0}
+.muted{color:#444;font-size:15px}
+.small{font-size:12px;color:#666}
+.credits{margin-top:56px;text-align:center;color:#6b6b6b;font-size:12px}
+
+/* === PAINIKKEET - PERUSTYYLIT === */
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:2px solid #ccc;border-radius:10px;background:#fafafa;cursor:pointer;font-size:18px;min-width:44px;min-height:44px;text-align:center;color:#000;-webkit-text-fill-color:#000;-webkit-appearance:none;appearance:none;transition:all 0.2s ease;box-shadow:0 2px 4px rgba(0,0,0,0.1);margin:2px;}
+.btn:hover{background:#e0e0e0;border-color:#999;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.15);}
+.btn:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,0.1);}
+.btn.selected{background:#ffe066 !important;border-color:#e6c200 !important;color:#222 !important;box-shadow:0 4px 16px rgba(255,224,102,0.4);transform:translateY(-2px) scale(1.08);transition:all 0.25s cubic-bezier(.4,0,.2,1);}
+
+/* === LINKIT JA MUUT ELEMENTIT === */
+.linkbtn{display:inline-block;padding:12px 16px;border:1px solid #ccc;border-radius:10px;background:#fafafa;text-decoration:none;color:#000;-webkit-text-fill-color:#000}
+.linkbtn:hover{background:#f0f0f0}
+.badge{padding:2px 8px;border-radius:999px;background:#eef;border:1px solid #ccd;font-size:12px}
+.badge-off{background:#fee;border-color:#fbb}
+.sep{padding:0 6px;color:#999}
+.logo{height:96px;width:auto;object-fit:contain}
+.spacer{height:28px}
+
+/* === PROGRESS BAR === */
+.progress{width:100%;height:12px;background:#e9ecf3;border-radius:8px;overflow:hidden}
+.progress-bar{height:100%;background:linear-gradient(90deg,#6b8cff,#3f6bff);border-radius:8px;transition:width .25s ease}
+
+/* === BUTTON-VARIANTIT === */
+/* Phase 1 buttons */
+.btn-p1-left{background:var(--p1-left-bg);border-color:#f591a8;}
+.btn-p1-left:hover{background:#ffc0cf;border-color:#f56b8b;}
+.btn-p1-right{background:var(--p1-right-bg);border-color:#7ac47a;}
+.btn-p1-right:hover{background:#c4e8c4;border-color:#5cb85c;}
+
+/* Phase 2 buttons */
+/* Vasemmanpuoleiset painonapit - lievästi */
+.btn-left-mild{background:#f5f0c0;border-color:#e5e0a0;font-size:14px;padding:6px 8px;line-height:1.2;min-height:40px;max-width:120px;word-break:keep-all;hyphens:auto;}
+.btn-left-mild:hover{background:#f8f3cc;border-color:#e8e3a6;}
+
+/* Vasemmanpuoleiset painonapit - selvästi */
+.btn-left-strong{background:#e6d555;border-color:#d4c04a;font-size:14px;padding:6px 8px;line-height:1.2;min-height:40px;max-width:120px;word-break:keep-all;hyphens:auto;}
+.btn-left-strong:hover{background:#ead966;border-color:#d8c450;}
+
+/* Oikeanpuoleiset painonapit - lievästi */
+.btn-right-mild{background:#d8e5f8;border-color:#c0d0f0;font-size:14px;padding:6px 8px;line-height:1.2;min-height:40px;max-width:120px;word-break:keep-all;hyphens:auto;}
+.btn-right-mild:hover{background:#e0ebfa;border-color:#c8d6f2;}
+
+/* Oikeanpuoleiset painonapit - selvästi */
+.btn-right-strong{background:#a5c2ff;border-color:#90b0eb;font-size:14px;padding:6px 8px;line-height:1.2;min-height:40px;max-width:120px;word-break:keep-all;hyphens:auto;}
+.btn-right-strong:hover{background:#b5ccff;border-color:#a0baef;}
+
+/* Automaattinen fontin pienennys pitkille teksteille */
+@media (max-width: 1200px) {
+  .btn-left-mild, .btn-left-strong, .btn-right-mild, .btn-right-strong {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .btn-left-mild, .btn-left-strong, .btn-right-mild, .btn-right-strong {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 600px) {
+  .btn-left-mild, .btn-left-strong, .btn-right-mild, .btn-right-strong {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-left-mild, .btn-left-strong, .btn-right-mild, .btn-right-strong {
+    font-size: 9px;
+    padding: 3px 4px;
+    max-width: none;
+    width: 100%;
+  }
+  .btn-eos {
+    max-width: none;
+    width: 100%;
+  }
+  .choice2-form, .tb2-form {
+    width: 100% !important;
+    display: block !important;
+  }
+}
+
+.btn-zero{background:#f5f5f5;border-color:#cfcfcf;font-size:14px;padding:16px;line-height:1.5;min-height:80px;width:100%;max-width:100%;}
+.btn-zero:hover{background:#e0e0e0;border-color:#999;}
+
+.btn-eos{background:#999;color:white;border:2px solid #666;border-radius:8px;padding:12px 20px;font-size:16px;font-weight:bold;cursor:pointer;transition:all 0.2s ease;min-height:50px;width:100%;}
+.btn-eos:hover{background:#888;border-color:#555;}
+
+/* === LAYOUT-KOMPONENTIT === */
+.case-wrap{display:grid;grid-template-columns:1fr 0.5fr 1fr;grid-auto-rows:auto;row-gap:20px;column-gap:7px;align-items:stretch;padding:16px 0;margin:0;}
+.opt-left{grid-column:1;display:flex;flex-direction:column;}
+.opt-center{grid-column:2;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+.opt-right{grid-column:3;display:flex;flex-direction:column;}
+.opt-box{flex:1;display:flex;flex-direction:column;border-radius:12px;border:1px solid transparent;padding:15px;font-size:18px;word-break:break-word;color:#000;min-height:120px;box-sizing:border-box;}
+.opt-box-content{flex-grow:1;}
+.opt-box.left{background:var(--left-bg);border-color:var(--left-bd);text-align:center}
+.opt-box.right{background:var(--right-bg);border-color:var(--right-bd);text-align:center}
+.opt-box.center{background:#e0e0e0;border-color:#bbb;text-align:center;padding:15px;min-height:120px;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;width:100%;}
+.opt-box .btn-group{margin-top:10px;}
+.opt-left .btn-group, .opt-right .btn-group{display:flex;gap:8px;}
+.opt-left .btn-group form, .opt-right .btn-group form{flex:1;}
+.case-desc{grid-column:1 / -1;font-size:18px;margin:0 0 5px 0;}
+.mobile-hint{display:none;grid-column:1 / -1;text-align:center;color:#666;font-size:14px;margin-top:10px;}
+/* === SCALE-KOMPONENTIT === */
+.scale-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;margin:10px 0 0;position:relative;min-height:60px;width:100%;gap:8px;}
+.scale-left,.scale-right{display:flex;align-items:center;gap:4px;padding:0 4px;justify-content:center;flex-wrap:wrap;}
+.scale-zero{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 4px;margin:0;position:relative;top:0;justify-content:center;flex:0 0 auto;}
+.scale-zero .bar{font-weight:700;color:#999;line-height:1;}
+
+/* === FORM-ELEMENTIT === */
+.textarea{width:100%;min-height:120px;padding:10px;border:1px solid #ccc;border-radius:10px;font-size:16px;resize:vertical}
+.center-row{display:flex;justify-content:center;gap:8px;flex-wrap:nowrap}
+.alert{padding:10px;border-radius:8px;margin:10px 0}
+.alert-ok{background:#e7f7e7;border:1px solid #a7d3a7}
+.alert-err{background:#fdeaea;border:1px solid #e7b0b0}
+
+/* === DEBUG JA APULUOKAT === */
+.help{grid-column:1/-1;color:#555}
+.debug{margin-top:10px;padding:10px;border:1px dashed #bbb;background:#fafcff;border-radius:10px;font-size:14px}
+
+/* === UUDET CSS-LUOKAT INLINE-TYYLIEN KORVAAMISEEN === */
+.error-messages{margin-bottom:20px}
+.error-message{background-color:#ffebee;color:#c62828;padding:12px;border-radius:4px;margin-bottom:8px;border-left:4px solid #c62828}
+.confidence-container{display:none;margin-top:12px}
+.confidence-container.show{display:block}
+.question-layout{display:flex;flex-direction:column;align-items:center}
+.scale-container{margin:16px 0;align-items:center;gap:8px;width:100%;max-width:800px}
+.scale-label{flex:1;font-size:14px;color:#555}
+.scale-label.left{text-align:right;padding-right:10px}
+.scale-label.right{text-align:left;padding-left:10px}
+.scale-buttons{display:flex;gap:4px;align-items:center;justify-content:center}
+.scale-divider{display:inline-flex;height:48px;align-items:center;margin:0 8px;color:#ccc}
+.question-text{font-size:18px;margin:0 0 16px 0}
+.scale-help{text-align:center;margin-top:8px}
+.badge-off{background:#fee;border-color:#fbb}
+.form-spacing{height:14px}
+.form-spacing-small{height:8px}
+.form-margin{margin-top:12px}
+.input-margin{margin-bottom:6px}
+.text-small{margin:4px 0 0 0;color:#666}
+.text-required{color:#b00}
+/* === RESPONSIIVISUUS === */
+.mobile-scale-label{display:none}
+.desktop-only{display:block}
+
+/* Varmistetaan että orientaation vaihtaminen toimii */
+@media screen and (orientation: landscape) {
+  .card{max-height:90vh;overflow-y:auto}
+}
+
+/* Tablet-koko (769px - 1024px) */
+@media (max-width:1024px){
+  .card{max-width:95%;margin:0}
+  body{padding:20px 10px 10px 10px}
+}
+
+/* Pieni tablet / suuri mobiili (521px - 768px) */
+@media (max-width:480px){
+  .card{padding:16px;max-width:98%;margin:0}
+  body{padding:15px 5px 5px 5px}
+  .logo{height:72px}
+  .opt-box,.case-desc{font-size:17px}
+  .scale-container{flex-direction:column;gap:12px}
+  .scale-label{text-align:center;padding:0}
+  .case-wrap{grid-template-columns:1fr;gap:15px}
+  .linkbtn{padding:10px 12px;font-size:16px}
+  
+  /* Phase 2 Mobile optimointi */
+  .opt-left,.opt-right,.opt-center{grid-column:1;width:100%;margin:0}
+  .case-wrap{grid-template-columns:1fr;grid-template-rows:auto auto auto auto auto;gap:15px;}
+  .opt-center{order:2;}
+  .opt-right{order:3;}
+  .opt-left .btn-group, .opt-right .btn-group{flex-direction:column;gap:10px;}
+  .mobile-hint{display:block !important;order:4;}
+  .opt-box{margin:0;padding:12px;min-height:auto}
+  .opt-box .btn-group{margin-top:8px;justify-content:center;display:flex;flex-wrap:wrap;gap:4px}
+  .scale-row{gap:6px;margin:8px 0;min-height:auto;justify-content:center;width:100%}
+  .scale-row[style*="grid-column"]{padding:0;margin:8px 0}
+  .btn-group form{display:inline-block;margin:2px}
+  
+  /* Mobiili asteikko-tekstit */
+  .desktop-only{display:none}
+  .mobile-scale-label{display:block;font-size:14px;margin:4px 0}
+  .mobile-scale-label.top-left{color:#8B0000;text-align:left;margin-bottom:8px}
+  .mobile-scale-label.bottom-right{color:#006400;text-align:right;margin-top:8px}
+  .scale-buttons{position:relative}
+}
+
+/* Mobiili (max 520px) */
+@media (max-width:520px){
+  .card{padding:12px;margin:0}
+  body{padding:12px 2px 2px 2px}
+  .logo{height:60px}
+  .btn{font-size:16px;min-width:42px;min-height:42px;padding:8px 12px}
+  .scale-buttons{flex-wrap:wrap;gap:4px;justify-content:flex-end}
+  .linkbtn{padding:8px 10px;font-size:15px}
+  h1{font-size:24px}
+  h2{font-size:20px}
+  .progress{height:10px}
+  
+  /* Phase 2 & Tiebreak optimointi pienille näytöille */
+  .case-wrap{gap:12px}
+  .opt-box{padding:10px;font-size:16px}
+  .btn-group{margin-top:6px}
+  .btn-group .btn{margin:2px;min-width:auto;padding:6px 8px;font-size:14px}
+  .case-desc{font-size:16px;margin-bottom:8px}
+  
+  /* Keskimmäinen nappi optimointi - koko leveys */
+  .scale-row[style*="grid-column"] .btn-zero{width:100%;max-width:none;margin:0;padding:10px}
+}
+
+/* Erittäin pieni mobiili (max 360px) */
+@media (max-width:360px){
+  .card{padding:8px;margin:0}
+  body{padding:8px 1px 1px 1px}
+  .btn{font-size:15px;min-width:40px;min-height:40px;padding:6px 10px;margin:1px}
+  .linkbtn{padding:6px 8px;font-size:14px}
+  h1{font-size:22px}
+  .mobile-scale-label{font-size:13px}
+  .scale-help{font-size:14px}
+  
+  /* Phase 2 pienimmille näytöille */
+  .case-wrap{gap:10px;padding:8px 0}
+  .opt-box{padding:8px;font-size:15px;min-height:auto}
+  .case-desc{font-size:15px;margin-bottom:6px}
+  .btn-left-mild,.btn-left-strong,.btn-right-mild,.btn-right-strong{font-size:12px;padding:4px 6px;min-height:36px;max-width:100px;margin:1px}
+  .btn-zero{font-size:13px;padding:8px;min-height:auto;max-width:none;width:100%}
+  .scale-row{gap:4px;margin:6px 0}
+}
+
+/* === RIPPLE-EFEKTI === */
+</style>
+</head>
+<body>
+<div class="card">
+  <?= display_error_messages() ?>
+  <div class="header" role="banner">
+    <div>
+      <h1>ENNEGRAMMITESTI-pilotti</h1>
+      <?php if ($SHOW_TEST_TOGGLE): ?>
+      <div class="small">
+        Testimoodi:
+        <?php if ($TEST_MODE): ?>
+          <span class="badge" aria-live="polite">Päällä</span>
+          <a href="?test=0<?= isset($_GET['showtestmode'])?'&showtestmode=1':'' ?>">Poista</a> •
+          <a href="?test=1&amp;admin=1<?= isset($_GET['showtestmode'])?'&showtestmode=1':'' ?>">Admin-tarkistus</a>
+        <?php else: ?>
+          <span class="badge badge-off" aria-live="polite">Pois</span>
+          <a href="?test=1<?= isset($_GET['showtestmode'])?'&showtestmode=1':'' ?>">Kytke päälle</a>
+        <?php endif; ?>
+      <?php endif; ?>
+    </div>
+  </div>
+
+<?php if (($_SESSION['state'] ?? '') === 'intro'):
+    $oldNick  = h($_POST['nickname'] ?? ($_SESSION['nickname'] ?? ''));
+    $oldEnnea = isset($_POST['ennea']) ? (string)$_POST['ennea'] : '';
+    $inviteInfo = $_SESSION['invite_claim_info'] ?? '';
+    $haveToken = !empty($_SESSION['InviteId']);
+    $oldCode = h($_POST['invite_code'] ?? '');
+?>
+  <h2>Tervetuloa</h2>
+  <p class="lead">
+    Katso ensimmäisenä ohjevideo alla, niin saat käsityksen mistä testissä on kyse ja kuinka tehdä testi.
+  </p>
+  <div class="block" role="region" aria-label="Esittelyvideo">
+    <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; margin: 0 auto;">
+      <div id="video-thumbnail" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('video-thumbnail.png'); background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <div style="width: 80px; height: 80px; background: rgba(0,0,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+          <div style="width: 0; height: 0; border-left: 25px solid #fff; border-top: 15px solid transparent; border-bottom: 15px solid transparent; margin-left: 5px;"></div>
+        </div>
+      </div>
+      <div id="video-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;">
+      </div>
+    </div>
+    <script nonce="<?= $nonce ?>">
+    document.getElementById('video-thumbnail').addEventListener('click', function() {
+      var thumbnail = document.getElementById('video-thumbnail');
+      var iframeContainer = document.getElementById('video-iframe');
+      
+      // Luo iframe autoplay-parametrilla
+      var iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px;';
+      iframe.src = 'https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1';
+      iframe.title = 'Enneagrammitesti esittelyvideo';
+      iframe.allowFullscreen = true;
+      
+      // Piilota thumbnail ja näytä video
+      thumbnail.style.display = 'none';
+      iframeContainer.appendChild(iframe);
+      iframeContainer.style.display = 'block';
+    });
+    
+    // Hover-efekti play-napille
+    document.getElementById('video-thumbnail').addEventListener('mouseenter', function() {
+      var playBtn = this.querySelector('div');
+      playBtn.style.transform = 'scale(1.1)';
+      playBtn.style.background = 'rgba(255,255,255,0.2)';
+    });
+    
+    document.getElementById('video-thumbnail').addEventListener('mouseleave', function() {
+      var playBtn = this.querySelector('div');
+      playBtn.style.transform = 'scale(1)';
+      playBtn.style.background = 'rgba(0,0,0,0.8)';
+    });
+    </script>
+  </div>
+
+  <?php if ($TEST_MODE): 
+    $phase1_all_preview = get_cached_phase1_questions();
+    $phase1_preview_path = csv_path(PHASE1_FILE_BASE);
+    $phase1_preview_count = count($phase1_all_preview);
+    $type_desc_path = csv_path(TYPEDESC_FILE_BASE);
+  ?>
+    <p class="small" style="margin-top:8px">
+      CSV (vaihe 1): <strong><?= $phase1_preview_path ? h($phase1_preview_path) : 'ei löytynyt' ?></strong> — A1/B1/C1/D1 yhteensä: <strong><?= h($phase1_preview_count) ?></strong><br>
+      TypeDescriptions: <strong><?= $type_desc_path ? h($type_desc_path) : 'ei löytynyt' ?></strong><br>
+      Loki: <strong><?= h(log_path()) ?></strong> — Sovellusloki: <strong><?= h(index_app_log_path()) ?></strong><br>
+      Kutsurekisteri: <strong><?= h(invites_path()) ?></strong>
+    </p>
+  <?php endif; ?>
+
+  <?php if (!empty($inviteInfo) && $TEST_MODE): ?>
+    <p class="small" style="color:#055;"><?= h($inviteInfo) ?></p>
+  <?php endif; ?>
+
+  <?php if (!empty($error)): ?>
+    <p style="color:#b00" role="alert"><strong><?= h($error) ?></strong></p>
+  <?php endif; ?>
+
+  <?php 
+  $formError = '';
+  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['start'])) {
+      if (empty($_POST['ennea'])) {
+          $formError = 'Valitse enneagrammityyli (1-9) tai \'en tiedä\' jatkaaksesi';
+      } elseif ($_POST['ennea'] !== 'en tiedä' && empty($_POST['confidence'])) {
+          $formError = 'Valitse varmuustasosi arvioistasi';
+      }
+  }
+  ?>
+  <?php if ($formError): ?>
+    <div class="alert alert-err" role="alert"><?= h($formError) ?></div>
+  <?php endif; ?>
+  <form id="startForm" method="post" class="form-margin" novalidate>
+    <?php if (INVITES_ENABLED && !$haveToken): ?>
+      <label for="invite_code">Kutsukoodi (jos sait kutsun)</label>
+      <input type="text" id="invite_code" name="invite_code" value="<?=$oldCode?>" placeholder="Esim. ABCD1234">
+      <div class="form-spacing"></div>
+    <?php endif; ?>
+
+    <label for="nickname">Nimimerkki</label>
+    <input type="text" id="nickname" name="nickname" value="<?=$oldNick?>" autocomplete="nickname" class="input-margin">
+    <div class="form-spacing-small"></div>
+
+    <label for="ennea">Mikä on sinun enneagrammityylisi? <span class="text-required">*</span></label>
+    <select id="ennea" name="ennea" required>
+      <option value="">-- Valitse --</option>
+      <?php for ($i=1;$i<=9;$i++): ?>
+        <option value="<?=$i?>" <?=$oldEnnea===(string)$i?'selected':''?>><?=$i?></option>
+      <?php endfor; ?>
+      <option value="en tiedä" <?=$oldEnnea==='en tiedä'?'selected':''?>>en tiedä</option>
+    </select>
+    <p class="small text-small">Valitse enneagrammityylisi. Jos et tiedä, valitse "en tiedä".</p>
+    
+    <div id="confidenceContainer" class="confidence-container">
+      <label for="confidence">Kuinka varma olet arvioistasi omasta tyypistäsi? <span class="text-required">*</span></label>
+      <select id="confidence" name="confidence" required class="form-control">
+        <option value="">-- Valitse --</option>
+        <option value="1" <?= ($_POST['confidence'] ?? '') === '1' ? 'selected' : '' ?>>En ole lainkaan varma</option>
+        <option value="2" <?= ($_POST['confidence'] ?? '') === '2' ? 'selected' : '' ?>>Olen melko varma</option>
+        <option value="3" <?= ($_POST['confidence'] ?? '') === '3' ? 'selected' : '' ?>>Olen täysin varma</option>
+      </select>
+    </div>
+    <script nonce="<?= $nonce ?>">
+    function toggleConfidence() {
+        const ennea = document.getElementById('ennea');
+        const container = document.getElementById('confidenceContainer');
+        const confidence = document.getElementById('confidence');
+        
+        if (ennea?.value && ennea.value !== 'en tiedä') {
+            container?.classList.add('show');
+            if (confidence) confidence.required = true;
+        } else {
+            container?.classList.remove('show');
+            if (confidence) confidence.required = false;
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('startForm');
+        const ennea = document.getElementById('ennea');
+        const confidence = document.getElementById('confidence');
+        
+        ennea?.addEventListener('change', toggleConfidence);
+        toggleConfidence(); // Initialize state
+        
+        form?.addEventListener('submit', function(event) {
+            if (!ennea?.value) {
+                event.preventDefault();
+                alert('Valitse enneagrammityyli (1-9) tai "en tiedä" jatkaaksesi');
+                ennea?.focus();
+                return;
+            }
+            
+            if (ennea.value !== 'en tiedä' && !confidence?.value) {
+                event.preventDefault();
+                alert('Valitse varmuustasosi');
+                confidence?.focus();
+            }
+        });
+    });
+    </script>
+
+    <div class="footer">
+      <button class="btn" type="submit" name="start" value="1">Aloita kysely</button>
+    </div>
+  </form>
+
+<?php elseif (($_SESSION['state'] ?? '') === 'quiz1'):
+    $set = $_SESSION['phase1'] ?? []; $total = count($set);
+    $i   = (int)$_SESSION['q1_index'] ?? 0;
+    $pct = ($total>0) ? (int)floor(($i/$total)*100) : 0;
+    if ($total === 0): ?>
+      <p style="color:#b00"><strong>Tiedostosta ei löytynyt kysymyksiä.</strong></p>
+    <?php else:
+      if ($i<0 || $i>=$total){$i=0;$_SESSION['q1_index']=0;}
+      $q = $set[$i];
+    ?>
+    <div class="row"><h2>Vaihe 1</h2>
+      <div style="flex:1 1 100%">
+        <?= generate_progress_bar($i + 1, count($set), 'Eteneminen vaihe 1') ?>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="block"><p style="font-size:18px;margin:0"><?= h($q['text']) ?></p></div>
+
+    <div class="question-layout">
+      <div class="center-row scale-container">
+        <div class="scale-label left desktop-only">
+          Täysin eri mieltä
+        </div>
+        
+        <div class="scale-buttons">
+            <div class="mobile-scale-label top-left">Täysin eri mieltä</div>
+            <?php for ($n=1;$n<=3;$n++): ?>
+              <form method="post" style="display:inline" class="choice-form">
+                <input type="hidden" name="choice" value="<?=$n?>">
+                <?= generate_phase1_button($n, 'left') ?>
+              </form>
+            <?php endfor; ?>
+          
+            <span class="scale-divider">|</span>
+          
+            <?php for ($n=4;$n<=6;$n++): ?>
+              <form method="post" style="display:inline" class="choice-form">
+                <input type="hidden" name="choice" value="<?=$n?>">
+                <?= generate_phase1_button($n, 'right') ?>
+              </form>
+            <?php endfor; ?>
+            <div class="mobile-scale-label bottom-right">Täysin samaa mieltä</div>
+        </div>
+        
+        <div class="scale-label right desktop-only">
+          Täysin samaa mieltä
+        </div>
+      </div>
+      <p class="muted scale-help">Valitse asteikolta mielipidettäsi tai asennettasi parhaiten kuvaava vaihtoehto.</p>
+    </div>
+
+      <script nonce="<?= $nonce ?>">
+      // Vaihe 1 painonappien valinta-animaatio ja ripple-efekti
+      document.addEventListener('DOMContentLoaded', function() {
+        var forms = document.querySelectorAll('.choice-form');
+        forms.forEach(function(form) {
+          form.addEventListener('submit', function(e) {
+            var btn = form.querySelector('.choice-btn');
+            if (btn) {
+              btn.classList.add('selected');
+              // Ripple-efekti
+              var rect = btn.getBoundingClientRect();
+              var ripple = document.createElement('span');
+              ripple.className = 'ripple-effect';
+              var size = Math.max(rect.width, rect.height) * 1.6;
+              ripple.style.width = ripple.style.height = size + 'px';
+              // Sijoitetaan klikattuun kohtaan
+              var x = e.clientX - rect.left;
+              var y = e.clientY - rect.top;
+              ripple.style.left = (x - size/2) + 'px';
+              ripple.style.top = (y - size/2) + 'px';
+              btn.appendChild(ripple);
+              setTimeout(function() {
+                ripple.remove();
+              }, 1100);
+            }
+            // Viive ennen lomakkeen lähettämistä (350ms)
+            e.preventDefault();
+            setTimeout(function() {
+              form.submit();
+            }, 350);
+          });
+        });
+      });
+      </script>
+
+    <?php if ($TEST_MODE): ?>
+      <div class="debug"><strong>Luokka (piilossa):</strong> <?= h($q['class']) ?> — id: <?= h($q['id']) ?></div>
+    <?php endif; ?>
+
+    <?php endif; ?>
+
+<?php elseif (($_SESSION['state'] ?? '') === 'tiebreak'):
+    $set = $_SESSION['tiebreak_set'] ?? []; $total = count($set);
+    $i   = (int)($_SESSION['tiebreak_index'] ?? 0);
+    $pct = ($total>0) ? (int)floor(($i/$total)*100) : 0;
+?>
+  <div class="row"><h2>Vaihe 1</h2>
+    <div style="flex:1 1 100%">
+      <?= generate_progress_bar($i + 1, count($set), 'Lisäkysymysten eteneminen') ?>
+    </div>
+  </div>
+  <div style="height:16px"></div>
+  <?php if ($total === 0): ?>
+    <p class="muted">Lisäkysymyksiä ei löytynyt. Jatketaan pisteillä.</p>
+    <form method="post"><button class="btn" name="tb_choice" value="4">Jatka</button></form>
+  <?php else:
+      $q = $set[$i] ?? null;
+      if ($q): ?>
+      <div class="block"><p class="question-text"><?= h($q['text']) ?></p></div>
+      
+      <div class="question-layout">
+        <div class="center-row scale-container">
+          <div class="scale-label left desktop-only">
+            Täysin eri mieltä
+          </div>
+          
+          <div class="scale-buttons">
+            <div class="mobile-scale-label top-left">Täysin eri mieltä</div>
+            <?php for ($n=1;$n<=3;$n++): ?>
+              <form method="post" style="display:inline" class="tb-choice-form">
+                <input type="hidden" name="tb_choice" value="<?=$n?>">
+                <?= generate_phase1_button($n, 'left', 'tb-choice') ?>
+              </form>
+            <?php endfor; ?>
+            
+            <span class="scale-divider">|</span>
+            
+            <?php for ($n=4;$n<=6;$n++): ?>
+              <form method="post" style="display:inline" class="tb-choice-form">
+                <input type="hidden" name="tb_choice" value="<?=$n?>">
+                <?= generate_phase1_button($n, 'right', 'tb-choice') ?>
+              </form>
+            <?php endfor; ?>
+            <div class="mobile-scale-label bottom-right">Täysin samaa mieltä</div>
+          </div>
+          
+          <div class="scale-label right desktop-only">
+            Täysin samaa mieltä
+          </div>
+        </div>
+        <p class="muted scale-help">Valitse asteikolta mielipidettäsi tai asennettasi parhaiten kuvaava vaihtoehto.</p>
+      </div>
+      <script nonce="<?= $nonce ?>">
+      // Tiebreak painonappien ripple-efekti ja valinta-animaatio
+      document.addEventListener('DOMContentLoaded', function() {
+        var forms = document.querySelectorAll('.tb-choice-form');
+        forms.forEach(function(form) {
+          form.addEventListener('submit', function(e) {
+            var btn = form.querySelector('.tb-choice-btn');
+            if (btn) {
+              btn.classList.add('selected');
+              // Ripple-efekti
+              var rect = btn.getBoundingClientRect();
+              var ripple = document.createElement('span');
+              ripple.className = 'ripple-effect';
+              var size = Math.max(rect.width, rect.height) * 1.6;
+              ripple.style.width = ripple.style.height = size + 'px';
+              var x = e.clientX - rect.left;
+              var y = e.clientY - rect.top;
+              ripple.style.left = (x - size/2) + 'px';
+              ripple.style.top = (y - size/2) + 'px';
+              btn.appendChild(ripple);
+              setTimeout(function() {
+                ripple.remove();
+              }, 1100);
+            }
+            // Viive ennen lomakkeen lähettämistä (350ms)
+            e.preventDefault();
+            setTimeout(function() {
+              form.submit();
+            }, 350);
+          });
+        });
+      });
+      </script>
+    <?php endif; endif; ?>
+
+<?php elseif (($_SESSION['state'] ?? '') === 'a1_result'): ?>
+  <?php if ($TEST_MODE): ?>
+    <div class="debug">
+      <strong>Vaihe 1 pisteet:</strong>
+      A1: <?= (int)($_SESSION['points1']['A1']??0) ?>,
+      B1: <?= (int)($_SESSION['points1']['B1']??0) ?>,
+      C1: <?= (int)($_SESSION['points1']['C1']??0) ?>,
+      D1: <?= (int)($_SESSION['points1']['D1']??0) ?><br>
+      <strong>“Kyllä” (4–6):</strong>
+      A1: <?= (int)($_SESSION['yesCounts1']['A1']??0) ?>,
+      B1: <?= (int)($_SESSION['yesCounts1']['B1']??0) ?>,
+      C1: <?= (int)($_SESSION['yesCounts1']['C1']??0) ?>,
+      D1: <?= (int)($_SESSION['yesCounts1']['D1']??0) ?>
+    </div>
+  <?php endif; ?>
+  <p class="leadLarge">Enneagrammityylisi tämän testin perusteella vaikuttaisi olevan TYYLI 4</p>
+  <?php 
+    $type_desc_map = get_cached_type_descriptions();
+    $desc = $type_desc_map['4'] ?? ''; 
+    if ($desc!==''): ?>
+    <div class="block"><p style="margin:0"><?= h($desc) ?></p></div>
+  <?php else: ?>
+    <p class="muted">Kuvausta ei löytynyt tyypille 4.</p>
+  <?php endif; ?>
+  <div class="footer">
+    <a class="linkbtn" href="?reset=1">Aloita alusta</a>
+    <a class="linkbtn" href="https://www.enneagram.fi/tietoa-enneagrammista/" target="_blank" rel="noopener">Lue lisää enneagrammista</a>
+    <?php if (empty($_SESSION['feedback_given'])): ?>
+    <form method="post" style="display:inline">
+      <input type="submit" class="linkbtn" name="show_feedback" value="Anna palautetta" style="border:1px solid #ccc;background:#fafafa;cursor:pointer">
+    </form>
+    <?php endif; ?>
+  </div>
+
+  <?php
+    $feedback_show = !empty($_SESSION['show_feedback']) && empty($_SESSION['feedback_given']);
+    if ($feedbackMsg !== '') echo '<div class="alert alert-ok">'.h($feedbackMsg).'</div>';
+    if ($feedbackErr !== '') echo '<div class="alert alert-err">'.h($feedbackErr).'</div>';
+    if ($feedback_show):
+  ?>
+    <form method="post" style="margin-top:12px">
+      <label for="feedback_text"><strong>Palaute</strong></label>
+      <textarea id="feedback_text" name="feedback_text" class="textarea" placeholder="Kirjoita palautteesi tähän..."><?= h($oldFeedbackText) ?></textarea>
+      <div class="footer">
+        <button class="linkbtn" type="submit" name="send_feedback" value="1">Lähetä</button>
+      </div>
+    </form>
+  <?php endif; ?>
+
+<?php elseif (($_SESSION['state'] ?? '') === 'phase2'):
+    $i     = (int)($_SESSION['q2_index'] ?? 0);
+    $blk   = $_SESSION['blocks2'][$i] ?? null;
+    $track = $_SESSION['track'] ?? '';
+    $total = count($_SESSION['blocks2'] ?? []);
+    $pct   = ($total>0) ? (int)floor(($i/$total)*100) : 0;
+?>
+  <div class="row">
+    <?php if ($TEST_MODE): ?><h2>Vaihe 2, tapaus <?= h($i+1) ?> (<?= h($track) ?>)</h2>
+    <?php else: ?><h2>Vaihe 2</h2><?php endif; ?>
+    <div style="flex:1 1 100%"><?= generate_progress_bar($i + 1, count($_SESSION['blocks2'] ?? []), 'Eteneminen vaihe 2') ?></div>
+  </div>
+  <div style="height:16px"></div>
+
+  <?php if ($blk): ?>
+    <div class="case-wrap">
+      <div class="case-desc"><?= h($blk['desc']) ?></div>
+      <div style="grid-column: 1 / -1; color: #555; font-size: 13px; line-height: 1.4; max-width: 100%; margin: 10px 0 20px 0;">
+        Mieti kuvaako sinua vasemman vai oikean laidan kuvaus sinua enemmän ja sen jölkeen valitse oletko selvästi vai lievästi samaa mieltä kuvauksen kanssa. Jos et osaa valita, valitse En osaa sanoa -vaihtoehto.
+      </div>
+      <div class="opt-left">
+        <div class="opt-box left">
+          <div class="opt-box-content"><?= h($blk['left_text']) ?></div>
+          <div class="btn-group scale-row" role="group" aria-label="Vasemmanpuoleiset valinnat">
+            <?php 
+            $buttons = generate_phase2_button_group();
+            echo $buttons['left_strong'] . $buttons['left_mild'];
+            ?>
+          </div>
+        </div>
+      </div>
+      <div class="opt-center">
+        <div class="opt-box center">
+          <div class="opt-box-content">En osaa sanoa</div>
+          <div class="btn-group" role="group" aria-label="Keskimmäinen valinta">
+            <?= $buttons['neutral'] ?>
+          </div>
+        </div>
+      </div>
+      <div class="opt-right">
+        <div class="opt-box right mobile-buttons-top">
+          <div class="btn-group scale-row" role="group" aria-label="Oikeanpuoleiset valinnat">
+            <?php 
+            echo $buttons['right_mild'] . $buttons['right_strong'];
+            ?>
+          </div>
+          <div class="opt-box-content"><?= h($blk['right_text']) ?></div>
+        </div>
+      </div>
+      <div class="mobile-hint">
+        Vinkki: Jos haluat nähdä vaihtoehdot rinnakkain, käännä puhelin vaakasuoraan
+      </div>
+      <script nonce="<?= $nonce ?>">
+      // Vaihe 2 painonappien ripple-efekti ja valinta-animaatio
+      document.addEventListener('DOMContentLoaded', function() {
+        var forms = document.querySelectorAll('.choice2-form, .tb2-form');
+        forms.forEach(function(form) {
+          form.addEventListener('submit', function(e) {
+            var btn = form.querySelector('.choice2-btn, .ripple');
+            if (btn) {
+              btn.classList.add('selected');
+              // Ripple-efekti
+              var rect = btn.getBoundingClientRect();
+              var ripple = document.createElement('span');
+              ripple.className = 'ripple-effect';
+              var size = Math.max(rect.width, rect.height) * 1.6;
+              ripple.style.width = ripple.style.height = size + 'px';
+              var x = e.clientX - rect.left;
+              var y = e.clientY - rect.top;
+              ripple.style.left = (x - size/2) + 'px';
+              ripple.style.top = (y - size/2) + 'px';
+              btn.appendChild(ripple);
+              setTimeout(function() {
+                ripple.remove();
+              }, 1100);
+            }
+            // Viive ennen lomakkeen lähettämistä (350ms)
+            e.preventDefault();
+            setTimeout(function() {
+              form.submit();
+            }, 350);
+          });
+        });
+      });
+      </script>
+    </div>
+  <?php else: ?>
+    <p class="muted">Jatkolohkoja ei löytynyt (<?= h($track) ?>).</p>
+  <?php endif; ?>
+
+<?php elseif (($_SESSION['state'] ?? '') === 'phase2_tb'):
+    $i     = (int)($_SESSION['tb2_index'] ?? 0);
+    $blk   = $_SESSION['tb2_set'][$i] ?? null;
+    $total = count($_SESSION['tb2_set'] ?? []);
+    $pct   = ($total>0) ? (int)floor(($i/$total)*100) : 0;
+    $pair  = $_SESSION['tb2_pair'] ?? [];
+?>
+  <div class="row"><h2>Vaihe 2</h2>
+    <div style="flex:1 1 100%"><div class="progress" aria-label="Vaihe 2 eteneminen" title="<?= $pct ?>%"><div class="progress-bar" style="width:<?= $pct ?>%"></div></div></div>
+  </div>
+  <div style="height:16px"></div>
+
+  <?php if ($TEST_MODE): ?>
+    <div class="debug"><strong>TB2-pari:</strong> <?= h(implode(' vs ', $pair)) ?> — caset: <?= (int)$total ?></div>
+  <?php endif; ?>
+
+  <?php if ($blk): ?>
+    <div class="case-wrap">
+      <div class="case-desc"><?= h($blk['desc']) ?></div>
+      <div style="grid-column: 1 / -1; color: #555; font-size: 13px; line-height: 1.4; max-width: 100%; margin: 10px 0 20px 0;">
+        Mieti kuvaako sinua vasemman vai oikean laidan kuvaus sinua enemmän ja sen jölkeen valitse oletko selvästi vai lievästi samaa mieltä kuvauksen kanssa. Jos et osaa valita, valitse En osaa sanoa -vaihtoehto.
+      </div>
+      <div class="opt-left">
+        <div class="opt-box left">
+          <div class="opt-box-content"><?= h($blk['left_text']) ?></div>
+          <div class="btn-group scale-row" role="group" aria-label="Vasemmanpuoleiset valinnat">
+            <?php 
+            $buttons = generate_phase2_tiebreak_button_group();
+            echo $buttons['left_strong'] . $buttons['left_mild'];
+            ?>
+          </div>
+        </div>
+      </div>
+      <div class="opt-center">
+        <div class="opt-box center">
+          <div class="opt-box-content">En osaa sanoa</div>
+          <div class="btn-group" role="group" aria-label="Keskimmäinen valinta">
+            <?= $buttons['neutral'] ?>
+          </div>
+        </div>
+      </div>
+      <div class="opt-right">
+        <div class="opt-box right">
+          <div class="btn-group scale-row mobile-buttons-top" role="group" aria-label="Oikeanpuoleiset valinnat">
+            <?php 
+            echo $buttons['right_mild'] . $buttons['right_strong'];
+            ?>
+          </div>
+          <div class="opt-box-content"><?= h($blk['right_text']) ?></div>
+        </div>
+      </div>
+      <div class="mobile-hint">
+        Vinkki: Jos haluat nähdä vaihtoehdot rinnakkain, käännä puhelin vaakasuoraan
+      </div>
+    </div>
+  <?php else: ?>
+    <p class="muted">Tiebreak-caseja ei löydy valitulle parille. Ratkaistaan satunnaisesti.</p>
+  <?php endif; ?>
+
+<?php elseif (($_SESSION['state'] ?? '') === 'done2'):
+    $vars = $_SESSION['varPoints'] ?? []; arsort($vars);
+    $nonzero = array_filter($vars, function($v) { return $v > 0; });
+    $topVar  = $_SESSION['log_row']['finalVar'] ?? ( $nonzero ? key($nonzero) : '' );
+    $type_desc_map = get_cached_type_descriptions();
+    $desc    = ($topVar!=='') ? ($type_desc_map[(string)$topVar] ?? '') : '';
+?>
+  <?php if ($TEST_MODE): ?>
+    <h2>Muuttujapisteet (> 0)</h2>
+    <?php if ($nonzero): ?>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        <?php foreach ($nonzero as $k=>$v): ?><div class="block" style="padding:8px 12px"><?= h($k) ?>: <?= h($v) ?></div><?php endforeach; ?>
+      </div>
+    <?php else: ?>
+      <p class="muted">Ei kertynyt positiivisia muuttujapisteitä.</p>
+    <?php endif; ?>
+  <?php endif; ?>
+
+  <p class="leadLarge">Enneagrammityylisi tämän testin perusteella vaikuttaisi olevan TYYLI <?= h($topVar !== '' ? $topVar : '—') ?></p>
+  <?php if ($desc!==''): ?>
+    <div class="block"><p style="margin:0"><?= h($desc) ?></p></div>
+  <?php else: ?>
+    <p class="muted">Kuvausta ei löytynyt tälle tyypille.</p>
+  <?php endif; ?>
+  <div class="footer">
+    <a class="linkbtn" href="?reset=1">Aloita alusta</a>
+    <a class="linkbtn" href="https://www.enneagram.fi/tietoa-enneagrammista/" target="_blank" rel="noopener">Lue lisää enneagrammista</a>
+    <?php if (empty($_SESSION['feedback_given'])): ?>
+    <form method="post" style="display:inline">
+      <input type="submit" class="linkbtn" name="show_feedback" value="Anna palautetta" style="border:1px solid #ccc;background:#fafafa;cursor:pointer">
+    </form>
+    <?php endif; ?>
+  </div>
+
+  <?php
+    $feedback_show = !empty($_SESSION['show_feedback']) && empty($_SESSION['feedback_given']);
+    if ($feedbackMsg !== '') echo '<div class="alert alert-ok">'.h($feedbackMsg).'</div>';
+    if ($feedbackErr !== '') echo '<div class="alert alert-err">'.h($feedbackErr).'</div>';
+    if ($feedback_show):
+      $prefill = $oldFeedbackText !== '' ? $oldFeedbackText : '';
+  ?>
+    <form method="post" style="margin-top:12px">
+      <label for="feedback_text"><strong>Palaute</strong></label>
+      <textarea id="feedback_text" name="feedback_text" class="textarea" placeholder="Kirjoita palautteesi tähän..."><?= h($prefill) ?></textarea>
+      <div class="footer">
+        <button class="linkbtn" type="submit" name="send_feedback" value="1">Lähetä</button>
+      </div>
+    </form>
+  <?php endif; ?>
+
+<?php endif; ?>
+
+  <div class="credits">Suomen Enneagrammiyhdistys, 2025</div>
+</div>
+
+<!-- Näppäimistöoikotiet poistettu pyynnöstä -->
+</body>
+</html>
+

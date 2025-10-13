@@ -1,0 +1,42 @@
+Connections
+Hostname
+An internal hostname used by your Render services.
+Port
+Database
+Username
+Password
+Internal Database URL
+External Database URL
+PSQL Command
+postgresql://candlelight_db_user:24XoDoSNVM3CCfJDFmwMxhmUv2q4yfbn@dpg-d3j2c2ripnbc73ehjgeg-a/candlelight_db
+
+tässä tiedot sisäisen kannan osoitteen muodostukseen: 
+
+An internal hostname used by your Render services:dpg-d3j2c2ripnbc73ehjgeg-a
+port 5432
+database candlelight_db
+username candlelight_db_user
+
+postgresql://candlelight_db_user:24XoDoSNVM3CCfJDFmwMxhmUv2q4yfbn@dpg-d3j2c2ripnbc73ehjgeg-a.internal:5432/candlelight_db?sslmode=disable
+
+
+
+Bullish Engulfing, 
+Piercing Pattern
+Dragonfly Doji
+
+
+Tee sitten yksikkö testit  configuration   sivulle ja sen painonapeille, virhetilanteille ja lomakevalidoinneille
+
+Muuta yksikkö testit  conditition params  sivulle ja sen painonapeille, virhetilanteille ja lomakevalidoinneille,koska sivu on hieman muuttunut
+
+Stocks 
+Active Alerts
+Alerts History
+Candles
+Condition Params
+Jobs
+Configuration   
+
+
+lataa tarvittavat kirjastot ja apuohjelmat sekä ympäristömuuttujat ja tee kaikki muut tarvitavat toimenpiteet ohjelman käynnistämiseksi

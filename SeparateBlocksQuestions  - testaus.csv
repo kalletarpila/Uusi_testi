@@ -1,0 +1,24 @@
+﻿/* tämä on kommenttirivin aloitusmerkki;
+;
+/* Tässä tiedosssa on väittämiä testausta varten;
+/* Tässä väittämiä testausta varten;
+;
+"/* A1 -tagilla merkityt rivit on 4-tyyppiväittämiä,johon mahdollinen 4-tyyppi reagoi myönteisesti, ""kyllä"" vastauksella";
+/* A11 -tagilla merkityt rivit on samanlaisia 4-tyyppiväittämiä,jmutta nämä ovat lisäkysymyksiä, jos ensimmäisilleä kysymyksillä ei saada selkeää tulosta;
+/* B, C ja D tagit ovat vastaavasti koodattuja. B tarkoittaa 3,7,8 väittämiä, C tarkoittaa 2,6,9 väittämiä ja D tarkoittaa 1,5,6 väittämiä;
+;
+/* Huom! Tyyppi 6 on tarkoituksella mukna C ja D väittämissä;
+;
+/* Huom! Perusväittämiä voi olla maksimissaan 32 kpl (eli 8 per ryhmä) ja lisäkysymyksiä 6 (eli 3 per ryhmä);
+;
+;
+A1;Ensimmäinen nelosväittämä
+A11;Toinen lisä nelosväittämä
+;
+B1;Ensimmäinen 378-väittämä
+B11;Toinen lisä 378-väittämä
+C1;ea k 269-väittämä
+C11;Toinen lisä 269-väittämä
+;
+D1;Ensimmäinen 156-väittämä
+D11;Toinen lisä 156-väittämä

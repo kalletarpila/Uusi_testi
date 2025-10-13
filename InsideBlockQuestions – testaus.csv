@@ -1,0 +1,124 @@
+﻿/* tämä on kommenttirivin aloitusmerkki;
+;
+/* Tässä tiedosssa on väittämiä testausta varten;
+/* Tässä väittämiä testausta varten;
+;
+/* Yksi tapaus esitetään aina kolmella rivillä, eli ensimmäisellä Tiannekuvaus, seuraavalla tyypin X reagointi ja kolmannella tyypi Y reagointi;
+/* B2 -tagilla merkityt rivit on 3-7-8 tapauksia;
+/* B2-XvsY tarkoittaa tapausta, jossa verrataan tyyppejä X ja Y;
+/* TB2 -alkuisella tagilla merkityt rivit on 3-7-8 tapauksia varten tehdyt LISÄ-kysymykset, jos ei tyyppi erotu varsinaisilla kysymyksillä ;
+/* C2 -tagilla merkityt rivit on 2-6-9 tapauksia ja D2-tagilla 1-5-6 tapauksia;
+;
+/* Huom! Tyyppi 6 on tarkoituksella mukna C ja D väittämissä;
+;
+/* Huom! Perustilanteita voi olla maksimissaan 9 kpl (eli 3 per ryhmä) ja lisäkysymyksiä 6 (eli 3 per ryhmä);
+;
+B2-3vs7;" Tässä on ensimmäinen tilannekuvaus 3-7-8  tyypeille .""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+B2a-3;"Tämä kuvaa kolmostyyppiä ""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+B2b-7;Tämä kuvaa Seiskastyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;
+B2-3vs8; Tässä on toinen tilannekuvaus 3-7-8  tyypeille
+B2a-3;Tämä kuvaa kolmostyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+B2b-8;Tämä kuvaa Kasityyppiä 
+;
+B2-7vs8;Tässä on kolmas tilannekuvaus 3-7-8  tyypeille
+B2a-7;Tämä kuvaa seiskatyyppiä 
+B2b-8;Tämä kuvaa Kasityyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;
+TB2-3vs7;"TASATILANNE, LISÄKYSYMYS  Tässä on ensimmäinen tilannekuvaus 3-7-8  tyypeille .""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+TB2a-3;"TASATILANNE, LISÄKYSYMYS Tämä kuvaa kolmostyyppiä ""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+TB2b-7;TASATILANNE, LISÄKYSYMYSTämä kuvaa Seiskastyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;
+TB2-3vs8;TASATILANNE, LISÄKYSYMYS Tässä on toinen tilannekuvaus 3-7-8  tyypeille
+TB2a-3;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kolmostyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+TB2b-8;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa Kasityyppiä 
+;
+TB2-7vs8;TASATILANNE, LISÄKYSYMYS  Tässä on kolmas tilannekuvaus 3-7-8  tyypeille
+TB2a-7;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa seiskatyyppiä 
+TB2b-8;TASATILANNE, LISÄKYSYMYS , Tämä kuvaa Kasityyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;
+TB2-3vs7;"2. TASATILANNE, LISÄKYSYMYS  Tässä on ensimmäinen tilannekuvaus 3-7-8  tyypeille .""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+TB2a-3;"2. TASATILANNE, LISÄKYSYMYS Tämä kuvaa kolmostyyppiä ""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+TB2b-7;2. TASATILANNE, LISÄKYSYMYSTämä kuvaa Seiskastyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;
+TB2-3vs8;2. TASATILANNE, LISÄKYSYMYS Tässä on toinen tilannekuvaus 3-7-8  tyypeille
+TB2a-3;2. TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kolmostyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+TB2b-8;2. TASATILANNE, LISÄKYSYMYS  Tämä kuvaa Kasityyppiä 
+;
+TB2-7vs8;2. TASATILANNE, LISÄKYSYMYS  Tässä on kolmas tilannekuvaus 3-7-8  tyypeille
+TB2a-7;2. TASATILANNE, LISÄKYSYMYS  Tämä kuvaa seiskatyyppiä 
+TB2b-8;2. TASATILANNE, LISÄKYSYMYS , Tämä kuvaa Kasityyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;
+;
+C2-2vs6; Tässä on ensimmäinen tilannekuvaus 2-6-9  tyypeille
+C2a-2;Tämä kuvaa kakkostyyppiä 
+C2b-6;Tämä kuvaa kuutostyyppiä 
+;
+C2-2vs6; Tässä on toinen tilannekuvaus 2-6-9  tyypeille
+C2a-2;Tämä kuvaa kakkostyyppiä 
+C2b-9;Tämä kuvaa Ysityyppiä 
+;
+C2-2vs6;Tässä on kolmas tilannekuvaus 2-6-9  tyypeille
+C2a-6;Tämä kuvaa kutostyyppiä 
+C2b-9;Tämä kuvaa ysityyppiä 
+;
+TC2-2vs6;TASATILANNE, LISÄKYSYMYS   Tässä on ensimmäinen tilannekuvaus 2-6-9  tyypeille
+TC2a-2;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kakkostyyppiä 
+TC2b-6;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kuutostyyppiä 
+;
+TC2-2vs9;TASATILANNE, LISÄKYSYMYS  Tässä on toinen tilannekuvaus 2-6-9  tyypeille
+TC2a-2;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kakkostyyppiä 
+TC2b-9;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa Ysityyppiä 
+;
+TC2-6vs9;TASATILANNE, LISÄKYSYMYS   Tässä on kolmas tilannekuvaus 2-6-9  tyypeille
+TC2a-6;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kutostyyppiä 
+TC2b-9;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa ysityyppiä 
+;
+TC2-2vs6;2.TASATILANNE, LISÄKYSYMYS   Tässä on ensimmäinen tilannekuvaus 2-6-9  tyypeille
+TC2a-2;2.TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kakkostyyppiä 
+TC2b-6;2.TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kuutostyyppiä 
+;
+TC2-2vs9;2.TASATILANNE, LISÄKYSYMYS  Tässä on toinen tilannekuvaus 2-6-9  tyypeille
+TC2a-2;2.TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kakkostyyppiä 
+TC2b-9;2.TASATILANNE, LISÄKYSYMYS  Tämä kuvaaysi tyyppiä 
+;
+TC2-6vs9;2.TASATILANNE, LISÄKYSYMYS   Tässä on kolmas tilannekuvaus 2-6-9  tyypeille
+TC2a-6;2.TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kutostyyppiä 
+TC2b-9;2.TASATILANNE, LISÄKYSYMYS  Tämä kuvaa ysityyppiä 
+;
+;
+D2-1vs5; Tässä on ensimmäinen tilannekuvaus 1-5-6  tyypeille
+D2a-1;Tämä kuvaa ykköstyyppiä 
+D2b-5;Tämä kuvaa vitosstyyppiä 
+;
+D2-1vs6; Tässä on toinen tilannekuvaus1-5-6 tyypeille
+D2a-1;Tämä kuvaa ykköstyyppiä 
+D2b-6;Tämä kuvaa Kutosyyppiä 
+;
+D2-5vs6;Tässä on kolmas tilannekuvaus 1-5-6 tyypeille
+D2a-5;Tämä kuvaa vitostyyppiä 
+D2b-6;Tämä kuvaa Kutostyyppiä 
+;
+TD2-1vs5; TASATILANNE, LISÄKYSYMYS  Tässä on ensimmäinen tilannekuvaus 1-5-6  tyypeille
+TD2a-1;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa ykköstyyppiä 
+TD2b-5;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa vitosstyyppiä 
+;
+TD2-1vs6;TASATILANNE, LISÄKYSYMYS  Tässä on toinen tilannekuvaus1-5-6 tyypeille
+TD2a-1;TASATILANNE, LISÄKYSYMYS Tämä kuvaa ykköstyyppiä 
+TD2b-6;TASATILANNE, LISÄKYSYMYS Tämä kuvaa Kutosyyppiä 
+;
+TD2-5vs6;TASATILANNE, LISÄKYSYMYS Tässä on kolmas tilannekuvaus 1-5-6 tyypeille
+TD2a-5;TASATILANNE, LISÄKYSYMYS Tämä kuvaa vitostyyppiä 
+TD2b-6;TASATILANNE, LISÄKYSYMYS Tämä kuvaa Kutostyyppiä 
+;
+TD2-1vs5; 2. TASATILANNE, LISÄKYSYMYS  Tässä on ensimmäinen tilannekuvaus 1-5-6  tyypeille
+TD2a-1;2. TASATILANNE, LISÄKYSYMYS  Tämä kuvaa ykköstyyppiä 
+TD2b-5;2. TASATILANNE, LISÄKYSYMYS  Tämä kuvaa vitosstyyppiä 
+;
+TD2-1vs6;TASATILANNE, LISÄKYSYMYS  Tässä on toinen tilannekuvaus1-5-6 tyypeille
+TD2a-1;2. TASATILANNE, LISÄKYSYMYS Tämä kuvaa ykköstyyppiä 
+TD2b-6;2. TASATILANNE, LISÄKYSYMYS Tämä kuvaa Kutosyyppiä 
+;
+TD2-5vs6;TASATILANNE, LISÄKYSYMYS Tässä on kolmas tilannekuvaus 1-5-6 tyypeille
+TD2a-5;2. TASATILANNE, LISÄKYSYMYS Tämä kuvaa vitostyyppiä 
+TD2b-6;2. TASATILANNE, LISÄKYSYMYS Tämä kuvaa kutostyyppiä 

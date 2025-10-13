@@ -1,0 +1,353 @@
+﻿/* tämä on kommenttirivin aloitusmerkki;;
+;;
+/* Tässä tiedosssa on väittämiä testausta varten;;
+/* Tässä väittämiä testausta varten;;
+;;
+/* Yksi tapaus esitetään aina kolmella rivillä, eli ensimmäisellä Tiannekuvaus, seuraavalla tyypin X reagointi ja kolmannella tyypi Y reagointi;;
+/* B2 -tagilla merkityt rivit on 3-7-8 tapauksia;;
+/* B2-XvsY tarkoittaa tapausta, jossa verrataan tyyppejä X ja Y;;
+/* TB2 -alkuisella tagilla merkityt rivit on 3-7-8 tapauksia varten tehdyt LISÄ-kysymykset, jos ei tyyppi erotu varsinaisilla kysymyksillä ;;
+/* C2 -tagilla merkityt rivit on 2-6-9 tapauksia ja D2-tagilla 1-5-6 tapauksia;;
+;;
+/* Huom! Tyyppi 6 on tarkoituksella mukana C ja D väittämissä;;
+;;
+/* Huom! Perustilanteita voi olla maksimissaan 9 kpl (eli 3 per ryhmä) ja lisäkysymyksiä 6 (eli 3 per ryhmä);;
+;;
+;;
+;;
+/*  3 vs 8 kysymykset;;
+;;
+B2-3vs8;1;Ajatellaan, että olet pitämässä esitelmää tärkeälle yleisölle. Kumpi toimintamalli seuraavista on sinulle luontaisempaa?
+B2a-3;2;Olen valmis mukauttamaan omaa tyyliäni ja viestiäni, jotta saan yleisön suosion.
+B2b-8;3;Menen yleisön eteen itsenäni ja kerron asiat sellaisina, kuin ne minusta on.
+;;
+B2-3vs8;5;Olet palaverissa, jossa on mukana ihmisiä, jotka mahdollisesti voivat vaikuttaa omiin ura-/työmahdollisuuksiisi. Kumpi toimintamalli seuraavista on sinulle luontaisempaa?
+B2a-3;6;Voisin jättää oman aidon mielipiteeni sanomatta, jos epäilen että se saattaa heikentää uramahdollisuuksiani jatkossa.
+B2b-8;7;Sanon suoraan oman mielipiteeni ja hyväksyn sen, mitä siitä mahdollisesti seuraa urani jatkon kannalta.
+;;
+B2-3vs8;9;Olet mukana verkostossa, jossa tiedät, että sinulla on hyvä maine muiden silmissä. Kumpi toimintamalli seuraavista on sinulle luontaisempaa?
+B2a-3;10;Vaikka olisin eri mieltä enemmistön kanssa, jätän ilmaisematta mielipiteeni, ja sopeudun enemmistön kantaan, koska näin en vaaranna hyvää mainettani ryhmän silmissä.
+B2b-8;11;Koen tärkeänä, että ilmaisen suoraan oman aidon mielipiteeni asiaan, vaikka edustaisin vähemmistöä ryhmässä.
+;;
+B2-3vs8;13;Kuvittele itsesi esihenkilön asemaan. Ajatellaan että joutuisit esittämään johtamallesi työyhteisölle tutkimustuloksia, joiden tiedät sisältävän sekä positiivisia, että negatiivisia tuloksia teistä työyhteisönä. Kumpi toimintamalli seuraavista on sinulle luontaisempaa?
+B2a-3;14;Yritän korostaa positiivisia tuloksia ja saada näin motivoitua tiimin keskittymään vahvuuksiinsa.
+B2b-8;15;Näytän sekä positiiviset, että negatiiviset tulokset yhtä arvokkaina. En yritä arvottaa niitä omalla toiminnallani.
+;;
+B2-3vs8;17;Kuvittele, että sinulle tarjotaan kahta vaihtoehtoa seuraavaksi työtehtäväksi:  Kumpi työmahdollisuus olisi sinulle luontaisempi valinta?
+B2a-3;18; Työ 1 pitää sisällään mahdollisuuden haastatteluihin mediassa ja näkyvyyttä myös organisaation ulkopuolella.
+B2b-8;19; Työ 2 on tehtävänä yhtä vaativa, mutta melko näkymätön. Tässä työssä on kuitenkin mahdollisuus edistää oman yksikkösi hyvinvointia. 
+;;
+B2-3vs8;21;Tämä kysymys vaatii sinulta erityistä rehellisyyttä. Mikä on suhteesi sääntöihin? (Jos säännöistä ei voi mielestäsi luistaa millään perusteella koskaan, valitse keskimmäinen vaihtoehto.)
+B2a-3;22;Säännöistä voi luistaa, jos se edistää omaa tavoitettasi, eikä siitä ole haittaa kenellekään.
+B2b-8;23;Säännöistä voi luistaa vain, jos sillä korjataan oikeudenmukaisuuden puutteita.
+;;
+TB2-3vs8;25;Kuvittele, että sinulle tarjotaan kahta vaihtoehtoa seuraavaksi työtehtäväksi:  Kumpi työmahdollisuus olisi sinulle luontaisempi valinta?
+TB2a-3;26; Työ 1 pitää sisällään mahdollisuuden haastatteluihin mediassa ja näkyvyyttä myös organisaation ulkopuolella.
+TB2b-8;27; Työ 2 on tehtävänä yhtä vaativa, mutta melko näkymätön. Tässä työssä on kuitenkin mahdollisuus edistää oman yksikkösi hyvinvointia. 
+;;
+TB2-3vs8;29;Tämä kysymys vaatii sinulta erityistä rehellisyyttä. Mikä on suhteesi sääntöihin? (Jos säännöistä ei voi mielestäsi luistaa millään perusteella koskaan, valitse keskimmäinen vaihtoehto.)
+TB2a-3;30;Säännöistä voi luistaa, jos se edistää omaa tavoitettasi, eikä siitä ole haittaa kenellekään.
+TB2b-8;31;Säännöistä voi luistaa vain, jos sillä korjataan oikeudenmukaisuuden puutteita.
+;;
+;;
+/*  3 vs 7 kysymykset;34;
+;;
+B2-3vs7;36;Ajattele, että sinulla olisi mahdollisuus valita uusi työ kahden työpaikan välillä. Työt ovat kaikilta muilta osin täysin samanlaiset, lukuun ottamatta asteikolla mainittavia ominaisuuksia. Valitse asteikolta kumman työpaikan mieluummin valitsisit?
+B2a-3;37;Työ 1 on muuten samanlainen kuin Työ 2, mutta tällä organisaatiolla on erityisen hyvä maine tunnettujen tuotteidensa vuoksi ja siksi sitä arvostetaan työpaikkana. Työpaikan ilmapiiri ihmisten välillä on kuitenkin viileä ja etäinen.
+B2b-7;38;Työ 2 on muuten samanlainen kuin Työ 1, mutta tässä organisaatiossa ihmiset viihtyvät erityisen hyvin. Organisaation tuotteet, tai maine työpaikkana, ei erotu alan muista organisaatioista.
+;;
+B2-3vs7;40;Olet tekemässä tärkeää, mutta tylsää tehtävää, jonka pitää olla valmiina huomisaamuna. Ystäväsi pyytää sinua yllättäen viettämään aikaa yhteisten ystävienne kanssa. Kumpi toimintamalli seuraavista on sinulle luontaisempaa?
+B2a-3;41;Kiität kutsusta, mutta et tartu tarjoukseen, sillä tiedät että vaativa tehtävä edellyttää sinulta paneutumista, ja varmistaaksesi työn riittävän laadun, sinulla ei ole mahdollisuutta nyt liittyä seuraan. 
+B2b-7;42;Tartun ystävän tarjoukseen ja siirrän tylsää tehtävää myöhemmin, vaikka yöllä, tehtäväksi. Et kuitenkaan jätä välistä ystäviesi tapaamista. 
+;;
+B2-3vs7;44;Tämä on vaikea kysymys: kumpi pelko seuraavista on sinulle suurempi?
+B2a-3;45;Pelko siitä, että näyttäydyn epäpätevänä.
+B2b-7;46;Pelko siitä, että koet olosi tylsistyneeksi.
+;;
+B2-3vs7;48;Onko sinun helppo sanoa ”kyllä” spontaanille seikkailulle?
+B2a-3;49;Ei. Spontaani reagointi sotkee aikatauluni ja lopulta estää tärkeiden tavoitteiden saavuttamisen.
+B2b-7;50;Kyllä. Minulle paras elämä on vapaasti koettu sarja innostavia ja joskus yllättäviäkin tapahtumia.
+;;
+B2-3vs7;52; Ostaessasi vaatteita, onko sinulle tärkeää, että ne ovat ensisijaisesti … 
+B2a-3;53;… laadukkaita merkkituotteita.
+B2b-7;54;… mukavat, sopivat ja niistä tulee hyvä fiilis.
+;;
+B2-3vs7;56;Kun lähdet matkalle vieraaseen maahan, toimitko … 
+B2a-3;57;… ennalta laaditun matkasuunnitelman mukaan.
+B2b-7;58;… ilman tarkkaa suunnitelmaa, elääksesi hetkessä sen mukaan, mitä eteen tulee.
+;;
+TB2-3vs7;60; Ostaessasi vaatteita, onko sinulle tärkeää, että ne ovat ensisijaisesti … 
+TB2a-3;61;… laadukkaita merkkituotteita.
+TB2b-7;62;… mukavat, sopivat ja niistä tulee hyvä fiilis.
+;;
+TB2-3vs7;64;Kun lähdet matkalle vieraaseen maahan, toimitko … 
+TB2a-3;65;… ennalta laaditun matkasuunnitelman mukaan.
+TB2b-7;66;… ilman tarkkaa suunnitelmaa, elääksesi hetkessä sen mukaan, mitä eteen tulee.
+;;
+;;
+/*  7 vs 8 kysymykset;69;
+;;
+B2-7vs8;71;Ajatellaan, että omassa työyhteisössäsi syntyy voimakasta erimielisyyttä ihmisten välillä. Kumpi toimintamalli seuraavista on sinulle luontaisempaa?
+B2a-7;72;Yritän kääntää jännitteisen tilanteen nopeasti kevyemmäksi ja myönteisemmäksi.
+B2b-8;73;Minua ei kovasanainenkaan konflikti haittaa. Hyvä vaan, että mieltä puhutaan painavat asiat halki.
+;;
+B2-7vs8;75;Olet vapaa-ajan harrastusryhmän mukana järjestämässä isoa tapahtumaa. Kumpi toimintamalli seuraavista on sinulle luontaisempaa?
+B2a-7;76;Toivon, että minulle annetaan mahdollisuus toimia vapaasti ja spontaanisti, ilman tarkkaa ohjausta.
+B2b-8;77;Toivon, että joku ottaa selkeästi vastuun järjestelyjen organisoinnista ja ohjaa tilannetta oikeaan suuntaan.
+;;
+B2-7vs8;79;Minkälainen suhde sinulla on konflikteihin? 
+B2a-7;80;Pyrin välttämään konflikteja viimeiseen asti, koska ne vievät toimintakykyni.
+B2b-8;81;Koen niin, että ristiriidat voivat olla hyödyllisiä ja jopa välttämättömiä, jotta totuus tulee esiin.
+;;
+B2-7vs8;83;Onko sinulle tärkeää, että ryhmässä on selkeät roolit ja päätöksentekijä?  
+B2a-7;84;Ei, löydän kyllä paikkani ryhmässä ilman hierarkiaakin.
+B2b-8;85;Kyllä, roolien selkeys ja hierarkia luovat turvallisuutta ja lisäävät ryhmän tehokkuutta
+;;
+B2-7vs8;87;Miten suhtaudut itseesi?  
+B2a-7;88;Suhtaudun kepeästi. Voin helposti ”nauraa itselleni”, varsinkin jos se kohottaa tunnelmaa ryhmässä.
+B2b-8;89;Minusta saattaa syntyä kuva, että otan itseni vakavasti. Itselle nauraminen – varsinkaan julkisesti – ei ole minun juttuni.
+;;
+B2-7vs8;91;Mikä on sinulle mieluisin tapa viestiä asioita puhumalla? 
+B2a-7;92;Kerron mielelläni tarinan ja mieluiten sellaisessa muodossa, joka herättää hilpeyttä.
+B2b-8;93;Viestin asiat suoraan ja selkeästi, ilman turhia krumeluureja.
+;;
+TB2-7vs8;95;Millainen on suhteesi aikatauluhin? 
+TB2a-7;96;Suhteeni aikatauluihin on joustava ja salliva. Pieni myöhästely on inhimillistä.
+TB2b-8;97;Suhteeni aikatauluihin on tiukka. Haluan olla ajoissa paikalla.
+;;
+TB2-7vs8;99;Miten suhtaudut itseesi?  
+TB2a-7;100;Suhtaudun kepeästi. Voin helposti ”nauraa itselleni”, varsinkin jos se kohottaa tunnelmaa ryhmässä.
+TB2b-8;101;Minusta saattaa syntyä kuva, että otan itseni vakavasti. Itselle nauraminen – varsinkaan julkisesti – ei ole minun juttuni.
+;;
+TB2-7vs8;103;Mikä on sinulle mieluisin tapa viestiä asioita puhumalla? 
+TB2a-7;104;Kerron mielelläni tarinan ja mieluiten sellaisessa muodossa, joka herättää hilpeyttä.
+TB2b-8;105;Viestin asiat suoraan ja selkeästi, ilman turhia krumeluureja.
+;;
+/*  5 vs 6 kysymykset;107;
+;;
+C2-5vs6;109;Jos olet epävarma jostakin päätöksestä, ratkaisetko tilanteen tyypillisemmin …
+C2a-5;110;… vetäytymällä yksin etsimään lisätietoa asiasta.
+C2b-6;111;… hakemalla vahvistusta luotettavalta ihmiseltä, tiimiltä tai säännöiltä.
+;;
+C2-5vs6;113;Missä määrin tunteet ohjaavat sinua arjessasi? 
+C2a-5;114;Ei juuri ollenkaan.
+C2b-6;115;Hyvin paljon.
+;;
+C2-5vs6;117;Stressin hetkellä, onko ensimmäinen huolenaiheesi se, että …   
+C2a-5;118;… riittääkö sinulla aika tehdä asia riittävän hyvin?
+C2b-6;119;… voitko luottaa asiaan liittyviin ihmisiin tai puitteisiin?
+;;
+C2-5vs6;121;Vaikeaa päätöstä tehdessäsi, onko sinulla taipumus mieluummin tehdä päätös …
+C2a-5;122;… luottaen omaan arvioosi?
+C2b-6;123;… valita enemmistön mielestä oikea tapa, tai yleisesti suosittu käytäntö?
+;;
+C2-5vs6;125;Jos tunnet erimielisyyttä asiantuntijan kanssa, oletko lopulta taipuvaisempi …
+C2a-5;126;… luottamaan omaan kantaasi?
+C2b-6;127;… luottamaan asiantuntijan arvioon tai suositukseen?
+;;
+C2-5vs6;129;Jos jokin menee pieleen, suuntautuuko ensimmäinen impulssisi tarkistamaan …
+C2a-5;130;… ylititkö omat rajasi tai tietopohjasi?
+C2b-6;131;… onko jokin sääntö, sopimus tai ihminen pettänyt luottamuksesi?
+;;
+TC2-5vs6;133;Jos tunnet erimielisyyttä asiantuntijan kanssa, oletko lopulta taipuvaisempi …
+TC2a-5;134;… luottamaan omaan kantaasi?
+TC2b-6;135;… luottamaan asiantuntijan arvioon tai suositukseen?
+;;
+TC2-5vs6;137;Jos jokin menee pieleen, suuntautuuko ensimmäinen impulssisi tarkistamaan …
+TC2a-5;138;… ylititkö omat rajasi tai tietopohjasi?
+TC2b-6;139;… onko jokin sääntö, sopimus tai ihminen pettänyt luottamuksesi?
+;;
+/*  1 vs 6 kysymykset;141;
+;;
+C2-1vs6;143; Häiritseekö sinua enemmän se, että  …
+C2a-1;144;…  jotakin tehdään taas väärin.
+C2b-6;145;… asia on edelleen epävarma.
+;;
+C2-1vs6;147;Keskusteletko mieluummin siitä että …  
+C2a-1;148;…  ohjeita pitää noudattaa.
+C2b-6;149;… mitä siitä mahdollisesti seuraa, jos ohjeita ei noudata.
+;;
+C2-1vs6;151;Onko sinulle tyypillistä … 
+C2a-1;152;… luottaa siihen, että kaikki menee oikein ja suunnitellusti.
+C2b-6;153;… poistaa jäytävää epävarmuutta varautumalla kaikkiin mahdollisiin uhkiin.
+;;
+C2-1vs6;155;Huomaat, että ystäväsi huijaa kokeessa. Tämä ei vaikuta sinun arvosanaasi. Koetko tuossa tilanteessa, että …   
+C2a-1;156;… sinun pitäisi reagoida tähän, vaikka se saattaa aiheuttaa kitkaa välillenne.
+C2b-6;157;… sinun ei kannata puuttua asiaan, sillä siitä voi seurata ikävää draamaa.
+;;
+C2-1vs6;159;Ajatellaan, että joudut ex tempore tekemään esihenkilösi puolesta päätöksen – vaikka sellaisen, missä  ravintolassa syödään päivällinen hänen vieraidensa kanssa. Ajatellaan, että soveltuvia vaihtoehtoja on useita. Onko tilanne sinulle ajatuksena …
+C2a-1;160;… luonteva?
+C2b-6;161;… stressaava?
+;;
+C2-1vs6;163;Jos pitäisi valita, onko sinulle tärkeämpää …  
+C2a-1;164;… tehdä asiat oikein ja sääntöjen mukaan?
+C2b-6;165;… tehdä asiat muiden mielestä turvallisesti?
+;;
+TC2-1vs6;167;Huolimatta siitä, missä roolissa tällä hetkellä toimit oikeassa elämässä, koetko että sinulle luontainen rooli on …
+TC2a-1;168;… toimia johdossa?
+TC2b-6;169;… toimia johdon tukena?
+;;
+TC2-1vs6;171;Ajatellaan, että joudut ex tempore tekemään esihenkilösi puolesta päätöksen – vaikka sellaisen, missä  ravintolassa syödään päivällinen hänen vieraidensa kanssa. Ajatellaan, että soveltuvia vaihtoehtoja on useita. Onko tilanne sinulle ajatuksena …
+TC2a-1;172;… luonteva?
+TC2b-6;173;… stressaava?
+;;
+TC2-1vs6;175;Jos pitäisi valita, onko sinulle tärkeämpää …  
+TC2a-1;176;… tehdä asiat oikein ja sääntöjen mukaan?
+TC2b-6;177;… tehdä asiat muiden mielestä turvallisesti?
+;;
+;;
+/*  1 vs 5 kysymykset;180;
+C2-1vs5;181;Onko työpöydälläsi taipumus … 
+C2a-1;182;… pysyä hyvässä järjestyksessä.
+C2b-5;183;… ajautua epäjärjestykseen pitkäksi aikaa.
+;;
+C2-1vs5;185;Jos joku myöhästyy sovitusta 10 minuuttia, eikä ilmoita asiasta, onko kyseessä …
+C2a-1;186;… merkittävä rike sitä kohtaan, mikä on hyväksyttävää.
+C2b-5;187;… mitätön rike, johon minun on helppo sopeutua.
+;;
+C2-1vs5;189;Huomaat eräässä asiassa, että työyhteisössä on ohjeistus yhteisestä toimintatavasta, mutta vain puolet työyhteisöstä noudattaa sitä. Kukaan ei ole nostanut tätä puheeksi aiemmin, vaan asian kanssa on eletty. Onko tämä mielestäsi …
+C2a-1;190;…epäjohdonmukaisuus, jonka sinun on syytä ottaa puheeksi ja vaatia joko ohjeistuksen noudattamista tai siitä luopumista.
+C2b-5;191;… epäjohdonmukaisuus, jonka tulkitset niin, että sitä voi noudattaa, jos haluaa. Et nosta asiaa käsiteltäväksi.
+;;
+C2-1vs5;193;Ajattele suhdettasi tietoon. Onko tapasi … .
+C2a-1;194;… etsiä olennainen tieto tehokkaasti ja rajoittaa turhaa vaeltelua tiedon valtateillä.
+C2b-5;195;… upota innostuneena syvälle johonkin aiheeseen, vaikka siitä ei olisi mitään hyötyä juuri nyt.
+;;
+C2-1vs5;197;Minkälainen on suhteesi vaatteisiin ja pukeutumiseen. Kumpi seuraavasta ajattelutavasta on sinulle luontaisempi?
+C2a-1;198;Olen tarkka pukeutumisen suhteen ja esiinnyn yleensä laadukkaissa ja hyvin istuvissa vaatteissa.
+C2b-5;199;Pukeutuminen ja vaatteet eivät voisi vähempää kiinnostaa. Valitsen – lähes tilanteesta riippumatta – ne vaatteet päälleni, joissa viihdyn ja jotka sattuvat olemaan käsillä.
+;;
+C2-1vs5;201;Ostat kaupasta homeisen leivän. Huomaat asian kotona vasta. Onko sinulle …
+C2a-1;202;… ilmiselvää, että otat asian esille.
+C2b-5;203;… kyseessä niin pieni asia, ettet jaksa siitä vaivautua.
+;;
+TC2-1vs5;205;Minkälainen on suhteesi vaatteisiin ja pukeutumiseen. Kumpi seuraavasta ajattelutavasta on sinulle luontaisempi?
+TC2a-1;206;Olen tarkka pukeutumisen suhteen ja esiinnyn yleensä laadukkaissa ja hyvin istuvissa vaatteissa.
+TC2b-5;207;Pukeutuminen ja vaatteet eivät voisi vähempää kiinnostaa. Valitsen – lähes tilanteesta riippumatta – ne vaatteet päälleni, joissa viihdyn ja jotka sattuvat olemaan käsillä.
+;;
+TC2-1vs5;209;Et saavu tärkeään tapaamiseen, koska sinulta on jäänyt tekemättä merkintä päivyriin. Kumpi seuraavista on sinulle luontaisempi reaktio, kun tilanne valkenee sinulle?
+TC2a-1;210;Syyllistät ja soimaat itseäsi siitä, ettet ollut riittävän tarkka.
+TC2b-5;211;Harmittaa, että tästä syntyy nyt ylimääräistä vaivaa.
+;;
+TC2-1vs5;213;Minkälainen on suhteesi vaatteisiin ja pukeutumiseen. Kumpi seuraavasta ajattelutavasta on sinulle luontaisempi?
+TC2a-1;214;Olen tarkka pukeutumisen suhteen ja esiinnyn yleensä laadukkaissa ja hyvin istuvissa vaatteissa.
+TC2b-5;215;Pukeutuminen ja vaatteet eivät voisi vähempää kiinnostaa. Valitsen – lähes tilanteesta riippumatta – ne vaatteet päälleni, joissa viihdyn ja jotka sattuvat olemaan käsillä.
+;;
+/*  2 vs 9 kysymykset;217;
+;;
+D2-2vs9;219;Kuvittele, että ystäväsi kertoo olevansa uupunut. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa? 
+D2a-2;220;Tarjoan heti konkreettista apua, kysyn lisää ja haluan olla tukena.
+D2b-9;221;Kuuntelen rauhassa, olen läsnä, mutta en ehdota mitään, ellei minulta sitä pyydetä.
+;;
+D2-2vs9;223;Ryhmässä syntyy jännite tai erimielisyys. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa?
+D2a-2;224;Yritän sovitella tilannetta, pehmentää tunnelmaa ja tuoda ihmiset yhteen.
+D2b-9;225;Vetäydyn tai pysyn hiljaa, jotta tilanne ei eskaloidu – toivon että se rauhoittuu itsestään.
+;;
+D2-2vs9;227;Ystäväsi soittaa ja haluaisi sinut osaksi ryhmään auttamaan hänen muutossaan viikonloppuna. Tunnet itsesi väsyneeksi ja haluaisit vain levätä. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa?
+D2a-2;228;Väsymyksestäni huolimatta lähden auttamaan, koska en halua tuottaa pettymystä tai menettää yhteyttä.
+D2b-9;229;Vaikka haluaisin sanoa ”en tule”, luultavasti lupaudun paikalle. Saatan kuitenkin viivytellä lähtöä tai toteuttaa muuttoa verkkaisesti, ikään kuin passiivisesti protestoiden.
+;;
+D2-2vs9;231;Kun sinulla on eri näkemys kuin muilla. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa?
+D2a-2;232;Tuon näkemykseni esiin empaattisesti, koska haluan olla rehellinen ja rakentava.
+D2b-9;233;Pidän näkemykseni omana tietonani, koska en halua aiheuttaa ristiriitaa. Mukaudun mieluummin.
+;;
+D2-2vs9;235;Kun joku muistuttaa sinua tekemättömästä asiasta, miten reagoit?  
+D2a-2;236;Pahoittelen ja hoidan sen heti – en halua tuottaa pettymystä.
+D2b-9;237;Nyökkään, mutta saatan silti lykätä asian toteutusta edelleen. Se tehdään, kun sen aika on.
+;;
+D2-2vs9;239;Olet lähettänyt ystävälle useita viestejä, mutta hän ei vastaa moneen päivään. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa?
+D2a-2;240;"Alan miettiä, olenko tehnyt jotakin väärin. Tunnen oloni hylätyksi ja saatan lähettää uuden viestin, jossa kysyn ""Onko kaikki hyvin?"""
+D2b-9;241;Ajattelen, että hänellä on varmaan kiire. En ota asiaa henkilökohtaisesti, enkä välttämättä tee mitään.
+;;
+TD2-2vs9;243;Jos sinun pitää hoitaa joku tehtävä, joka ei sinua innosta yhtään, onko sinulle luontaista tässä tilanteessa, että … 
+TD2a-2;244;… hoidat sen pian pois alta, jotta voit keskittyä mukavampiin asioihin tai olla avuksi muille.
+TD2b-9;245;… siirrät tekemistä myöhäisemmäksi, toivoen että se joko ratkeaa itsestään tai tuntuu helpommalta myöhemmin.
+;;
+TD2-2vs9;247;Kun sinulla on useita tehtäviä odottamassa, miten priorisoit? 
+TD2a-2;248;Teet ensin ne, jotka liittyvät toisten tarpeisiin, koska näin voit olla hyödyksi muille.
+TD2b-9;249;Teet ensin helpoimmat alta pois ja siirrät vaikeat tehtävät myöhäisemmäksi – pyrit välttämään stressiä mahdollisimman pitkään.
+;;
+TD2-2vs9;251;Kun jokin asia vaatii päätöksen, mutta ei ole kiireellinen, miten toimit?  
+TD2a-2;252;Teen päätöksen pian, jotta voin siirtyä eteenpäin ja olla selkeä muille.
+TD2b-9;253;Odotan, kunnes on pakko – päätöksenteko tuntuu raskaalta.
+;;
+TD2-2vs9;255;Kun joku muistuttaa sinua tekemättömästä asiasta, miten reagoit?  
+TD2a-2;256;Pahoittelen ja hoidan sen heti – en halua tuottaa pettymystä.
+TD2b-9;257;Nyökkään, mutta saatan silti lykätä asian toteutusta edelleen. Se tehdään, kun sen aika on.
+;;
+TD2-2vs9;259;Ajattele tilanne, jossa olet joutunut valitsemaan oman toiveesi ja jonkun toisen toiveiden välillä. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa?
+TD2a-2;260;Minulla on joskus vaikeuksia tunnistaa mitä itse toivon ja päädynkin toteuttamaan toisen toiveet. Se tuntuu oikealta, koska uskon, että auttamalla muita omat tarpeenikin täyttyvät jollakin tavalla.
+TD2b-9;261;Usein valitsen toisen toiveet, koska se tuntuu helpommalta ja vältän riidan. Saatan jopa unohtaa, mitä alun perin itse halusin. Se on helpoin tapa säilyttää rauha ja se on minulle tärkeintä.
+;;
+/*  2 vs 6 kysymykset;263;
+;;
+D2-2vs6;265; Oletko … 
+D2a-2;266;… hyvä tunnistamaan ihmisten emotionaalisia tarpeita?
+D2b-6;267;… hyvä tunnistamaan riskejä ja uhkia?
+;;
+D2-2vs6;269;Uuteen ihmiseen tutustuminen … 
+D2a-2;270;… käy minulta helposti, ystävystyn nopeasti vieraidenkin ihmisten kanssa.
+D2b-6;271;… kestää minulla pidempään, koska minun pitää varmistua, voinko luottaa riittävästi tähän henkilöön.
+;;
+D2-2vs6;273;Työyhteisön toimintatavoissa on tapahtumassa muutos, joka vaikuttaa merkittävästi tiimin tapaan tehdä työtä. Onko tässä tilanteessa mielestäsi tärkeintä … 
+D2a-2;274;… lisätä yhteisen keskustelun ja fiilisten jakamisen määrää?
+D2b-6;275;… löytää ne osat, mikä muutoksessa voisi perua tai hoitaa järkevämmin?
+;;
+D2-2vs6;277;Seuraava kysymys on vaikea, mutta yritä syventyä sinulle tärkeisiin tarpeisiin. Onko sinulle tärkeämpää … 
+D2a-2;278;… olla muiden seurassa?
+D2b-6;279;… olla turvassa?
+;;
+D2-2vs6;281;Kumpi on sinulle tärkeämpää ihmissuhteissa … 
+D2a-2;282;… olla spontaani ja tilanteisiin positiivisesti mukautuva?
+D2b-6;283;… olla lojaali ja luotettava?
+;;
+D2-2vs6;285;Onko sinulla tapana miettiä etukäteen, mikä kaikki voi mennä pieleen, vaikka tilanne vaikuttaisi ulospäin rauhalliselta?
+D2a-2;286;Eipä juurikaan, luotan siihen, että asiat kyllä lutviutuvat kohdalleen.
+D2b-6;287;Kyllä! Mietin riskejä hengästymiseen asti.
+;;
+TD2-2vs6;289;Kumpi on sinulle tärkeämpää ihmissuhteissa … 
+TD2a-2;290;… olla spontaani ja tilanteisiin positiivisesti mukautuva?
+TD2b-6;291;… olla lojaali ja luotettava?
+;;
+TD2-2vs6;293;Onko sinulla tapana miettiä etukäteen, mikä kaikki voi mennä pieleen, vaikka tilanne vaikuttaisi ulospäin rauhalliselta?
+TD2a-2;294;Eipä juurikaan, luotan siihen, että asiat kyllä lutviutuvat kohdalleen.
+TD2b-6;295;Kyllä! Mietin riskejä hengästymiseen asti.
+;;
+TD2-2vs6;297;Koetko olevasti rento ?
+TD2a-2;298;Kyllä, jos kanssaihmisilläni on kaikki hyvin.
+TD2b-6;299;Kyllä, jos kaikkiin riskeihin on varauduttu.
+;;
+/*  6 vs 9 kysymykset;301;
+;;
+D2-6vs9;303;Herättääkö yllättävä muutos, johon et ole halukas taipumaan, sinussa … 
+D2a-6;304;… tarpeen kysyä, kuka tästä päätti ja miksi – ennen kuin voit hyväksyä sen.
+D2b-9;305;… halun vetäytyä hiljaisuuteen mieluummin, kuin sanoa suoraan, että et ole mukana.
+;;
+D2-6vs9;307;Ajatellaan, että ryhmä, johon kuulut, päättää jotakin, josta et ole kovin innoissasi. Kumpi seuraavista käytösmalleista on lähempänä sinun tapaasi reagoida?
+D2a-6;308;Mukaudun päätökseen, koska koen tarvetta olla lojaali ryhmää ja sen tekemiä päätöksiä kohtaan.
+D2b-9;309;Ulkoisesti mukaudun ryhmän päätökseen, mutta saatan olla passiivinen varsinaisen toteutuksen suhteen.
+;;
+D2-6vs9;311;Huomaatko joskus miettiväsi, mikä kaikki voisi mennä pieleen, vaikka kaikki vaikuttaisi olevan kunnossa? 
+D2a-6;312;Kyllä, tämä on minulle tyypillistä.
+D2b-9;313;En, mietin toki silloin tällöin riskejä, mutta en varaudu kaikkeen etukäteen.
+;;
+D2-6vs9;315;Koetko joskus painetta olla valppaana ja vastuullinen, vaikka kukaan ei sinulta sitä odota? 
+D2a-6;316;Kyllä, tämä on minulle tyypillistä.
+D2b-9;317;En.
+;;
+D2-6vs9;319;Kumpi seuraavista kuvaa paremmin sinua epävarmuuden hetkellä? 
+D2a-6;320;Pyrin palauttamaan mielenrauhani etsimällä näkyviä todisteita siitä, että asiat eivät ole niin huonosti, kuin pelkään.
+D2b-9;321;Säilytän sisäisen rauhani ja uskon asioiden järjestyvän, vaikka ne eivät juuri nyt olisikaan hallinnassani.
+;;
+D2-6vs9;323;Kun haluat jonkin sinulle oleellisen asian tapahtuvaksi, niin oletko enemmän …
+D2a-6;324;… kärsimätön, ja haluat asian tapahtuvan heti.
+D2b-9;325;… kärsivällinen  ja uskot asian kyllä hoituvan.
+;;
+/*  6 vs 9 tiebreak kysymykset ;327;
+TD2-6vs9;328;Kumpi seuraavista kuvaa paremmin sinua epävarmuuden hetkellä? 
+TD2a-6;329;Pyrin palauttamaan mielenrauhani etsimällä näkyviä todisteita siitä, että asiat eivät ole niin huonosti, kuin pelkään.
+TD2b-9;330;Säilytän sisäisen rauhani ja uskon asioiden järjestyvän, vaikka ne eivät juuri nyt olisikaan hallinnassani.
+;;
+TD2-6vs9;332;Kun haluat jonkin sinulle oleellisen asian tapahtuvaksi, niin oletko enemmän …
+TD2a-6;333;käsrsimätön, ja haluat asian tapahtuvan heti.
+TD2b-9;334;kärsivällinen  ja uskot asian kyllä hoituvan.

@@ -1,0 +1,20 @@
+Te
+
+
+Kerro minulle miten tämän ymmärrät ja tarvitsetko tarkennusta? Älä vielä tee koodia kortille.
+
+
+lataa tarvittavat kirjastot ja apuohjelmat sekä ympäristömuuttujat ja tee kaikki muut tarvitavat toimenpiteet ohjelman käynnistämiseksi ja vaihda hakemisto oikeaksi ohjelma ajamista varten,
+
+Tee sitten yksikkö testit  configuration   sivulle ja sen painonapeille, virhetilanteille ja lomakevalidoinneille
+Aja testi  // Muista testaa tesi
+
+Muuta yksikkö testit  conditition params  sivulle ja sen painonapeille, virhetilanteille ja lomakevalidoinneille,koska sivu on hieman muuttunut
+
+Stocks 
+Active Alerts
+Alerts History
+Candles
+Condition Params
+Jobs
+Configuration   

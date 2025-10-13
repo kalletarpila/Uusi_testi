@@ -1,0 +1,78 @@
+tarkastaan vielä ennen seuraavaa deploymenttia, ettei koodin hakemistorakenne aiheuta näitä ongelmia. Esimerkkisi hakemistoa "kynttilat" on kaksi kappaletta, /home/kalle/osake/kynttilat ja niissä on myös samannimisiä tiedostoja. Tutki tämä tilanne ensin, mutta ÄLÄ TEE MITÄÄN MUUOKSIA vielä
+
+
+yllä — rakenteen voi selkeyttää ilman suurta urakkaa. Suosittelen kahta vaihtoehtoa, joista “kevyt siivous” on pienin riski:
+
+Vaihtoehto A: Kevyt siivous (pieni muutos, matala riski)
+
+Poista juuren __init__.py, jotta repojuuri ei ole enää paketti “kynttilat”. Tällöin import “from kynttilat import create_app” viittaa suoraan sisäiseen pakettiin kynttilat/ (oikea lähde).
+Poista/uuudelleennimeä duplikaatit juuresta (models.py, routes.py), jotta ne eivät sekoita importteja.
+Testaa: kaikki importit (wsgi, app, tests, alembic/env.py) edelleen toimivat ja viittaavat sisäiseen kynttilat-pakettiin.
+Arvio: 30–60 min, koska meillä on testit jotka varmistavat toimivuuden nopeasti.
+Vaihtoehto B: Selkeä uudelleennimeäminen (hieman isompi, silti kohtuullinen)
+
+Nimeä sisäinen kynttilat/ vaikkapa app/ tai candlelight_app/ (yksi selkeä applikaatiopaketti).
+Päivitä import-polut (wsgi, app.py, alembic/env.py, testit) uuteen nimeen.
+Poista repojuuren __init__.py ja duplikaatit juuresta.
+Arvio: 1–2 h, lähinnä import-polkujen päivitystä ja testien ajamista.
+Riskejä/huomioita:
+
+Alembic: env.py saattaa importoida mallit/metadataa polusta; polku pitää päivittää.
+Vanhat suhteelliset importit pysyvät mutta polut muuttuvat, joten tee yksi “grep” ja varmistusajo testeillä.
+Renderin start-komento ja wsgi eivät välttämättä muutu lainkaan (pidetään wsgi:application samana), kunhan wsgi.py importtaa uuden polun.
+Yhteenveto:
+
+On täysin tehtävissä, eikä ole “vaativa työ”. Kevyt siivous onnistuu tyypillisesti alle tunnissa; laajempi uudelleennimeäminen noin 1–2 h. Suosittelen aloittamaan vaihtoehdolla A (poista juuren __init__.py + duplikaatit), koska se on vähäriskinen ja poistaa nimen päällekkäisyyden, joka aiheuttaa eniten hämmennystä.
+
+
+https://candlelight-ugzy.onrender.com/
+
+postgresql://candlelight_db_user:24XoDoSNVM3CCfJDFmwMxhmUv2q4yfbn@dpg-3j2c2ripnbc73ehjgeg-a/candlelight_db?sslmode=disable
+
+postgresql://candlelight_db_user:24XoDoSNVM3CCfJDFmwMxhmUv2q4yfbn@dpg-d3j2c2ripnbc73ehjgeg-a.internal:5432/candlelight_db?sslmode=disable
+
+EEDpL9ILL3XrB7losjw5J6gpgqnGdA6R
+
+postgresql://candlelight_db_user:24XoDoSNVM3CCfJDFmwMxhmUv2q4yfbn@dpg-d3j2c2ripnbc73ehjgeg-a/candlelight_db
+
+pip install --upgrade pip && pip install -r requirements.txt && if [ -f requirements-optional.txt ]; then pip install -r requirements-optional.txt || true; fi && pip install gunicorn==21.2.0 psycopg2-binary==2.9.9 APScheduler==3.10.4 yfinance==0.2.43 requests-cache==1.2.0 pandas-ta==0.4.71b0
+
+python -m gunicorn -w 2 -k gthread -b 0.0.0.0:$PORT wsgi:application
+
+juu .. meillä on nyt sitten koneisto: 
+1) jolle voi antaa 1-n kappaletta osakkeita ja niiden Open, close ... tiedot luetaan 1.1.2024 alkaen (kaksi sourcea)
+2) ja pyynnöstä tarkistetaan laukeaako ehto A tai B (arvoja ja rajoja voi säätää itse).
+3) Joka aamuyö haetaan edellisen päivän tiedot osakkeista, jotka on merkitty aktiiviseksi
+4) Jos ehto laukeaa, tulee hälytys
+5) Häly näkyy "aktiiviset hälyt listalla kunnes se sieltä kuitataan
+6) Osakekohtaisella sivulla näkyy listamuodossa kaikki ko. osakkeen hälyt ja tieto siitä onko se kuitattu vain ei sekä chartissa hälyjen ajankohdat
+
+Kun tämän saan vielä nettiin, niin voidaan testata. Käyttöliittymä vielä raakaversio, eikä taida kännykällä.
+
+Kun tämä peruspaketti toimii, voi ehtoja lisätä helposti ja hakea dataa useasta lähteestä.
+
+
+Säädetään ensi alapiikin säädöt kohdalleen. 
+
+Nyt ne ovat 
+
+Pitkä keskiarvo osakkeelle : oletus 20 pv
+Lopetuskurssin oleskeluaika alle pitkän keskiarvon : oletus 20 pv
+=> ehto 1 on siis 20 päivää alle 20 päivän liukuvan keskiarvon
+
+
+Lyhyt keskiarvo osakkeelle; oletus 5 pv
+Montako prosenttia alle pitkän keskiarvon: oletus 2
+=> ehto 2 on siis lyhyt 5 viiden päivän keskiavo on 2 prosentia alle pitkän keskiarvon 
+
+Alapiikin suhteellinen pituus : oletus 25%
+=> ehto 3 on siis kuinka suuri pitää vähintään alapiikin olla rungosta
+
+Päivän tyyppi,  Bullish, Bearish vai mikä vaan (none)
+= ehto  4  on siis vielä loppuehto
+
+
+Tarviiko muita parametrejä? Volyyminmuutos? Yläpiiki? Rungon koko?
+
+
+ 

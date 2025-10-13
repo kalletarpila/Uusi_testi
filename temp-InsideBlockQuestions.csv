@@ -1,0 +1,454 @@
+﻿/* tämä on kommenttirivin aloitusmerkki;;
+;;
+/* Tässä tiedosssa on väittämiä testausta varten;;
+/* Tässä väittämiä testausta varten;;
+;;
+/* Yksi tapaus esitetään aina kolmella rivillä, eli ensimmäisellä Tiannekuvaus, seuraavalla tyypin X reagointi ja kolmannella tyypi Y reagointi;;
+/* B2 -tagilla merkityt rivit on 3-7-8 tapauksia;;
+/* B2-XvsY tarkoittaa tapausta, jossa verrataan tyyppejä X ja Y;;
+/* TB2 -alkuisella tagilla merkityt rivit on 3-7-8 tapauksia varten tehdyt LISÄ-kysymykset, jos ei tyyppi erotu varsinaisilla kysymyksillä ;;
+/* C2 -tagilla merkityt rivit on 2-6-9 tapauksia ja D2-tagilla 1-5-6 tapauksia;;
+;;
+/* Huom! Tyyppi 6 on tarkoituksella mukana C ja D väittämissä;;
+;;
+/* Huom! Perustilanteita voi olla maksimissaan 9 kpl (eli 3 per ryhmä) ja lisäkysymyksiä 6 (eli 3 per ryhmä);;
+;;
+;;
+;;
+/*  3 vs 8 ksymykset;;
+;;
+B2-3vs8;;Ajatellaan, että olet pitämässä esitelmää tärkeälle yleisölle. Kumpi toimintamalli seuraavista on sinulle luontaisempaa
+B2a-3;;Olen valmis mukauttamaan omaa tyyliäni ja viestiäni, jotta saan yleisön suosion
+B2b-8;;Menen yleisön eteen itsenäni ja kerron asiat sellaisina, kuin ne minusta on
+;;
+B2-3vs8;;Olet palaverissa, jossa on mukana ihmisiä, jotka mahdollisesti voivat vaikuttaa omiin ura-/työmahdollisuuksiisi. Kumpi toimintamalli seuraavista on sinulle luontaisempaa
+B2a-3;;Voisin jättää oman aidon mielipiteeni sanomatta, jos epäilen että se saattaa heikentää uramahdollisuuksiani jatkossa
+B2b-8;;Sanon suoraan oman mielipiteeni ja hyväksyn sen, mitä siitä mahdollisesti seuraa urani jatkon kannalta
+;;
+;;
+;;
+;;
+TB2-3vs8;;TASATILANNE- Olet mukana verkostossa, jossa tiedät, että sinulla on hyvä maine muiden silmissä. Kumpi toimintamalli seuraavista on sinulle luontaisempaa
+TB2a-3;;Vaikka olisin eri mieltä enemmistön kanssa, jätän ilmaisematta mielipiteeni, ja sopeudun enemmistön kantaan, koska näin en vaaranna hyvää mainettani ryhmän silmissä
+TB2b-8;;Koen tärkeänä, että ilmaisen suoraan oman aidon mielipiteeni asiaan, vaikka edustaisin vähemmistöä ryhmässä
+;;
+TB2-3vs8;;TASATILANNE, LISÄKYSYMYS Tässä on toinen tilannekuvaus 3-7-8  tyypeille
+TB2a-3;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kolmostyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+TB2b-8;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa Kasityyppiä 
+;;
+/*  3 vs 7 kysymykset;;
+;;
+B2-3vs7;;Ajattele, että sinulla olisi mahdollisuus valita uusi työ kahden työpaikan välillä. Työt ovat kaikilta muilta osin täysin samanlaiset, lukuun ottamatta asteikolla mainittavia ominaisuuksia
+B2a-3;;Työ 1 on muuten samanlainen kuin Työ 2, mutta tällä organisaatiolla on erityisen hyvä maine tunnettujen tuotteidensa vuoksi ja siksi sitä arvostetaan työpaikkana. Työpaikan ilmapiiri ihmisten välillä on kuitenkin viileä ja etäinen
+B2b-7;;Työ 2 on muuten samanlainen kuin Työ 1, mutta tässä organisaatiossa ihmiset viihtyvät erityisen hyvin. Organisaation tuotteet, tai maine työpaikkana, ei erotu alan muista organisaatioista
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+B2-7vs8;;Tässä on kolmas tilannekuvaus 3-7-8  tyypeille
+B2a-7;;Tämä kuvaa seiskatyyppiä 
+B2b-8;;Sanon suoraan oman mielipiteeni ja hyväksyn sen, mitä siitä mahdollisesti seuraa urani jatkon kannalta
+;;
+TB2-3vs7;;"TASATILANNE, LISÄKYSYMYS  Tässä on ensimmäinen tilannekuvaus 3-7-8  tyypeille .""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+TB2a-3;;"TASATILANNE, LISÄKYSYMYS Tämä kuvaa kolmostyyppiä ""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+TB2b-7;;TASATILANNE, LISÄKYSYMYSTämä kuvaa Seiskastyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;;
+TB2-3vs8;;TASATILANNE, LISÄKYSYMYS Tässä on toinen tilannekuvaus 3-7-8  tyypeille
+TB2a-3;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kolmostyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+TB2b-8;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa Kasityyppiä 
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+TB2-7vs8;;TASATILANNE, LISÄKYSYMYS  Tässä on kolmas tilannekuvaus 3-7-8  tyypeille
+TB2a-7;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa seiskatyyppiä 
+TB2b-8;;TASATILANNE, LISÄKYSYMYS , Tämä kuvaa Kasityyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;;
+TB2-3vs7;;"TASATILANNE, LISÄKYSYMYS KAKSI  Tässä on ensimmäinen tilannekuvaus 3-7-8  tyypeille .""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+TB2a-3;;"TASATILANNE, LISÄKYSYMYS KAKSI Tämä kuvaa kolmostyyppiä ""Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto "
+TB2b-7;;TASATILANNE, LISÄKYSYMYS KAKSITämä kuvaa Seiskastyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;;
+TB2-3vs8;;TASATILANNE, LISÄKYSYMYS KAKSI Tässä on toinen tilannekuvaus 3-7-8  tyypeille
+TB2a-3;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa kolmostyyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+TB2b-8;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa Kasityyppiä 
+;;
+TB2-7vs8;;TASATILANNE, LISÄKYSYMYS KAKSI  Tässä on kolmas tilannekuvaus 3-7-8  tyypeille
+TB2a-7;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa seiskatyyppiä 
+TB2b-8;;TASATILANNE, LISÄKYSYMYS KAKSI , Tämä kuvaa Kasityyppiä Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium 
+;;
+;;
+C2-2vs6;; Tässä on ensimmäinen tilannekuvaus 2-6-9  tyypeille
+C2a-2;;Tämä kuvaa kakkostyyppiä 
+C2b-6;;Tämä kuvaa kuutostyyppiä 
+;;
+C2-2vs6;; Tässä on toinen tilannekuvaus 2-6-9  tyypeille
+C2a-2;;Tämä kuvaa kakkostyyppiä 
+C2b-9;;Tämä kuvaa Ysityyppiä 
+;;
+C2-2vs6;;Tässä on kolmas tilannekuvaus 2-6-9  tyypeille
+C2a-6;;Tämä kuvaa kutostyyppiä 
+C2b-9;;Tämä kuvaa ysityyppiä 
+;;
+TC2-2vs6;;TASATILANNE, LISÄKYSYMYS   Tässä on ensimmäinen tilannekuvaus 2-6-9  tyypeille
+TC2a-2;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kakkostyyppiä 
+TC2b-6;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kuutostyyppiä 
+;;
+TC2-2vs9;;TASATILANNE, LISÄKYSYMYS  Tässä on toinen tilannekuvaus 2-6-9  tyypeille
+TC2a-2;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kakkostyyppiä 
+TC2b-9;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa Ysityyppiä 
+;;
+TC2-6vs9;;TASATILANNE, LISÄKYSYMYS   Tässä on kolmas tilannekuvaus 2-6-9  tyypeille
+TC2a-6;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa kutostyyppiä 
+TC2b-9;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa ysityyppiä 
+;;
+TC2-2vs6;;TASATILANNE, LISÄKYSYMYS KAKSI   Tässä on ensimmäinen tilannekuvaus 2-6-9  tyypeille
+TC2a-2;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa kakkostyyppiä 
+TC2b-6;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa kuutostyyppiä 
+;;
+TC2-2vs9;;TASATILANNE, LISÄKYSYMYS KAKSI  Tässä on toinen tilannekuvaus 2-6-9  tyypeille
+TC2a-2;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa kakkostyyppiä 
+TC2b-9;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa Ysityyppiä 
+;;
+TC2-6vs9;;TASATILANNE, LISÄKYSYMYS KAKSI   Tässä on kolmas tilannekuvaus 2-6-9  tyypeille
+TC2a-6;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa kutostyyppiä 
+TC2b-9;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa ysityyppiä 
+;;
+;;
+D2-1vs5;; Tässä on ensimmäinen tilannekuvaus 1-5-6  tyypeille
+D2a-1;;Tämä kuvaa ykköstyyppiä 
+D2b-5;;Tämä kuvaa vitosstyyppiä 
+;;
+D2-1vs6;; Tässä on toinen tilannekuvaus1-5-6 tyypeille
+D2a-1;;Tämä kuvaa ykköstyyppiä 
+D2b-6;;Tämä kuvaa Kutosyyppiä 
+;;
+D2-5vs6;;Tässä on kolmas tilannekuvaus 1-5-6 tyypeille
+D2a-5;;Tämä kuvaa vitostyyppiä 
+D2b-6;;Tämä kuvaa Kutostyyppiä 
+;;
+TD2-1vs5;; TASATILANNE, LISÄKYSYMYS  Tässä on ensimmäinen tilannekuvaus 1-5-6  tyypeille
+TD2a-1;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa ykköstyyppiä 
+TD2b-5;;TASATILANNE, LISÄKYSYMYS  Tämä kuvaa vitosstyyppiä 
+;;
+TD2-1vs6;;TASATILANNE, LISÄKYSYMYS  Tässä on toinen tilannekuvaus1-5-6 tyypeille
+TD2a-1;;TASATILANNE, LISÄKYSYMYS Tämä kuvaa ykköstyyppiä 
+TD2b-6;;TASATILANNE, LISÄKYSYMYS Tämä kuvaa Kutosyyppiä 
+;;
+TD2-5vs6;;TASATILANNE, LISÄKYSYMYS Tässä on kolmas tilannekuvaus 1-5-6 tyypeille
+TD2a-5;;TASATILANNE, LISÄKYSYMYS Tämä kuvaa vitostyyppiä 
+TD2b-6;;TASATILANNE, LISÄKYSYMYS Tämä kuvaa Kutostyyppiä 
+;;
+TD2-1vs5;; TASATILANNE, LISÄKYSYMYS KAKSI  Tässä on ensimmäinen tilannekuvaus 1-5-6  tyypeille
+TD2a-1;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa ykköstyyppiä 
+TD2b-5;;TASATILANNE, LISÄKYSYMYS KAKSI  Tämä kuvaa vitosstyyppiä 
+;;
+TD2-1vs6;;TASATILANNE, LISÄKYSYMYS KAKSI  Tässä on toinen tilannekuvaus1-5-6 tyypeille
+TD2a-1;;TASATILANNE, LISÄKYSYMYS KAKSI Tämä kuvaa ykköstyyppiä 
+TD2b-6;;TASATILANNE, LISÄKYSYMYS KAKSI Tämä kuvaa Kutosyyppiä 
+;;
+TD2-5vs6;;TASATILANNE, LISÄKYSYMYS KAKSI Tässä on kolmas tilannekuvaus 1-5-6 tyypeille
+TD2a-5;;TASATILANNE, LISÄKYSYMYS KAKSI Tämä kuvaa vitostyyppiä 
+TD2b-6;;TASATILANNE, LISÄKYSYMYS KAKSI Tämä kuvaa Kutostyyppiä 
+;;
+;;
+;;
+;;3 vs 8
+;;
+;;
+;;1 Ajatellaan, että olet pitämässä esitelmää tärkeälle yleisölle. Kumpi toimintamalli seuraavista on sinulle luontaisempaa.
+;;Olen valmis mukauttamaan omaa tyyliäni ja viestiäni, jotta saan yleisön suosion.
+;;Menen yleisön eteen itsenäni ja kerron asiat sellaisina, kuin ne minusta on.
+;;
+;;2 Olet palaverissa, jossa on mukana ihmisiä, jotka mahdollisesti voivat vaikuttaa omiin ura-/työmahdollisuuksiisi. Kumpi toimintamalli seuraavista on sinulle luontaisempaa.
+;;Voisin jättää oman aidon mielipiteeni sanomatta, jos epäilen että se saattaa heikentää uramahdollisuuksiani jatkossa.
+;;Sanon suoraan oman mielipiteeni ja hyväksyn sen, mitä siitä mahdollisesti seuraa urani jatkon kannalta.
+;;
+;;3 Olet mukana verkostossa, jossa tiedät, että sinulla on hyvä maine muiden silmissä. Kumpi toimintamalli seuraavista on sinulle luontaisempaa.
+;;Vaikka olisin eri mieltä enemmistön kanssa, jätän ilmaisematta mielipiteeni, ja sopeudun enemmistön kantaan, koska näin en vaaranna hyvää mainettani ryhmän silmissä.
+;;Koen tärkeänä, että ilmaisen suoraan oman aidon mielipiteeni asiaan, vaikka edustaisin vähemmistöä ryhmässä.
+;;
+;;4 Kuvittele itsesi esihenkilön asemaan. Ajatellaan että joutuisit esittämään johtamallesi työyhteisölle tutkimustuloksia, joiden tiedät sisältävän sekä positiivisia, että negatiivisia tuloksia teistä työyhteisönä. Kumpi toimintamalli seuraavista on sinulle luontaisempaa.
+;;Yritän korostaa positiivisia tuloksia ja saada näin motivoitua tiimin keskittymään vahvuuksiinsa.
+;;Näytän sekä positiiviset, että negatiiviset tulokset yhtä arvokkaina. En yritä arvottaa niitä omalla toiminnallani.
+;;
+;;5 Kuvittele, että sinulle tarjotaan kahta vaihtoehtoa seuraavaksi työtehtäväksi: Työ 1 niistä pitää sisällään mahdollisuuden haastatteluihin mediassa ja näkyvyyttä myös organisaation ulkopuolella. Työ 2 on tehtävänä yhtä vaativa, mutta melko näkymätön. Tässä työssä on kuitenkin mahdollisuus edistää oman yksikkösi hyvinvointia. Kumpi työmahdollisuus olisi sinulle luontaisempi valinta.
+;;Työ 1
+;;Työ 2
+;;6 Tämä kysymys vaatii sinulta erityistä rehellisyyttä. Mikä on suhteesi sääntöihin? .
+;;Säännöistä voi luistaa, jos se edistää omaa tavoitettasi, eikä siitä ole haittaa kenellekään.
+;;Säännöistä voi luistaa vain, jos sillä korjataan oikeudenmukaisuuden puutteita.
+;;Jos säännöistä ei voi mielestäsi luistaa millään perusteella koskaan, valitse keskimmäinen vaihtoehto.
+;;
+;;
+;;
+;;
+;;
+;;
+;;7 vs 8
+;;
+;;1 Ajatellaan, että omassa työyhteisössäsi syntyy voimakasta erimielisyyttä ihmisten välillä. Kumpi toimintamalli seuraavista on sinulle luontaisempaa.
+;;Yritän kääntää jännitteisen tilanteen nopeasti kevyemmäksi ja myönteisemmäksi
+;;Minua ei kovasanainenkaan konflikti haittaa. Hyvä vaan, että mieltä puhutaan painavat asiat halki
+;;
+;;
+;;2 Olet vapaa-ajan harrastusryhmän mukana järjestämässä isoa tapahtumaa. Kumpi toimintamalli seuraavista on sinulle luontaisempaa.
+;;Toivon, että minulle annetaan mahdollisuus toimia vapaasti ja spontaanisti, ilman tarkkaa ohjausta
+;;Toivon, että joku ottaa selkeästi vastuun järjestelyjen organisoinnista ja ohjaa tilannetta oikeaan suuntaan
+;;
+;;
+;;3 Minkälainen suhde sinulla on konflikteihin?  .
+;;Pyrin välttämään konflikteja viimeiseen asti, koska ne vievät toimintakykyni
+;;Koen niin, että ristiriidat voivat olla hyödyllisiä ja jopa välttämättömiä, jotta totuus tulee esiin
+;;
+;;
+;;4 Onko sinulle tärkeää, että ryhmässä on selkeät roolit ja päätöksentekijä?  .
+;;Ei, löydän kyllä paikkani ryhmässä ilman hierarkiaakin
+;;Kyllä, roolien selkeys ja hierarkia luovat turvallisuutta ja lisäävät ryhmän tehokkuutta
+;;
+;;5 Miten suhtaudut itseesi?  .
+;;Suhtaudun kepeästi. Voin helposti ”nauraa itselleni”, varsinkin jos se kohottaa tunnelmaa ryhmässä
+;;Minusta saattaa syntyä kuva, että otan itseni vakavasti. Itselle nauraminen – varsinkaan julkisesti – ei ole minun juttuni
+;;
+;;6 Mikä on sinulle mieluisin tapa viestiä asioita puhumalla?  .
+;;Kerron mielelläni tarinan ja mieluiten sellaisessa muodossa, joka herättää hilpeyttä.
+;;Viestin asiat suoraan ja selkeästi, ilman turhia krumeluureja.
+;;
+;;7 Millainen on suhteesi aikatauluhin?  .
+;;Suhteeni aikatauluihin on joustava ja salliva. Pieni myöhästely on inhimillistä.
+;;Suhteeni aikatauluihin on tiukka. Haluan olla ajoissa paikalla.
+;;
+;;Minusta tuntuu, että olen koko ajan vähän jäljessä siitä. Järjestelen sitä myös jatkuvasti uudelleen.
+;;
+;;3 vs 7
+;;1 Ajattele, että sinulla olisi mahdollisuus valita uusi työ kahden työpaikan välillä. Työt ovat kaikilta muilta osin täysin samanlaiset, lukuun ottamatta asteikolla mainittavia ominaisuuksia. Valitse asteikolta kumman työpaikan mieluummin valitsisit.
+;;Työ 1 on muuten samanlainen kuin Työ 2, mutta tällä organisaatiolla on erityisen hyvä maine tunnettujen tuotteidensa vuoksi ja siksi sitä arvostetaan työpaikkana. Työpaikan ilmapiiri ihmisten välillä on kuitenkin viileä ja etäinen.
+;;Työ 2 on muuten samanlainen kuin Työ 1, mutta tässä organisaatiossa ihmiset viihtyvät erityisen hyvin. Organisaation tuotteet, tai maine työpaikkana, ei erotu alan muista organisaatioista.
+;;
+;;2 Olet tekemässä tärkeää, mutta tylsää tehtävää, jonka pitää olla valmiina huomisaamuna. Ystäväsi pyytää sinua yllättäen viettämään aikaa yhteisten ystävienne kanssa. Kumpi toimintamalli seuraavista on sinulle luontaisempaa.
+;;Kiität kutsusta, mutta et tartu tarjoukseen, sillä tiedät että vaativa tehtävä edellyttää sinulta paneutumista, ja varmistaaksesi työn riittävän laadun, sinulla ei ole mahdollisuutta nyt liittyä seuraan. (3)
+;;Tartun ystävän tarjoukseen ja siirrän tylsää tehtävää myöhemmin, vaikka yöllä, tehtäväksi. Et kuitenkaan jätä välistä ystäviesi tapaamista. (7)
+;;
+;;
+;;3 Tämä on vaikea kysymys: kumpi pelko seuraavista on sinulle suurempi.
+;;Pelko siitä, että koet olosi tylsistyneeksi.
+;;Pelko siitä, että näyttäydyn epäpätevänä.
+;;
+;;4 Onko sinun helppo sanoa ”kyllä” spontaanille seikkailulle? .
+;;Kyllä. Minulle paras elämä on vapaasti koettu sarja innostavia ja joskus yllättäviäkin tapahtumia.
+;;Ei. Spontaani reagointi sotkee aikatauluni ja lopulta estää tärkeiden tavoitteiden saavuttamisen.
+;;
+;;5 Ostaessasi vaatteita, onko sinulle tärkeää, että ne ovat ensisijaisesti… .
+;;mukavat, sopivat ja niistä tulee hyvä fiilis.
+;;laadukkaita merkkituotteita.
+;;
+;;6 Kun lähdet matkalle vieraaseen maahan, toimitko… .
+;;ilman tarkkaa suunnitelmaa, elääksesi hetkessä sen mukaan, mitä eteen tulee.
+;;ennalta laaditun matkasuunnitelman mukaan.
+;;
+;;
+;;
+;;
+;;
+;;
+;;5 vs 6
+;;
+;;1 Jos olet epävarma jostakin päätöksestä, ratkaisetko tilanteen tyypillisemmin… .
+;;vetäytymällä yksin etsimään lisätietoa asiasta
+;;hakemalla vahvistusta luotettavalta ihmiseltä, tiimiltä tai säännöiltä
+;;
+;;2 Missä määrin tunteet ohjaavat sinua arjessasi? .
+;;hyvin paljon (6)
+;;ei juuri ollenkaan (5)
+;;
+;;
+;;
+;;3 Stressin hetkellä, onko ensimmäinen huolenaiheesi se,…   .
+;;riittääkö sinulla aika tehdä asia riittävän hyvin
+;;voitko luottaa asiaan liittyviin ihmisiin tai puitteisiin
+;;4 Vaikeaa päätöstä tehdessäsi, onko sinulla taipumus mieluummin tehdä päätös,    .
+;;luottaen omaan arvioosi
+;;valita enemmistön mielestä oikea tapa, tai yleisesti suosittu käytäntö
+;;
+;;5 Jos tunnet erimielisyyttä asiantuntijan kanssa, oletko lopulta taipuvaisempi,..    .
+;;luottamaan omaan kantaasi
+;;luottamaan asiantuntijan arvioon tai suositukseen
+;;
+;;6 Jos jokin menee pieleen, suuntautuuko ensimmäinen impulssisi tarkistamaan,    .
+;;ylititkö omat rajasi tai tietopohjasi
+;;onko jokin sääntö, sopimus tai ihminen pettänyt luottamuksesi
+;;
+;;
+;;1 vs 6
+;;
+;;1 Häiritseekö sinua enemmän,  .
+;;se, että jotakin tehdään taas väärin
+;;se, että asia on edelleen epävarma
+;;
+;;2 Keskusteletko mieluummin…  .
+;;siitä, että ohjeita pitää noudattaa
+;;siitä, mitä siitä mahdollisesti seuraa, jos ohjeita ei noudata
+;;
+;;3 Onko sinulle tyypillistä…  .
+;;luottaa siihen, että kaikki menee oikein ja suunnitellusti
+;;poistaa jäytävää epävarmuutta varautumalla kaikkiin mahdollisiin uhkiin
+;;
+;;4 Huomaat, että ystäväsi huijaa kokeessa. Tämä ei vaikuta sinun arvosanaasi. Koetko tuossa tilanteessa, että…   .
+;;sinun pitäisi reagoida tähän, vaikka se saattaa aiheuttaa kitkaa välillenne.
+;;sinun ei kannata puuttua asiaan, sillä siitä voi seurata ikävää draamaa.
+;;
+;;5 Huolimatta siitä, missä roolissa tällä hetkellä toimit oikeassa elämässä, koetko että sinulle luontainen rooli on…. .
+;;toimia johdossa
+;;toimia johdon tukena
+;;
+;;6 Ajatellaan, että joudut ex tempore tekemään esihenkilösi puolesta päätöksen – vaikka sellaisen, missä  ravintolassa syödään päivällinen hänen vieraidensa kanssa. Ajatellaan, että soveltuvia vaihtoehtoja on useita. Onko tilanne sinulle ajatuksena…. .
+;;luonteva.
+;;stressaava.
+;;
+;;7 Jos pitäisi valita, onko sinulle tärkeämpää…  .
+;;tehdä asiat oikein ja sääntöjen mukaan
+;;tehdä asiat muiden mielestä turvallisesti
+;;
+;;8 Missä määrin tunteet ohjaavat sinua arjessasi? .
+;;hyvin paljon (6)
+;;ei juuri ollenkaan (5)
+;;
+;;
+;;
+;;1 vs 5
+;;1 Onko työpöydälläsi taipumus… .
+;;pysyä hyvässä järjestyksessä
+;;ajautua epäjärjestykseen pitkäksi aikaa
+;;
+;;2 Jos joku myöhästyy sovitusta 10 minuuttia, eikä ilmoita asiasta, onko kyseessä .
+;;merkittävä rike sitä kohtaan, mikä on hyväksyttävää
+;;mitätön rike, johon minun on helppo sopeutua
+;;
+;;3 Huomaat eräässä asiassa, että työyhteisössä on ohjeistus yhteisestä toimintatavasta, mutta vain puolet työyhteisöstä noudattaa sitä. Kukaan ei ole nostanut tätä puheeksi aiemmin, vaan asian kanssa on eletty. Onko tämä mielestäsi… .
+;;Epäjohdonmukaisuus, jonka sinun on syytä ottaa puheeksi ja vaatia joko ohjeistuksen noudattamista tai siitä luopumista.
+;;Epäjohdonmukaisuus, jonka tulkitset niin, että sitä voi noudattaa, jos haluaa. Et nosta asiaa käsiteltäväksi.
+;;4 Ajattele suhdettasi tietoon. Onko tapasi … .
+;;Etsiä olennainen tieto tehokkaasti ja rajoittaa turhaa vaeltelua tiedon valtateillä.
+;;Upota innostuneena syvälle johonkin aiheeseen, vaikka siitä ei olisi mitään hyötyä juuri nyt.
+;;5 Ostat kaupasta homeisen leivän. Huomaat asian kotona vasta. Onko sinulle … .
+;;ilmiselvää, että otat asian esille.
+;;kyseessä niin pieni asia, ettet jaksa siitä vaivautua.
+;;
+;;6 Et saavu tärkeään tapaamiseen, koska sinulta on jäänyt tekemättä merkintä päivyriin. Kumpi seuraavista on sinulle luontaisempi reaktio, kun tilanne valkenee sinulle.
+;;Syyllistät ja soimaat itseäsi siitä, ettet ollut riittävän tarkka
+;;Harmittaa, että tästä syntyy nyt ylimääräistä vaivaa
+;;7 Minkälainen on suhteesi vaatteisiin ja pukeutumiseen, kumpi seuraavasta ajattelutavasta on sinulle luontaisempi: … .
+;;Olen tarkka pukeutumisen suhteen ja esiinnyn yleensä laadukkaissa ja hyvin istuvissa vaatteissa.
+;;Pukeutuminen ja vaatteet eivät voisi vähempää kiinnostaa. Valitsen – lähes tilanteesta riippumatta – ne vaatteet päälleni, joissa viihdyn ja jotka sattuvat olemaan käsillä.
+;;
+;;
+;;2 vs 9
+;;
+;;1 Kuvittele, että ystäväsi kertoo olevansa uupunut. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa: … .
+;;tarjoan heti konkreettista apua, kysyn lisää ja haluan olla tukena.
+;;kuuntelen rauhassa, olen läsnä, mutta en ehdota mitään, ellei minulta sitä pyydetä.
+;;
+;;2 Ryhmässä syntyy jännite tai erimielisyys. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa:  .
+;;yritän sovitella tilannetta, pehmentää tunnelmaa ja tuoda ihmiset yhteen.
+;;vetäydyn tai pysyn hiljaa, jotta tilanne ei eskaloidu – toivon että se rauhoittuu itsestään.
+;;
+;;3 Ystäväsi soittaa ja haluaisi sinut osaksi ryhmään auttamaan hänen muutossaan viikonloppuna. Tunnet itsesi väsyneeksi ja haluaisit vain levätä. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa.
+;;väsymyksestäni huolimatta lähden auttamaan, koska en halua tuottaa pettymystä tai menettää yhteyttä.
+;;vaikka haluaisin sanoa ”en tule”, luultavasti lupaudun paikalle. Saatan kuitenkin viivytellä lähtöä tai toteuttaa muuttoa verkkaisesti, ikään kuin passiivisesti protestoiden.
+;;
+;;4 Kun sinulla on eri näkemys kuin muilla…. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa.
+;;Tuon sen esiin empaattisesti, koska haluan olla rehellinen ja rakentava.
+;;Pidän näkemykseni omana tietonani, koska en halua aiheuttaa ristiriitaa. Mukaudun mieluummin.
+;;
+;;5 Jos sinun pitää hoitaa joku tehtävä, joka ei sinua innosta yhtään, onko sinulle luontaista tässä tilanteessa, että… .
+;;hoidat sen pian pois alta, jotta voit keskittyä mukavampiin asioihin tai olla avuksi muille?
+;;siirrät tekemistä myöhäisemmäksi, toivoen että se joko ratkeaa itsestään tai tuntuu helpommalta myöhemmin?
+;;6 Kun sinulla on useita tehtäviä odottamassa, miten priorisoit?  .
+;;teet ensin ne, jotka liittyvät toisten tarpeisiin, koska näin voit olla hyödyksi muille
+;;teet ensin helpoimmat alta pois ja siirrät vaikeat tehtävät myöhäisemmäksi – pyrit välttämään stressiä mahdollisimman pitkään.
+;;7 Kun jokin asia vaatii päätöksen, mutta ei ole kiireellinen, miten toimit?  .
+;;teen päätöksen pian, jotta voin siirtyä eteenpäin ja olla selkeä muille
+;;odotan, kunnes on pakko – päätöksenteko tuntuu raskaalta
+;;
+;;8 Kun joku muistuttaa sinua tekemättömästä asiasta, miten reagoit?  .
+;;pahoittelen ja hoidan sen heti – en halua tuottaa pettymystä.
+;;nyökkään, mutta saatan silti lykätä asian toteutusta edelleen. Se tehdään, kun sen aika on.
+;;
+;;9 Ajattele, että kumppanisi ei reagoi, kun jaat jotakin sinulle tärkeää tai emotionaalista. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa.
+;;Tunnen oloni torjutuksi. Saatan korottaa ääntäni tai vetäytyä loukkaantuneena, koska yhteys ei toteudu.
+;;Ajattelen, että ehkä hän ei juuri nyt ole vastaanottavainen. En tee asiasta numeroa.
+;;
+;;10 Olet lähettänyt ystävälle useita viestejä, mutta hän ei vastaa moneen päivään. Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa.
+;;Alan miettiä, olenko tehnyt jotakin väärin. Tunnen oloni hylätyksi ja saatan lähettää uuden viestin, jossa kysyn: onko kaikki hyvin.
+;;Ajattelen, että hänellä on varmaan kiire. En ota asiaa henkilökohtaisesti, enkä välttämättä tee mitään.
+;;11 Ajattele tilanne, jossa olet joutunut valitsemaan oman toiveesi ja jonkun toisen toiveiden välillä. . Kumpi seuraavasta käyttäytymismallista on sinulle luontaisempi tässä tilanteessa.
+;;Minulla on joskus vaikeuksia tunnistaa mitä itse toivon ja päädynkin toteuttamaan toisen toiveet. Se tuntuu oikealta, koska uskon, että auttamalla muita omat tarpeenikin täyttyvät jollakin tavalla.
+;;Usein valitsen toisen toiveet, koska se tuntuu helpommalta ja vältän riidan. Saatan jopa unohtaa, mitä alun perin itse halusin. Se on helpoin tapa säilyttää rauha ja se on minulle tärkeintä.
+;;
+;;
+;;
+;;
+;;
+;;2 vs 6
+;;
+;;1 Oletko… .
+;;hyvä tunnistamaan ihmisten emotionaalisia tarpeita
+;;hyvä tunnistamaan riskejä
+;;
+;;2 Uuteen ihmiseen tutustuminen… .
+;;käy minulta helposti, ystävystyn nopeasti vieraidenkin ihmisten kanssa
+;;kestää minulla pidempään, koska minun pitää varmistua, voinko luottaa riittävästi tähän henkilöön
+;;
+;;
+;;3 Työyhteisön toimintatavoissa on tapahtumassa muutos, joka vaikuttaa merkittävästi tiimin tapaan tehdä työtä. Onko tässä tilanteessa mielestäsi tärkeintä… .
+;;lisätä yhteisen keskustelun ja fiilisten jakamisen määrää
+;;löytämää ne osat, mikä muutoksessa voisi perua tai hoitaa järkevämmin
+;;
+;;4 Seuraava kysymys on vaikea, mutta yritä syventyä sinulle tärkeisiin tarpeisiin. Onko sinulle tärkeämpää… .
+;;olla muiden seurassa
+;;olla turvassa
+;;
+;;5 Kumpi on sinulle tärkeämpää ihmissuhteissa … .
+;;olla spontaani ja tilanteisiin positiivisesti mukautuva
+;;olla lojaali ja luotettava
+;;
+;;6 Onko sinulla tapana miettiä etukäteen, mikä kaikki voi mennä pieleen, vaikka tilanne vaikuttaisi ulospäin rauhalliselta? … .
+;;Eipä juurikaan, luotan siihen, että asiat kyllä lutviutuvat kohdalleen
+;;Kyllä! Mietin riskejä hengästymiseen asti.
+;;
+;;7 Koetko olevasti rento… .
+;;kyllä, jos kanssaihmisilläni on kaikki hyvin.
+;;kyllä, jos kaikkiin riskeihin on varauduttu.
+;;
+;;6 vs 9
+;;
+;;1 Herättääkö yllättävä muutos, johon et ole halukas taipumaan, sinussa… .
+;;tarpeen kysyä, kuka tästä päätti ja miksi – ennen kuin voit hyväksyä sen
+;;halun vetäytyä hiljaisuuteen mieluummin, kuin sanoa suoraan, että et ole mukana
+;;
+;;2 Ajatellaan, että ryhmä, johon kuulut, päättää jotakin, josta et ole kovin innoissasi. Kumpi seuraavista käytösmalleista on lähempänä sinun tapaasi reagoida … .
+;;mukaudun päätökseen, koska koen tarvetta olla lojaali ryhmää ja sen tekemiä päätöksiä kohtaan
+;;ulkoisesti mukaudun ryhmän päätökseen, mutta saatan olla passiivinen varsinaisen toteutuksen suhteen
+;;
+;;
+;;Kyllä, tämä on minulle tyypillistä
+;;En, mietin toki silloin tällöin riskejä, mutta en varaudu kaikkeen etukäteen
+;;
+;;4 Koetko joskus painetta olla valppaana ja vastuullinen, vaikka kukaan ei sinulta sitä odota? .
+;;Kyllä, tämä on minulle tyypillistä
+;;En
+;;5 Kumpi seuraavista kuvaa paremmin sinua epävarmuuden hetkellä? .
+;;Pyrin palauttamaan mielenrauhani etsimällä näkyviä todisteita siitä, että asiat eivät ole niin huonosti, kuin pelkään
+;;Säilytän sisäisen rauhani ja uskon asioiden järjestyvän, vaikka ne eivät juuri nyt olisikaan hallinnassani
