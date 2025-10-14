@@ -1826,8 +1826,8 @@ function check_tiebreak_needed(): bool {
 
   index_log('TIEBREAK CHECK: top=' . $top . ', second=' . $second . ', diff=' . $diff);
 
-  // Trigger tiebreak when the difference between top-two is 0,1 or 2
-  return ($diff <= 2);
+  // Trigger tiebreak when the difference between top-two is 4 or less
+  return ($diff <= 4);
 }
 
 /**
