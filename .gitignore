@@ -1,0 +1,27 @@
+# Composer
+/vendor/
+composer.lock
+
+# PHPUnit
+/.phpunit.cache/
+/tests/coverage/
+/tests/test_data/
+
+# IDE
+/.vscode/
+/.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data (local development)
+/data/*.json
+/data/*.log
+!/data/.gitkeep
+
+# Logs
+*.log

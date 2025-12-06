@@ -43,7 +43,7 @@ header('Pragma: no-cache');
 header('Expires: 0');
 
 /* Turvaotsikot */
-header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';");
+header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; base-uri 'self'; form-action 'self'; frame-ancestors 'none';");
 header('X-Frame-Options: DENY');
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: no-referrer');
@@ -183,36 +183,59 @@ function handle_success(string $message, array $invite, string $log_message = ''
     
     return [$success_msg, $clean_fields];
 }
-function validate_form_data(array $data): array {
+/**
+ * Validoi yksittäisen kutsuttavan tiedot
+ * 
+ * @param array $nominee Kutsuttavan tiedot
+ * @param string $nominee_name Kutsuttavan nimi (virheilmoituksiin)
+ * @return array Lista virheistä
+ */
+function validate_single_nominee(array $nominee, string $nominee_name): array {
     $errors = [];
     
-    $ref_name   = trim($data['ref_name']);
-    $nom_name   = trim($data['nom_name']);
-    $nom_email  = trim($data['nom_email']);
-    $guess_type = trim($data['guess_type']);
-    $prob_s     = trim($data['guess_prob']);
-    $ref_note   = $data['ref_note'];
+    $nom_name   = trim($nominee['name'] ?? '');
+    $nom_email  = trim($nominee['email'] ?? '');
+    $guess_type = trim($nominee['guess_type'] ?? '');
+    $prob_s     = trim($nominee['guess_prob'] ?? '');
     
-    if ($ref_name === '') $errors[] = 'Anna kutsujan nimi.';
-    if ($nom_name === '') $errors[] = 'Anna kutsuttavan nimi.';
+    if ($nom_name === '') {
+        $errors[] = ($nominee_name !== '' ? $nominee_name : 'Kutsuttava') . ': Anna nimi';
+    }
     
     if (!filter_var($nom_email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = 'Kutsuttavan sähköpostiosoite on virheellinen.';
+        $errors[] = ($nominee_name !== '' ? $nominee_name : 'Kutsuttava') . ': Sähköpostiosoite on virheellinen';
     } else {
         if (preg_match('/^[^@\s]+@([^\s@]+)$/', $nom_email, $m)) {
             $domain = $m[1];
             if (!checkdnsrr($domain, 'MX')) {
-                $errors[] = 'Kutsuttavan sähköpostin toimivuus epävarma (MX-tietuetta ei löytynyt).';
+                $errors[] = ($nominee_name !== '' ? $nominee_name : 'Kutsuttava') . ': Sähköpostin toimivuus epävarma (MX-tietuetta ei löytynyt)';
             }
         }
     }
     
     if ($guess_type === '' || !preg_match('/^[1-9]$/', $guess_type)) {
-        $errors[] = 'Valitse tyyli 1–9.';
+        $errors[] = ($nominee_name !== '' ? $nominee_name : 'Kutsuttava') . ': Valitse tyyli 1–9';
     }
     
     if (!array_key_exists($prob_s, CERTAINTY_LEVELS)) {
-        $errors[] = 'Valitse varmuustaso.';
+        $errors[] = ($nominee_name !== '' ? $nominee_name : 'Kutsuttava') . ': Valitse varmuustaso';
+    }
+    
+    return $errors;
+}
+
+function validate_form_data(array $data): array {
+    $errors = [];
+    
+    $ref_name = trim($data['ref_name']);
+    $ref_note = $data['ref_note'];
+    
+    if ($ref_name === '') $errors[] = 'Anna kutsujan nimi.';
+    
+    // Tarkista että on vähintään yksi kutsuttava
+    if (!isset($data['nominees']) || !is_array($data['nominees']) || count($data['nominees']) === 0) {
+        $errors[] = 'Lisää vähintään yksi kutsuttava.';
+        return $errors;
     }
     
     // Saatesanojen suodatus
@@ -257,7 +280,7 @@ function validate_captcha(string $input): bool {
  * @param array $data Lomakkeen syötetiedot
  * @return array Täydellinen kutsutietue
  */
-function create_invite_record(array $data): array {
+function create_invite_record(string $ref_name, array $nominee): array {
     $id    = uuid4();
     $token = rand_token();
     $code  = human_code();
@@ -267,12 +290,12 @@ function create_invite_record(array $data): array {
         'id'             => $id,
         'token'          => $token,
         'code'           => $code,
-        'referrer_name'  => trim($data['ref_name']),
+        'referrer_name'  => $ref_name,
         'referrer_email' => '',
-        'nominee_name'   => trim($data['nom_name']),
-        'nominee_email'  => trim($data['nom_email']),
-        'guess_type'     => trim($data['guess_type']),
-        'guess_prob'     => trim($data['guess_prob']),
+        'nominee_name'   => trim($nominee['name']),
+        'nominee_email'  => trim($nominee['email']),
+        'guess_type'     => trim($nominee['guess_type']),
+        'guess_prob'     => trim($nominee['guess_prob']),
         'status'         => 'sent',
         'created_at'     => $now,
         'accepted_at'    => null,
@@ -516,15 +539,15 @@ ensure_captcha();
 /* --- Tilamuuttujat käyttöliittymää varten --- */
 $okMsg  = '';  // Onnistumisviestin säilytys
 $errors = [];  // Virheviestien keruu
+$successList = []; // Lista onnistuneista lähetyksistä
 // Säilytetään lomakkeen arvot uudelleentäyttöä varten
 $old = [
     'ref_name'   => (string)($_POST['ref_name']   ?? ''),
-    'nom_name'   => (string)($_POST['nom_name']   ?? ''),
-    'nom_email'  => (string)($_POST['nom_email']  ?? ''),
-    'guess_type' => (string)($_POST['guess_type'] ?? ''),
-    'guess_prob' => (string)($_POST['guess_prob'] ?? ''),
     'ref_note'   => (string)($_POST['ref_note']   ?? ''),
     'captcha'    => (string)($_POST['captcha']    ?? ''),
+    'nominees'   => isset($_POST['nominees']) && is_array($_POST['nominees']) ? $_POST['nominees'] : [
+        ['name' => '', 'email' => '', 'guess_type' => '', 'guess_prob' => '']
+    ]
 ];
 
 /* --- Lomakkeen lähetyksen käsittely --- */
@@ -536,8 +559,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_invite'])) {
     if ($honeypot !== '') {
         invite_log('Honeypot triggered (blocked silently)');
         // Näytä onnistumisviestiä mutta älä tee mitään (stealth blocking)
-        $okMsg = 'Kutsu lähetetty onnistuneesti.';
-        $old = ['ref_name'=>'','nom_name'=>'','nom_email'=>'','guess_type'=>'','guess_prob'=>'','ref_note'=>'','captcha'=>''];
+        $okMsg = 'Kutsut lähetetty onnistuneesti.';
+        $old = ['ref_name'=>'','ref_note'=>'','captcha'=>'','nominees'=>[['name'=>'','email'=>'','guess_type'=>'','guess_prob'=>'']]];
         reset_captcha();
         goto display_form;
     }
@@ -551,7 +574,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_invite'])) {
         goto display_form;
     }
     
-    // 3. Lomakedata validointi
+    // 3. Lomakedata validointi (yleiset kentät)
     $errors = validate_form_data($old);
     
     // 4. CAPTCHA-tarkistus
@@ -559,36 +582,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_invite'])) {
         add_error($errors, 'Vastaa todennuskysymykseen oikein.', 'CAPTCHA fail');
     }
     
-    // Jos validoinnissa virheitä, keskeytä käsittely
+    // Jos perusvalidoinnissa virheitä, keskeytä käsittely
     if (!empty($errors)) {
         handle_form_error($errors);
         goto display_form;
     }
     
-    // 5. Luo kutsutietue
-    $invite = create_invite_record($old);
+    // 5. Käsittele jokainen kutsuttava erikseen
     $all_invites = load_invites();
-    $all_invites[] = $invite;
-    
-    // 6. Tallenna kutsutiedot
-    if (!save_invites($all_invites)) {
-        add_error($errors, 'Kutsun tallennus epäonnistui.', 'Save invites FAILED');
-        handle_form_error($errors);
-        goto display_form;
-    }
-    
-    // 7. Lähetä sähköpostikutsu
+    $ref_name = trim($old['ref_name']);
     $note_clean = trim(strip_tags($old['ref_note']));
-    $sent = send_invitation_email($invite, $note_clean);
     
-    if (!$sent) {
-        add_error($errors, 'Sähköpostin lähetys epäonnistui (mail()). Kutsu on silti tallennettu.', 'MAIL send FAILED id='.$invite['id']);
-        handle_form_error($errors);
-        goto display_form;
+    foreach ($old['nominees'] as $index => $nominee) {
+        // Validoi yksittäinen kutsuttava
+        $nom_name = trim($nominee['name'] ?? '');
+        $nominee_errors = validate_single_nominee($nominee, $nom_name);
+        
+        if (!empty($nominee_errors)) {
+            // Lisää virheet listaan
+            $errors = array_merge($errors, $nominee_errors);
+            continue; // Hyppää seuraavaan
+        }
+        
+        // Luo kutsutietue
+        $invite = create_invite_record($ref_name, $nominee);
+        
+        // Tallenna tiedot
+        $all_invites[] = $invite;
+        if (!save_invites($all_invites)) {
+            $errors[] = $nom_name . ': Kutsun tallennus epäonnistui';
+            invite_log('Save invites FAILED for nominee: '.$nom_name);
+            continue;
+        }
+        
+        // Lähetä sähköpostikutsu
+        $sent = send_invitation_email($invite, $note_clean);
+        
+        if (!$sent) {
+            $errors[] = $nom_name . ': Sähköpostin lähetys epäonnistui';
+            invite_log('MAIL send FAILED id='.$invite['id'].' to='.$invite['nominee_email']);
+        } else {
+            // Onnistunut lähetys
+            $successList[] = $nom_name . ' (' . $invite['nominee_email'] . ')';
+            invite_log('Invite sent OK id='.$invite['id'].' to='.$invite['nominee_email']);
+        }
     }
     
-    // 8. Käsittele onnistunut lähetys
-    [$okMsg, $old] = handle_success('Kutsu lähetetty onnistuneesti.', $invite, 'Invite sent OK id='.$invite['id'].' to='.$invite['nominee_email']);
+    // 6. Näytä tulokset
+    if (!empty($successList)) {
+        $count = count($successList);
+        $total = count($old['nominees']);
+        $okMsg = 'Lähetetty onnistuneesti ' . $count . '/' . $total . ' kutsua.';
+        
+        // Tyhjennä lomake onnistuneiden osalta
+        $_SESSION['form_ts'] = time();
+        reset_captcha();
+        $old = ['ref_name'=>'','ref_note'=>'','captcha'=>'','nominees'=>[['name'=>'','email'=>'','guess_type'=>'','guess_prob'=>'']]];
+    } else {
+        // Ei yhtään onnistunutta lähetystä
+        if (empty($errors)) {
+            $errors[] = 'Yhtään kutsua ei voitu lähettää.';
+        }
+        reset_captcha();
+    }
 }
 
 // Lomakkeen näyttäminen (täällä goto:lla hypitään virhetilanteissa)
@@ -732,6 +788,60 @@ textarea {
     height: 1px;
     overflow: hidden;
 }
+
+/* === NOMINEE BOXES === */
+.nominee-box {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 12px 20px;
+    position: relative;
+}
+
+.nominee-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.nominee-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.btn-remove {
+    padding: 6px 12px;
+    font-size: 14px;
+    background: #fff;
+    border: 1px solid #d33;
+    color: #d33;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 0;
+}
+
+.btn-remove:hover {
+    background: #fee;
+    border-color: #a22;
+}
+
+.nominee-box label {
+    margin: 8px 0 4px 0;
+}
+
+.nominee-box input,
+.nominee-box select {
+    width: calc(100% - 0px);
+    margin: 0;
+}
+
+#addNomineeBtn {
+    display: block;
+    width: auto;
+}
 </style>
 </head>
 <body>
@@ -740,24 +850,33 @@ textarea {
     <div>
       <h1>Lähetä kutsu enneagrammitestin pilottiin</h1>
       <p class="small" style="margin:6px 0 0">
-        Tällä lomakkeella voit lähettää tutullesi kutsun osallistua enneagrammitestin pilottiin.
+        Tällä lomakkeella voit lähettää tutuillesi kutsujaosallistua enneagrammitestin pilottiin.
         Sinun nimesi kerrotaan kutsuttavalle, mutta ei sinun arviotasi hänen <strong>enneagrammityylistään</strong>.
         Anna kutsuttavan tyyli ja kerro oma arviosi tyylin osuvuuden todennäköisyydestä.
       </p>
     </div>
   </div>
 
-  <?php if ($okMsg): ?><div class="msg ok"><?=h($okMsg)?></div><?php endif; ?>
+  <?php if ($okMsg): ?>
+    <div class="msg ok">
+      <?=h($okMsg)?>
+      <?php if (!empty($successList)): ?>
+        <ul style="margin:6px 0 0 16px; padding:0">
+          <?php foreach ($successList as $s): ?><li><?=h($s)?></li><?php endforeach; ?>
+        </ul>
+      <?php endif; ?>
+    </div>
+  <?php endif; ?>
   <?php if ($errors): ?>
     <div class="msg err">
-      <strong>Korjaa seuraavat kohdat:</strong>
+      <strong>Virheet:</strong>
       <ul style="margin:6px 0 0 16px; padding:0">
         <?php foreach ($errors as $e): ?><li><?=h($e)?></li><?php endforeach; ?>
       </ul>
     </div>
   <?php endif; ?>
 
-  <form method="post" novalidate>
+  <form method="post" novalidate id="inviteForm">
     <!-- Honeypot -->
     <div class="hp">
       <label>Jätä tämä tyhjäksi
@@ -769,38 +888,51 @@ textarea {
     <label for="ref_name">Nimesi *</label>
     <input type="text" id="ref_name" name="ref_name" value="<?=h($old['ref_name'])?>">
 
-    <h2 style="margin-top:16px">Kutsuttava</h2>
-    <label for="nom_name">Nimi *</label>
-    <input type="text" id="nom_name" name="nom_name" value="<?=h($old['nom_name'])?>">
+    <h2 style="margin-top:16px">Kutsuttavat (max 10)</h2>
+    <div id="nomineesContainer">
+      <?php foreach($old['nominees'] as $idx => $nom): ?>
+      <div class="nominee-box" data-index="<?=$idx?>">
+        <div class="nominee-header">
+          <span class="nominee-title">Kutsuttava #<?=$idx+1?></span>
+          <button type="button" class="btn-remove" data-nominee-index="<?=$idx?>">🗑️ Poista</button>
+        </div>
+        
+        <label>Nimi *</label>
+        <input type="text" name="nominees[<?=$idx?>][name]" value="<?=h($nom['name'])?>">
 
-    <label for="nom_email">Sähköposti *</label>
-    <input type="email" id="nom_email" name="nom_email" value="<?=h($old['nom_email'])?>">
+        <label>Sähköposti *</label>
+        <input type="email" name="nominees[<?=$idx?>][email]" value="<?=h($nom['email'])?>">
 
-    <div class="row">
-      <div>
-        <label for="guess_type">Ehdotettu enneagrammityyli *</label>
-        <select id="guess_type" name="guess_type">
-          <option value="">Valitse...</option>
-          <?php for($i=1;$i<=9;$i++): ?>
-            <option value="<?=$i?>" <?=$old['guess_type']===(string)$i?'selected':''?>><?=$i?></option>
-          <?php endfor; ?>
-        </select>
+        <div class="row">
+          <div>
+            <label>Ehdotettu enneagrammityyli *</label>
+            <select name="nominees[<?=$idx?>][guess_type]">
+              <option value="">Valitse...</option>
+              <?php for($i=1;$i<=9;$i++): ?>
+                <option value="<?=$i?>" <?=$nom['guess_type']===(string)$i?'selected':''?>><?=$i?></option>
+              <?php endfor; ?>
+            </select>
+          </div>
+          <div>
+            <label>Kuinka varma olet arviostasi? *</label>
+            <select name="nominees[<?=$idx?>][guess_prob]">
+              <option value="">Valitse...</option>
+              <?php foreach(CERTAINTY_LEVELS as $key => $label): ?>
+                <option value="<?=$key?>" <?=$nom['guess_prob']===$key?'selected':''?>><?=h($label)?></option>
+              <?php endforeach; ?>
+            </select>
+          </div>
+        </div>
       </div>
-      <div>
-        <label for="guess_prob">Kuinka varma olet arviostasi? *</label>
-        <select id="guess_prob" name="guess_prob">
-          <option value="">Valitse...</option>
-          <?php foreach(CERTAINTY_LEVELS as $key => $label): ?>
-            <option value="<?=$key?>" <?=$old['guess_prob']===$key?'selected':''?>><?=h($label)?></option>
-          <?php endforeach; ?>
-        </select>
-      </div>
+      <?php endforeach; ?>
     </div>
+    
+    <button type="button" class="btn" id="addNomineeBtn" style="margin-top:12px">➕ Lisää uusi kutsuttava</button>
 
     <label for="ref_note" style="margin-top:12px">Saatesanat kutsuttavalle (liitetään sähköpostiin)</label>
     <textarea id="ref_note" name="ref_note" maxlength="<?=NOTE_MAX_LEN?>" spellcheck="false" placeholder="Muokkaa viestiä tarpeen mukaan..."><?php 
       // Näytä oletusarvoinen viesti jos käyttäjä ei ole syöttänyt omaa
-      $default_message = "Tarvitsisin sun apua! Olen mukana kehittämässä suomenkielistä, tarkkaa enneagrammitestiä. Sen koeversioon tarvittaisiin paljon erilaisten ihmisten vastauksia. Tämä on tosi helppo juttu, eikä vaadi mitään pohjatietoa aiheesta. Kiitos jo etukäteen ja mukavaa syksyä!";
+      $default_message = "Tarvitsisin sun apua! Olen mukana kehittämässä suomenkielistä, tarkkaa enneagrammitestiä. Sen koeversioon tarvittaisiin paljon erilaisten ihmisten vastauksia, jotta saamme osumatarkkuutta kehitettyä (nyt n.50%). Tämä on tosi helppo juttu, eikä vaadi mitään pohjatietoa aiheesta. Kiitos jo etukäteen!";
       echo h($old['ref_note'] !== '' ? $old['ref_note'] : $default_message);
     ?></textarea>
     <p class="small">Voit muokata viestiä haluamaksesi tai poistaa sen kokonaan. Enintään <?=NOTE_MAX_LEN?> merkkiä. Linkit eivät ole sallittuja.</p>
@@ -816,5 +948,128 @@ textarea {
 
   <div class="credits">Suomen Enneagrammiyhdistys, 2025</div>
 </div>
+
+<script>
+// Nominee-kenttien hallinta
+let nomineeCount = <?=count($old['nominees'])?>;
+const MAX_NOMINEES = 10;
+
+// Certainty levels PHP:stä JavaScriptiin
+const certaintyLevels = <?=json_encode(CERTAINTY_LEVELS)?>;
+
+function updateNomineeNumbers() {
+    const boxes = document.querySelectorAll('.nominee-box');
+    boxes.forEach((box, index) => {
+        const title = box.querySelector('.nominee-title');
+        if (title) {
+            title.textContent = 'Kutsuttava #' + (index + 1);
+        }
+        box.dataset.index = index;
+    });
+    nomineeCount = boxes.length;
+    
+    // Näytä/piilota "Lisää"-nappi
+    const addBtn = document.getElementById('addNomineeBtn');
+    if (addBtn) {
+        addBtn.style.display = nomineeCount >= MAX_NOMINEES ? 'none' : 'block';
+    }
+}
+
+function addNominee() {
+    console.log('addNominee called, current count:', nomineeCount);
+    
+    if (nomineeCount >= MAX_NOMINEES) {
+        alert('Voit lisätä enintään ' + MAX_NOMINEES + ' kutsuttavaa.');
+        return;
+    }
+    
+    const container = document.getElementById('nomineesContainer');
+    if (!container) {
+        console.error('nomineesContainer not found!');
+        return;
+    }
+    
+    const newIndex = nomineeCount;
+    
+    // Luo uusi nominee-box
+    const div = document.createElement('div');
+    div.className = 'nominee-box';
+    div.dataset.index = newIndex;
+    
+    let html = '<div class="nominee-header">';
+    html += '<span class="nominee-title">Kutsuttava #' + (newIndex + 1) + '</span>';
+    html += '<button type="button" class="btn-remove" data-nominee-index="' + newIndex + '">🗑️ Poista</button>';
+    html += '</div>';
+    
+    html += '<label>Nimi *</label>';
+    html += '<input type="text" name="nominees[' + newIndex + '][name]" value="">';
+    
+    html += '<label>Sähköposti *</label>';
+    html += '<input type="email" name="nominees[' + newIndex + '][email]" value="">';
+    
+    html += '<div class="row"><div>';
+    html += '<label>Ehdotettu enneagrammityyli *</label>';
+    html += '<select name="nominees[' + newIndex + '][guess_type]">';
+    html += '<option value="">Valitse...</option>';
+    for (let i = 1; i <= 9; i++) {
+        html += '<option value="' + i + '">' + i + '</option>';
+    }
+    html += '</select></div><div>';
+    
+    html += '<label>Kuinka varma olet arviostasi? *</label>';
+    html += '<select name="nominees[' + newIndex + '][guess_prob]">';
+    html += '<option value="">Valitse...</option>';
+    for (const [key, label] of Object.entries(certaintyLevels)) {
+        html += '<option value="' + key + '">' + label + '</option>';
+    }
+    html += '</select></div></div>';
+    
+    div.innerHTML = html;
+    container.appendChild(div);
+    
+    nomineeCount++;
+    updateNomineeNumbers();
+}
+
+function removeNominee(index) {
+    const boxes = document.querySelectorAll('.nominee-box');
+    
+    // Estä viimeisen poistaminen
+    if (boxes.length <= 1) {
+        alert('Lomakkeella on oltava vähintään yksi kutsuttava.');
+        return;
+    }
+    
+    // Etsi ja poista oikea box
+    boxes.forEach(box => {
+        if (parseInt(box.dataset.index) === index) {
+            box.remove();
+        }
+    });
+    
+    updateNomineeNumbers();
+}
+
+// Alusta sivun latautuessa
+document.addEventListener('DOMContentLoaded', function() {
+    updateNomineeNumbers();
+    
+    // Lisää event listener "Lisää uusi kutsuttava" -napille
+    const addBtn = document.getElementById('addNomineeBtn');
+    if (addBtn) {
+        addBtn.addEventListener('click', addNominee);
+    }
+    
+    // Lisää event listenerit kaikille "Poista"-napeille (delegaatio)
+    document.getElementById('nomineesContainer').addEventListener('click', function(e) {
+        if (e.target.classList.contains('btn-remove') || e.target.closest('.btn-remove')) {
+            const btn = e.target.classList.contains('btn-remove') ? e.target : e.target.closest('.btn-remove');
+            const index = parseInt(btn.getAttribute('data-nominee-index'));
+            removeNominee(index);
+        }
+    });
+});
+</script>
+
 </body>
 </html>
