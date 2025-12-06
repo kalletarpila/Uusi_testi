@@ -498,6 +498,74 @@ function load_tiebreak_questions(string $base): array {
 }
 
 /**
+ * Loads new phase 1 tiebreaker blocks (statement-based)
+ * 
+ * Reads CSV file with block comparisons (BvsC, BvsD, DvsC) and creates
+ * statement-based tiebreaker questions where user chooses between two options.
+ * 
+ * @param string $filename CSV filename (e.g., 'SeparateBlocksQuestionsTiebreak.csv')
+ * @return array Array of tiebreaker statements with blocks and options
+ */
+function load_phase1_tiebreak_blocks(string $filename): array {
+    $path = csv_path($filename);
+    if (!file_exists($path)) {
+        index_log('ERROR: Phase1 tiebreak file not found: ' . $path);
+        return [];
+    }
+    
+    $lines = @file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    if ($lines === false) {
+        index_log('ERROR: Failed to read Phase1 tiebreak file: ' . $path);
+        return [];
+    }
+    
+    $blocks = [];
+    foreach ($lines as $line) {
+        // Skip comments and empty lines
+        if (trim($line) === '' || strpos(trim($line), '/*') === 0) continue;
+        
+        $parts = str_getcsv($line, ';', '"', '\\');
+        if (count($parts) < 6) continue;
+        
+        $question_num = trim($parts[0]);
+        $blocks_str = trim($parts[1]); // e.g., "BvsC"
+        // Sarake 2 on category (esim "3–7–8 vs 1–5–6") - ei tarvita
+        $statement = trim($parts[3]);
+        $option_left = trim($parts[4]);
+        $option_right = trim($parts[5]);
+        
+        // Validate we have required data
+        if (empty($question_num) || empty($blocks_str) || empty($statement) || empty($option_left) || empty($option_right)) {
+            continue;
+        }
+        
+        // Lataa vain kysymykset 1-7
+        if (!is_numeric($question_num) || intval($question_num) < 1 || intval($question_num) > 7) {
+            continue;
+        }
+        
+        // Parse blocks (e.g., "BvsC" -> ["B", "C"])
+        if (preg_match('/^([A-D])vs([A-D])$/i', $blocks_str, $m)) {
+            $block_left = strtoupper($m[1]);
+            $block_right = strtoupper($m[2]);
+            
+            $blocks[] = [
+                'question_num' => $question_num,
+                'blocks_str' => $blocks_str,
+                'statement' => $statement,
+                'block_left' => $block_left,
+                'option_left' => $option_left,
+                'block_right' => $block_right,
+                'option_right' => $option_right
+            ];
+        }
+    }
+    
+    index_log('TB1_NEW: Loaded ' . count($blocks) . ' tiebreaker statements from ' . $filename);
+    return $blocks;
+}
+
+/**
  * Loads phase 2 question blocks for detailed enneagram assessment
  * 
  * Parses CSV data into structured blocks for phase 2 testing, supporting
@@ -687,6 +755,22 @@ function get_cached_phase1_questions(): array {
 function get_cached_tiebreak_questions(): array {
     load_and_cache_quiz_data();
     return $_SESSION['cached_quiz_data']['tiebreak_questions'] ?? [];
+}
+
+/**
+ * Retrieves cached new phase 1 tiebreaker blocks from session
+ * 
+ * Returns preloaded statement-based tiebreaker questions for new tiebreak logic.
+ * 
+ * @return array Cached phase 1 tiebreaker blocks
+ */
+function get_cached_phase1_tiebreak_blocks(): array {
+    // Load if not cached
+    if (!isset($_SESSION['cached_tb1_new_blocks'])) {
+        $_SESSION['cached_tb1_new_blocks'] = load_phase1_tiebreak_blocks('SeparateBlocksQuestionsTiebreak.csv');
+        index_log('TB1_NEW: Blocks cached');
+    }
+    return $_SESSION['cached_tb1_new_blocks'] ?? [];
 }
 
 /**
@@ -924,7 +1008,7 @@ function session_initialize(): void {
  * @return void
  */
 function session_validate_state(): void {
-  $validStates = ['intro', 'quiz1', 'tiebreak_intro', 'tiebreak', 'a1_result', 'phase2_intro', 'phase2', 'phase2_tb', 'done2'];
+  $validStates = ['intro', 'quiz1', 'tiebreak_intro', 'tiebreak', 'tb1_new', 'a1_result', 'phase2_intro', 'phase2', 'phase2_tb', 'done2'];
     $currentState = $_SESSION['state'] ?? 'intro';
     
     if (!in_array($currentState, $validStates, true)) {
@@ -1297,17 +1381,28 @@ function ensure_log_header(): void {
             $cols[] = "Q{$i}";
         }
         
-        // Phase 1 tiebreak kysymykset TB1-TB10 (kolumnit 66-75)
+        // Phase 1 tiebreak kysymykset TB1_OLD_1-TB1_OLD_10 (old tiebreak, kolumnit 66-75)
         for ($i = 1; $i <= 10; $i++) {
-            $cols[] = "TB{$i}";
+            $cols[] = "TB1_OLD_{$i}";
         }
         
-        // Phase 2 case kysymykset Case1-Case36 (kolumnit 76-111)
+        // Phase 1 NEW tiebreak kysymykset TB1_1-TB1_7 (new tiebreak, kolumnit 76-82)
+        for ($i = 1; $i <= 7; $i++) {
+            $cols[] = "TB1_{$i}";
+        }
+        
+        // Phase 1 NEW tiebreak block counters A1_tb1_counter-D1_tb1_counter (kolumnit 83-86)
+        $cols[] = 'A1_tb1_counter';
+        $cols[] = 'B1_tb1_counter';
+        $cols[] = 'C1_tb1_counter';
+        $cols[] = 'D1_tb1_counter';
+        
+        // Phase 2 case kysymykset Case1-Case36 (kolumnit 87-122)
         for ($i = 1; $i <= 36; $i++) {
             $cols[] = "Case{$i}";
         }
         
-        // Phase 2 tiebreak kysymykset TB2_1-TB2_10 (kolumnit 112-121)
+        // Phase 2 tiebreak kysymykset TB2_1-TB2_10 (kolumnit 123-132)
         for ($i = 1; $i <= 10; $i++) {
             $cols[] = "TB2_{$i}";
         }
@@ -1428,7 +1523,7 @@ function write_full_log_row(array $row): void {
       (string)(($_SESSION['tiebreak_points']['B1'] ?? $row['B1_tiebreak_points'] ?? 0)),
       (string)(($_SESSION['tiebreak_points']['C1'] ?? $row['C1_tiebreak_points'] ?? 0)),
       (string)(($_SESSION['tiebreak_points']['D1'] ?? $row['D1_tiebreak_points'] ?? 0)),
-      isset($_SESSION['tiebreak_ord']) && !empty($_SESSION['tiebreak_ord']) ? 'Kyllä' : 'Ei',  // Phase1_tb
+      (string)($row['Phase1_tb'] ?? 'Ei'),  // Phase1_tb (Kyllä jos uusi tiebreak, Ei jos vanha)
       isset($_SESSION['tb2_pairs']) && !empty($_SESSION['tb2_pairs']) ? 'Kyllä' : 'Ei'  // Phase2_tb
         ];
         
@@ -1447,7 +1542,7 @@ function write_full_log_row(array $row): void {
         index_log('DEBUG: After Phase1 Q1-Q40, parts count=' . count($parts) . ' (should be 65: 25 fixed + 40 Q)');
         index_log('DEBUG: Q1-Q4 samples: [' . ($parts[25] ?? 'empty') . ',' . ($parts[26] ?? 'empty') . ',' . ($parts[27] ?? 'empty') . ',' . ($parts[28] ?? 'empty') . '] (format: class-qnum-value)');
         
-        // Phase 1 tiebreak vastaukset TB1-TB10 - vastausjärjestyksessä
+        // Phase 1 OLD tiebreak vastaukset TB1_OLD_1-TB1_OLD_10 - vastausjärjestyksessä
         $tb_answers = $row['tiebreak_log'] ?? $_SESSION['tiebreak_log'] ?? [];
         for ($i = 0; $i < 10; $i++) {
             $answer = '';
@@ -1459,8 +1554,26 @@ function write_full_log_row(array $row): void {
             }
             $parts[] = $answer;
         }
-        index_log('DEBUG: After Phase1 TB1-TB10, parts count=' . count($parts) . ' (should be 75: 25 fixed + 40 Q + 10 TB)');
-        index_log('DEBUG: TB1-TB4 samples: [' . ($parts[65] ?? 'empty') . ',' . ($parts[66] ?? 'empty') . ',' . ($parts[67] ?? 'empty') . ',' . ($parts[68] ?? 'empty') . '] (format: class-qnum-value)');
+        index_log('DEBUG: After Phase1 TB1_OLD_1-10, parts count=' . count($parts) . ' (should be 75: 25 fixed + 40 Q + 10 TB_OLD)');
+        
+        // Phase 1 NEW tiebreak vastaukset TB1_1-TB1_7 - vastaukset muodossa \"questionNum+Block\"
+        $tb1_new_answers = $_SESSION['tb1_new_answers'] ?? [];
+        for ($i = 0; $i < 7; $i++) {
+            $answer = '';
+            if (isset($tb1_new_answers[$i])) {
+                $answer = (string)$tb1_new_answers[$i]; // e.g., \"2A\"
+            }
+            $parts[] = $answer;
+        }
+        index_log('DEBUG: After Phase1 TB1_1-7 (new), parts count=' . count($parts) . ' (should be 82)');
+        
+        // Phase 1 NEW tiebreak block counters
+        $tb1_counters = $_SESSION['tb1_new_counters'] ?? ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0];
+        $parts[] = (string)($tb1_counters['A'] ?? 0);
+        $parts[] = (string)($tb1_counters['B'] ?? 0);
+        $parts[] = (string)($tb1_counters['C'] ?? 0);
+        $parts[] = (string)($tb1_counters['D'] ?? 0);
+        index_log('DEBUG: After TB1 counters, parts count=' . count($parts) . ' (should be 86)');
         
         // Phase 2 case vastaukset Case1-Case36  
         $pairs2 = $_SESSION['pairs2'] ?? [];
@@ -1894,6 +2007,7 @@ function handle_quiz1_completion(): void {
 function handle_single_winner(string $winner): void {
     $_SESSION['topClass'] = $winner;
     $_SESSION['log_row']['winner'] = $winner;
+    $_SESSION['log_row']['Phase1_tb'] = 'Ei';  // Ei tiebreakkia ollenkaan
 
     if ($winner === 'A1') {
         $_SESSION['log_row']['finalVar'] = '4';
@@ -1985,6 +2099,88 @@ function initialize_phase2(string $winner): void {
  * @param array $tops Tasapelissä olevat luokat
  */
 function handle_quiz1_tie(array $tops): void {
+  // Check if using old tiebreak
+  $useOldTB1 = !empty($_SESSION['use_old_tb1']) || !empty($_GET['oldTB1']);
+  
+  if ($useOldTB1) {
+    // Save flag to session
+    $_SESSION['use_old_tb1'] = true;
+    handle_quiz1_tie_old($tops);
+    return;
+  }
+  
+  // NEW TIEBREAK LOGIC
+  handle_quiz1_tie_new($tops);
+}
+
+/**
+ * Käsittelee uuden tiebreak-logiikan (statement-based)
+ * 
+ * @param array $tops Tasapelissä olevat luokat
+ */
+function handle_quiz1_tie_new(array $tops): void {
+  // Alusta uusi tiebreak
+  $allBlocks = get_cached_phase1_tiebreak_blocks();
+  
+  if (empty($allBlocks)) {
+    error_log('TB1_NEW ERROR: No tiebreaker blocks found, falling back to old tiebreak');
+    index_log('TB1_NEW ERROR: No tiebreaker blocks found, falling back to old tiebreak');
+    $_SESSION['use_old_tb1'] = true;
+    handle_quiz1_tie_old($tops);
+    return;
+  }
+  
+  // Määritä blokkipari tasapelissä olevista luokista
+  // Esim. jos tops = ['A1', 'B1'], niin haetaan 'AvsB' kysymykset
+  if (count($tops) < 2) {
+    index_log('TB1_NEW ERROR: Less than 2 tied classes, falling back to old tiebreak');
+    $_SESSION['use_old_tb1'] = true;
+    handle_quiz1_tie_old($tops);
+    return;
+  }
+  
+  // Ota ensimmäiset kaksi luokkaa ja muunna blokeiksi (A1 -> A, B1 -> B)
+  $block1 = substr($tops[0], 0, 1); // "A1" -> "A"
+  $block2 = substr($tops[1], 0, 1); // "B1" -> "B"
+  
+  // Muodosta blokkipari molempiin suuntiin (esim. "AvsB" tai "BvsA")
+  $pairKey1 = $block1 . 'vs' . $block2;
+  $pairKey2 = $block2 . 'vs' . $block1;
+  
+  // Suodata kysymykset jotka vastaavat tätä blokkiparia
+  $filteredQuestions = array_filter($allBlocks, function($q) use ($pairKey1, $pairKey2) {
+    $blockStr = $q['blocks_str'] ?? '';
+    return $blockStr === $pairKey1 || $blockStr === $pairKey2;
+  });
+  
+  // Uudelleenindeksoi array
+  $filteredQuestions = array_values($filteredQuestions);
+  
+  if (empty($filteredQuestions)) {
+    index_log('TB1_NEW ERROR: No questions found for pair ' . $pairKey1 . ', falling back to old tiebreak');
+    $_SESSION['use_old_tb1'] = true;
+    handle_quiz1_tie_old($tops);
+    return;
+  }
+  
+  $_SESSION['tb1_new_questions'] = $filteredQuestions;
+  $_SESSION['tb1_new_index'] = 0;
+  $_SESSION['tb1_new_counters'] = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0];
+  $_SESSION['tb1_new_answers'] = [];
+  $_SESSION['tiebreak_classes'] = $tops; // Keep for compatibility
+  
+  $_SESSION['state'] = 'tb1_new';
+  $questionCount = count($filteredQuestions);
+  index_log('STATE CHANGE: quiz1 -> tb1_new (tied_classes=' . implode(',', $tops) . ', pair=' . $pairKey1 . ', questions=' . $questionCount . ')');
+  index_log('TB1_NEW: Initialized new tiebreak (blocks loaded for ' . $pairKey1 . ')');
+}
+
+/**
+ * Käsittelee vanhan tiebreak-logiikan (numerovalinnat)
+ * 
+ * @param array $tops Tasapelissä olevat luokat
+ */
+function handle_quiz1_tie_old(array $tops): void {
   // If more than two candidate classes, pick the two with highest "kyllä" counts
   if (count($tops) > 2) {
     $yc = $_SESSION['yesCounts1'] ?? [];
@@ -2075,8 +2271,165 @@ function handle_quiz1_tie(array $tops): void {
     $_SESSION['tiebreak_ord']   = [];
   // Enter tiebreak intro state (show instructions before actual tiebreak questions)
   $_SESSION['state'] = 'tiebreak_intro';
-  index_log('STATE CHANGE: quiz1 -> tiebreak_intro (tied_classes=' . implode(',', $tops) . ', tb_questions=' . count($tbPool) . ')');
-    index_log('TIEBREAK: Initialized (classes=' . implode(',', $tops) . ', questions=' . count($tbPool) . ')');
+  index_log('STATE CHANGE: quiz1 -> tiebreak_intro_old (tied_classes=' . implode(',', $tops) . ', tb_questions=' . count($tbPool) . ')');
+    index_log('TIEBREAK_OLD: Initialized (classes=' . implode(',', $tops) . ', questions=' . count($tbPool) . ')');
+}
+
+/**
+ * Käsittelee uuden tiebreakn vastauksen
+ */
+function handle_tb1_new_answer(): void {
+    if (!isset($_POST['tb1_new_choice'])) {
+        index_log('TB1_NEW ERROR: No choice specified');
+        return;
+    }
+    
+    $selectedBlock = $_POST['tb1_new_choice']; // Block letter: 'A', 'B', 'C', or 'D'
+    $index = (int)($_SESSION['tb1_new_index'] ?? 0);
+    $questions = $_SESSION['tb1_new_questions'] ?? [];
+    
+    if ($index < 0 || $index >= count($questions)) {
+        index_log('TB1_NEW ERROR: Invalid index=' . $index);
+        return;
+    }
+    
+    $q = $questions[$index];
+    
+    // Validate selected block
+    if (!in_array($selectedBlock, ['A', 'B', 'C', 'D'])) {
+        index_log('TB1_NEW ERROR: Invalid block=' . $selectedBlock);
+        return;
+    }
+    
+    // Increment block counter
+    $_SESSION['tb1_new_counters'][$selectedBlock] = ($_SESSION['tb1_new_counters'][$selectedBlock] ?? 0) + 1;
+    
+    // Save answer for logging: \"questionNum+Block\" (e.g., \"2A\")
+    $_SESSION['tb1_new_answers'][] = $q['question_num'] . $selectedBlock;
+    
+    index_log('TB1_NEW ANSWER: Q' . ($index + 1) . '/7 block=' . $selectedBlock . ' (counters: A=' . ($_SESSION['tb1_new_counters']['A'] ?? 0) . ', B=' . ($_SESSION['tb1_new_counters']['B'] ?? 0) . ', C=' . ($_SESSION['tb1_new_counters']['C'] ?? 0) . ', D=' . ($_SESSION['tb1_new_counters']['D'] ?? 0) . ')');
+    
+    // Move to next question
+    $_SESSION['tb1_new_index'] = $index + 1;
+    
+    // Check if all questions answered
+    $totalQuestions = count($_SESSION['tb1_new_questions'] ?? []);
+    if ($_SESSION['tb1_new_index'] >= $totalQuestions) {
+        handle_tb1_new_completion();
+        return;
+    }
+    
+    // Redirect to prevent form resubmission
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+    exit;
+}
+
+/**
+ * Määrittää uuden tiebreakn voittajan
+ */
+function handle_tb1_new_completion(): void {
+    $counters = $_SESSION['tb1_new_counters'] ?? ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0];
+    $phase1_points = $_SESSION['points1'] ?? [];
+    $tiedClasses = $_SESSION['tiebreak_classes'] ?? [];
+    
+    // Muunna tasapelissä olevat luokat blokeiksi (A1 -> A, B1 -> B)
+    $tiedBlocks = array_map(function($class) {
+        return substr($class, 0, 1);
+    }, $tiedClasses);
+    
+    // Ota huomioon vain tasapelissä olevat blokit
+    $relevantCounters = [];
+    foreach ($tiedBlocks as $block) {
+        $relevantCounters[$block] = $counters[$block] ?? 0;
+    }
+    
+    // Find max counter (vain tasapelissä olevista)
+    if (empty($relevantCounters)) {
+        $relevantCounters = $counters; // Fallback
+    }
+    
+    $max = max($relevantCounters);
+    $winners = array_keys(array_filter($relevantCounters, fn($v) => $v === $max));
+    
+    $winner = null;
+    
+    // 1. If single winner
+    if (count($winners) === 1) {
+        $winner = $winners[0] . '1'; // e.g., \"B1\"
+    } else {
+        // 2. Tie - use phase 1 points
+        $bestBlock = null;
+        $bestPoints = -1;
+        foreach ($winners as $block) {
+            $pts = $phase1_points[$block . '1'] ?? 0;
+            if ($pts > $bestPoints) {
+                $bestPoints = $pts;
+                $bestBlock = $block;
+            }
+        }
+        
+        if ($bestBlock) {
+            $winner = $bestBlock . '1';
+        } else {
+            // 3. Last resort: Original tied classes order
+            foreach ($tiedClasses as $class) {
+                $block = substr($class, 0, 1);
+                if (in_array($block, $winners)) {
+                    $winner = $class;
+                    break;
+                }
+            }
+        }
+    }
+    
+    if (!$winner) $winner = $tiedClasses[0] ?? 'A1'; // Fallback
+    
+    $_SESSION['topClass'] = $winner;
+    $_SESSION['log_row']['class1'] = $winner;
+    $_SESSION['log_row']['winner'] = $winner;
+    $_SESSION['log_row']['Phase1_tb'] = 'Kyllä';
+    
+    index_log('TB1_NEW: Complete (winner=' . $winner . ', counters: A=' . $counters['A'] . ', B=' . $counters['B'] . ', C=' . $counters['C'] . ', D=' . $counters['D'] . ')');
+    
+    // Check if A1 wins
+    if ($winner === 'A1') {
+        $_SESSION['log_row']['finalVar'] = '4';
+        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+        write_full_log_row($_SESSION['log_row']);
+        $_SESSION['state'] = 'a1_result';
+        index_log('STATE CHANGE: tb1_new -> a1_result (finalVar=4)');
+    } else {
+        initialize_phase2($winner);
+        index_log('STATE CHANGE: tb1_new -> phase2_intro (winner=' . $winner . ')');
+    }
+}
+
+/**
+ * Käsittelee uuden tiebreakn navigoinnin (takaisin)
+ */
+function handle_tb1_new_navigation(): void {
+    $direction = $_POST['tb1_new_navigate'] ?? '';
+    $current_index = (int)($_SESSION['tb1_new_index'] ?? 0);
+    
+    if ($direction === 'back' && $current_index > 0) {
+        // Move back one question
+        $_SESSION['tb1_new_index'] = $current_index - 1;
+        
+        // Remove last answer and decrement corresponding counter
+        if (!empty($_SESSION['tb1_new_answers'])) {
+            $lastAnswer = array_pop($_SESSION['tb1_new_answers']);
+            // Extract block letter (last character of answer string like "2A")
+            $block = substr($lastAnswer, -1);
+            if (isset($_SESSION['tb1_new_counters'][$block]) && $_SESSION['tb1_new_counters'][$block] > 0) {
+                $_SESSION['tb1_new_counters'][$block]--;
+            }
+        }
+        
+        index_log('TB1_NEW NAV: Back to Q' . ($_SESSION['tb1_new_index'] + 1));
+    }
+    
+    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+    exit;
 }
 
 /* ========================================================================
@@ -2121,6 +2474,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'do
             }
         }
     }
+}
+
+// Check for oldTB1 parameter and save to session
+if (isset($_GET['oldTB1']) && $_GET['oldTB1'] == '1') {
+    $_SESSION['use_old_tb1'] = true;
+    index_log('INIT: Old tiebreak mode activated (oldTB1=1)');
 }
 
 /* Lomakekäsittelijöiden kutsuminen */
@@ -2289,6 +2648,7 @@ function handle_tiebreak_completion(): void {
 
   $_SESSION['topClass'] = $top;
   $_SESSION['log_row']['winner'] = $top;
+  $_SESSION['log_row']['Phase1_tb'] = 'Kyllä';
 
     if ($top === 'A1') {
         $_SESSION['log_row']['finalVar'] = '4';
@@ -2577,6 +2937,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'ti
   handle_tiebreak_answer((int)$_POST['tb_choice']);
 } elseif (($_SESSION['state'] ?? '') === 'tiebreak' && isset($_POST['tiebreak_navigate'])) {
   handle_tiebreak_navigation();
+}
+
+/* New tiebreak (tb1_new) vastauksen käsittely */
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && (($_SESSION['state'] ?? '') === 'tb1_new')) {
+  if (isset($_POST['tb1_new_choice'])) {
+    handle_tb1_new_answer();
+  } elseif (isset($_POST['tb1_new_navigate'])) {
+    handle_tb1_new_navigation();
+  } elseif (isset($_POST['tb1_new_skip'])) {
+    // Jos ei ole kysymyksiä, siirrytään suoraan lopputulokseen
+    handle_tb1_new_completion();
+  }
 }
 
 // Handle tiebreak intro continuation
@@ -3306,7 +3678,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
 
   <?php 
   $formError = '';
-  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['start'])) {
+  if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && isset($_POST['start'])) {
       if (empty($_POST['ennea'])) {
           $formError = 'Valitse enneagrammityyli (1-9) tai \'en tiedä\' jatkaaksesi';
       } elseif ($_POST['ennea'] !== 'en tiedä' && empty($_POST['confidence'])) {
@@ -3908,6 +4280,98 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
       <button type="submit" name="continue_phase2" value="1" class="btn">Jatka kyselyä</button>
     </form>
   </div>
+
+<?php elseif (($_SESSION['state'] ?? '') === 'tb1_new'):
+    $questions = $_SESSION['tb1_new_questions'] ?? [];
+    $i = (int)($_SESSION['tb1_new_index'] ?? 0);
+    $total = count($questions);
+    
+    if ($total === 0 || $i >= $total): ?>
+      <p class="muted">Lisäkysymyksiä ei löytynyt. Jatketaan pisteillä.</p>
+      <form method="post"><button class="btn" name="tb1_new_skip" value="1">Jatka</button></form>
+    <?php else:
+      $q = $questions[$i];
+      $stmt = $q['statement'] ?? '';
+      $leftOpt = $q['option_left'] ?? '';
+      $rightOpt = $q['option_right'] ?? '';
+      $leftBlock = $q['block_left'] ?? '';
+      $rightBlock = $q['block_right'] ?? '';
+    ?>
+  
+  <div class="row"><h2>Vaihe 1 - Lisäkysymykset</h2>
+    <div style="flex:1 1 100%">
+      <?= generate_progress_bar($i + 1, $total, 'Kysymys ' . ($i + 1) . ' / ' . $total) ?>
+    </div>
+  </div>
+  <div style="height:16px"></div>
+  
+  <div class="block">
+    <p class="question-text" style="text-align: center; font-size: 18px; line-height: 1.5; margin: 20px 0;">
+      <?= h($stmt) ?>
+    </p>
+  </div>
+  
+  <div class="question-layout">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; margin: 20px 0;">
+      <!-- Vasen vaihtoehto -->
+      <div style="display: flex; flex-direction: column; min-height: 250px;">
+        <div class="opt-box left" style="flex: 1; display: flex; flex-direction: column; margin: 0; border-radius: 8px;">
+          <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px 20px; text-align: center; font-style: italic; font-size: 16px; line-height: 1.5;">
+            <?= h($leftOpt) ?>
+          </div>
+          <div style="padding: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
+            <form method="post" style="margin: 0;">
+              <input type="hidden" name="tb1_new_choice" value="<?= h($leftBlock) ?>">
+              <button type="submit" class="btn btn-left" style="width: 100%; font-size: 16px; padding: 12px;">
+                Enemmän tätä mieltä
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Oikea vaihtoehto -->
+      <div style="display: flex; flex-direction: column; min-height: 250px;">
+        <div class="opt-box right" style="flex: 1; display: flex; flex-direction: column; margin: 0; border-radius: 8px;">
+          <div style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 30px 20px; text-align: center; font-style: italic; font-size: 16px; line-height: 1.5;">
+            <?= h($rightOpt) ?>
+          </div>
+          <div style="padding: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
+            <form method="post" style="margin: 0;">
+              <input type="hidden" name="tb1_new_choice" value="<?= h($rightBlock) ?>">
+              <button type="submit" class="btn btn-right" style="width: 100%; font-size: 16px; padding: 12px;">
+                Enemmän tätä mieltä
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="phase2-instructions" style="grid-column: 1 / -1; color: #555; font-size: 13px; line-height: 1.4; max-width: 100%; margin: 20px 0 10px 0; text-align: center;">
+      Valitse kumpi vaihtoehto kuvaa sinua paremmin.
+    </div>
+    
+    <!-- Navigointipainikkeet -->
+    <div class="navigation-controls" style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0; gap: 10px;">
+      <?php if ($i > 0): ?>
+        <form method="post" style="margin: 0;">
+          <input type="hidden" name="tb1_new_navigate" value="back">
+          <button type="submit" class="btn" style="font-size: 14px; padding: 8px 12px;">
+            ← Edellinen
+          </button>
+        </form>
+      <?php else: ?>
+        <div></div>
+      <?php endif; ?>
+      <div></div>
+    </div>
+    
+    <div class="mobile-hint">
+      Vinkki: Jos haluat nähdä vaihtoehdot rinnakkain, käännä puhelin vaakasuoraan
+    </div>
+  </div>
+  <?php endif; ?>
 
 <?php elseif (($_SESSION['state'] ?? '') === 'phase2'):
     $i     = (int)($_SESSION['q2_index'] ?? 0);
