@@ -3,6 +3,9 @@
  * Test 9: Täydellinen tiebreak-prosessi - vastaa kaikkiin kysymyksiin ja määritä voittaja
  */
 
+// Vaihda työhakemisto juureen, jotta CSV-tiedostot löytyvät
+chdir(__DIR__ . '/..');
+
 // Estä HTML-renderöinti
 define('TEST_MODE', true);
 
@@ -20,14 +23,18 @@ echo "1. Alustetaan tiebreak B1 vs C1 tie:lle...\n";
 // Alusta tiebreak BvsC parille
 handle_quiz1_tie_new(['B1', 'C1']);
 
-// Varmista että alustus onnistui
-if (($_SESSION['state'] ?? '') !== 'tb1_new' || !isset($_SESSION['tb1_new_questions'])) {
+// Varmista että alustus onnistui (pitäisi olla intro-tilassa)
+if (($_SESSION['state'] ?? '') !== 'tb1_new_intro' || !isset($_SESSION['tb1_new_questions'])) {
     echo "   ✗ VIRHE: Tiebreak-alustus epäonnistui\n";
-    echo "   State: " . ($_SESSION['state'] ?? 'NOT SET') . "\n";
+    echo "   State: " . ($_SESSION['state'] ?? 'NOT SET') . " (odotettu: tb1_new_intro)\n";
     exit(1);
 }
 
-echo "   ✓ Tiebreak alustettu tilaan: " . $_SESSION['state'] . "\n";
+echo "   ✓ Tiebreak alustettu intro-tilaan: " . $_SESSION['state'] . "\n";
+
+// Siirry intro-sivulta varsinaiseen tiebreakkiin
+$_SESSION['state'] = 'tb1_new';
+echo "   ✓ Siirrytty varsinaiseen tiebreakkiin: " . $_SESSION['state'] . "\n";
 echo "   ✓ Kysymyksiä ladattu: " . count($_SESSION['tb1_new_questions']) . " kpl\n";
 echo "   ✓ Tiebreak tyyppi: " . ($_SESSION['tb1_new_questions'][0]['blocks_str'] ?? 'N/A') . " (BvsC pari)\n";
 

@@ -13,7 +13,12 @@ $tests = [
     'tiebreak_answer_test.php',
     'error_handling_test.php',
     'phase2_tiebreak_test.php',
-    'phase2_full_test.php'
+    'phase2_full_test.php',
+    'tb1_default_new_test.php',
+    'tb1_intro_flow_test.php',
+    'tb1_leftright_swap_test.php',
+    'tb1_full_process_test.php',
+    'tb1_new_test.php'
 ];
 
 foreach ($tests as $test) {

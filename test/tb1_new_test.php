@@ -3,6 +3,9 @@
  * Testit uudelle Phase 1 tiebreak-toiminnallisuudelle
  */
 
+// Vaihda työhakemisto juureen, jotta CSV-tiedostot löytyvät
+chdir(__DIR__ . '/..');
+
 require_once __DIR__ . '/../index.php';
 
 echo "<h2>tb1_new_test.php</h2><pre>\n";
@@ -14,21 +17,21 @@ session_start();
 // Test 1: CSV lataus
 echo "Test 1: CSV-tiedoston lataus\n";
 $blocks = load_phase1_tiebreak_blocks('SeparateBlocksQuestionsTiebreak.csv');
-if (count($blocks) === 7) {
-    echo "✓ Ladattu 7 kysymystä\n";
+if (count($blocks) === 42) {
+    echo "✓ Ladattu 42 kysymystä (kaikki 6 lohkoparia)\n";
     echo "  Ensimmäinen kysymys: " . substr($blocks[0]['statement'] ?? '', 0, 50) . "...\n";
     echo "  Block left: " . ($blocks[0]['block_left'] ?? 'N/A') . "\n";
     echo "  Block right: " . ($blocks[0]['block_right'] ?? 'N/A') . "\n";
 } else {
-    echo "✗ VIRHE: Ladattu " . count($blocks) . " kysymystä, odotettu 7\n";
+    echo "✗ VIRHE: Ladattu " . count($blocks) . " kysymystä, odotettu 42\n";
 }
 
 // Test 2: Cache-funktio
 echo "\nTest 2: Cache-funktio\n";
 $_SESSION = [];
 $cached = get_cached_phase1_tiebreak_blocks();
-if (count($cached) === 7) {
-    echo "✓ Cache palauttaa 7 kysymystä\n";
+if (count($cached) === 42) {
+    echo "✓ Cache palauttaa 42 kysymystä\n";
 } else {
     echo "✗ VIRHE: Cache palauttaa " . count($cached) . " kysymystä\n";
 }
