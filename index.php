@@ -539,8 +539,8 @@ function load_phase1_tiebreak_blocks(string $filename): array {
             continue;
         }
         
-        // Lataa vain kysymykset 1-7
-        if (!is_numeric($question_num) || intval($question_num) < 1 || intval($question_num) > 7) {
+        // Validoi että question_num on numero (ei rajoitusta määrään - lataa kaikki kysymykset)
+        if (!is_numeric($question_num)) {
             continue;
         }
         
@@ -1008,7 +1008,7 @@ function session_initialize(): void {
  * @return void
  */
 function session_validate_state(): void {
-  $validStates = ['intro', 'quiz1', 'tiebreak_intro', 'tiebreak', 'tb1_new', 'a1_result', 'phase2_intro', 'phase2', 'phase2_tb', 'done2'];
+  $validStates = ['intro', 'quiz1', 'tiebreak_intro', 'tiebreak', 'tb1_new_intro', 'tb1_new', 'a1_result', 'phase2_intro', 'phase2', 'phase2_tb', 'done2'];
     $currentState = $_SESSION['state'] ?? 'intro';
     
     if (!in_array($currentState, $validStates, true)) {
@@ -2163,16 +2163,36 @@ function handle_quiz1_tie_new(array $tops): void {
     return;
   }
   
+  // Shuffle left/right sides randomly (like Phase 2)
+  $swapped_count = 0;
+  foreach ($filteredQuestions as &$question) {
+    if (rand(0, 1)) {
+      // Swap left and right sides
+      $temp_block = $question['block_left'];
+      $temp_text = $question['option_left'];
+      
+      $question['block_left'] = $question['block_right'];
+      $question['option_left'] = $question['option_right'];
+      
+      $question['block_right'] = $temp_block;
+      $question['option_right'] = $temp_text;
+      
+      $swapped_count++;
+    }
+  }
+  unset($question); // Remove reference
+  
   $_SESSION['tb1_new_questions'] = $filteredQuestions;
   $_SESSION['tb1_new_index'] = 0;
   $_SESSION['tb1_new_counters'] = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0];
   $_SESSION['tb1_new_answers'] = [];
   $_SESSION['tiebreak_classes'] = $tops; // Keep for compatibility
   
-  $_SESSION['state'] = 'tb1_new';
+  $_SESSION['state'] = 'tb1_new_intro';
   $questionCount = count($filteredQuestions);
-  index_log('STATE CHANGE: quiz1 -> tb1_new (tied_classes=' . implode(',', $tops) . ', pair=' . $pairKey1 . ', questions=' . $questionCount . ')');
-  index_log('TB1_NEW: Initialized new tiebreak (blocks loaded for ' . $pairKey1 . ')');
+  index_log('STATE CHANGE: quiz1 -> tb1_new_intro (tied_classes=' . implode(',', $tops) . ', pair=' . $pairKey1 . ', questions=' . $questionCount . ')');
+  index_log('TB1_NEW: Initialized new tiebreak intro (blocks loaded for ' . $pairKey1 . ')');
+  index_log('TB1_NEW: Left/right swapped for ' . $swapped_count . '/' . $questionCount . ' questions');
 }
 
 /**
@@ -2320,7 +2340,7 @@ function handle_tb1_new_answer(): void {
     }
     
     // Redirect to prevent form resubmission
-    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+    header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
 
@@ -2428,7 +2448,7 @@ function handle_tb1_new_navigation(): void {
         index_log('TB1_NEW NAV: Back to Q' . ($_SESSION['tb1_new_index'] + 1));
     }
     
-    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+    header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
 
@@ -2951,11 +2971,21 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && (($_SESSION['state'] ?? '')
   }
 }
 
-// Handle tiebreak intro continuation
+// Handle tiebreak intro continuation (old)
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'tiebreak_intro') && isset($_POST['continue_tiebreak'])) {
   $_SESSION['state'] = 'tiebreak';
   index_log('STATE CHANGE: tiebreak_intro -> tiebreak');
-  header('Location: ' . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+  header('Location: ' . $_SERVER['PHP_SELF']);
+  exit;
+}
+
+// Handle new tiebreak intro continuation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'tb1_new_intro') && isset($_POST['continue_tb1_new'])) {
+  $question_count = count($_SESSION['tb1_new_questions'] ?? []);
+  index_log('TB1_NEW_INTRO: Continue button pressed, questions in session: ' . $question_count);
+  $_SESSION['state'] = 'tb1_new';
+  index_log('STATE CHANGE: tb1_new_intro -> tb1_new');
+  header('Location: ' . $_SERVER['PHP_SELF']);
   exit;
 }
 
@@ -2964,7 +2994,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'ph
     $_SESSION['state'] = 'phase2';
     index_log('STATE CHANGE: phase2_intro -> phase2');
     index_log('PHASE2 START: Ready to show ' . count($_SESSION['blocks2']) . ' questions, starting with index ' . ($_SESSION['q2_index'] ?? 0));
-    header('Location: ' . $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET));
+    header('Location: ' . $_SERVER['PHP_SELF']);
     exit;
 }
 
@@ -4281,10 +4311,41 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
     </form>
   </div>
 
+<?php elseif (($_SESSION['state'] ?? '') === 'tb1_new_intro'): ?>
+  <div class="progress-wrap">
+    <div class="progress-label">Vaihe 1, tarkennuksia</div>
+    <div class="progress">
+      <div class="progress-bar" style="width: 0%;"></div>
+    </div>
+  </div>
+
+  <h2>Tarkentavia lisäkysymyksiä</h2>
+  <div style="background: #fff7e6; border: 1px solid #f0e0c8; border-radius: 8px; padding: 20px; margin: 20px 0; line-height: 1.6;">
+    <h3 style="margin-top: 0; color: #555;">Pikaohjeet</h3>
+    <p>Olemme havainneet monipuolisuutesi ja haluamme kysyä sinulta vielä hieman lisää ennen vaihetta 2. Seuraavaksi näet lyhyitä väittämiä ja kaksi eri näkökulmaa niihin.</p>
+    <ul style="margin: 10px 0; padding-left: 20px;">
+      <li>Jokaisessa kysymyksessä näet väittämän ja kaksi eri vaihtoehtoa sen alle.</li>
+      <li>Valitse kumpi vaihtoehto kuvaa sinua paremmin klikkaamalla "Enemmän tätä mieltä" -painiketta.</li>
+      <li>Vastaa nopeasti ja intuitiivisesti – ensimmäinen vaikutelmasi on usein oikea.</li>
+      <li>Kysymyksiä on vain muutama, joten ne menevät nopeasti.</li>
+    </ul>
+    <div style="background:#e7f3ff;border-left:4px solid #0066cc;padding:12px;margin-top:12px;">
+      <strong>Vinkki:</strong> Ei ole oikeita tai vääriä vastauksia. Valitse se vaihtoehto, joka tuntuu luontevammalta sinulle.
+    </div>
+  </div>
+  <div class="footer" style="text-align:right;">
+    <form method="post" style="display:inline;">
+      <button type="submit" name="continue_tb1_new" value="1" class="btn">Jatka kyselyä</button>
+    </form>
+  </div>
+
 <?php elseif (($_SESSION['state'] ?? '') === 'tb1_new'):
     $questions = $_SESSION['tb1_new_questions'] ?? [];
     $i = (int)($_SESSION['tb1_new_index'] ?? 0);
     $total = count($questions);
+    
+    // Debug logging
+    index_log('TB1_NEW DISPLAY: state=tb1_new, questions=' . $total . ', index=' . $i);
     
     if ($total === 0 || $i >= $total): ?>
       <p class="muted">Lisäkysymyksiä ei löytynyt. Jatketaan pisteillä.</p>
