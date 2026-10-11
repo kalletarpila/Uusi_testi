@@ -20,14 +20,14 @@
 19;DvsC;2–6–9 vs 1–5–6;Ryhmässä syntyy ristiriita.;Yritän tasoittaa tilannetta ja auttaa kaikkia tulemaan kuulluiksi.;Keskityn siihen, mikä prosessissa meni pieleen ja etsin selkeyttä.
 20;DvsC;2–6–9 vs 1–5–6;Työhön tulee uusi sääntö tai ohjeistus.;Pohdin, miten muutos vaikuttaa ihmisiin ja sujuvuuteen.;Selvitän yksityiskohdat ja logiikan noudattaakseni ohjetta tarkasti.
 21;DvsC;2–6–9 vs 1–5–6;Teet päätöksen, joka vaikuttaa muihin.;Varmistan, että päätös tuntuu oikeudenmukaiselta ja tukee yhteishenkeä.;Teen analyyttisen ratkaisun sen perusteella, mikä on järkevintä.
-22;AvsB;4 vs 3–7–8;Mietit tulevaisuuttasi.;Tämä herättää minussa paljon ajatuksia ja tunteita, ja haluan valita suunnan, joka tuntuu oikealta.;Tunnistan konkreettiset mahdollisuudet ja suuntaan kohti tavoitteita.
-23;AvsB;4 vs 3–7–8;Jokin tärkeä asia menee pieleen.;Tämä osuu minuun tunteella, ja mietin hetken, miksi se tuntuu niin paljon.;Keskityn korjaamiseen ja etenemiseen.
-24;AvsB;4 vs 3–7–8;Olet sosiaalisessa tilanteessa uusien ihmisten kanssa.;Etsin mieluummin tilanteita, joissa jutut tuntuvat aidolta ja mukavilta.;Lähestyn ihmisiä itsevarmasti ja verkostoidun.
-25;AvsB;4 vs 3–7–8;Saat uuden mahdollisuuden.;Pysähdyn hetkeksi ja tunnustelen, tuntuuko tämä minusta oikealta.;Hyödynnän tilaisuuden nopeasti kasvaakseni.
-26;AvsB;4 vs 3–7–8;Koet voimakkaan tunteen.;Huomaan tunteen vahvasti ja mietin, mitä se kertoo siitä, mitä oikeasti tarvitsen.;Kanavoin tunteen toimintaan ja edistän asioita.
-27;AvsB;4 vs 3–7–8;Kukaan ei tunnu ymmärtävän sinua.;Yritän selittää, miltä tämä minusta tuntuu, jotta toinen ymmärtäisi paremmin.;Siirryn eteenpäin ja keskityn tuloksiin, jotka puhuvat puolestaan.
-28;AvsB;4 vs 3–7–8;Mietit onnistumisiasi.;Pohdin, tuntuivatko nämä onnistumiset minusta oikeilta ja omannäköisiltä.;Katson saavutuksia tulosten kautta ja mietin seuraavia tavoitteita.
-29;AvsC;4 vs 1–5–6;Teet tärkeän päätöksen.;Valitsen sen, mikä tuntuu minulle sopivimmalta.;Teen päätöksen sen perusteella, mikä on perustelluinta ja järkevintä.
+22;AvsB;4 vs 3;Mietit, mitä haluaisit tehdä tulevaisuudessa.;Haluan löytää oman näköiseni suunnan, vaikka se poikkeaisi muiden valinnoista.;Haluan löytää suunnan, jossa voin onnistua ja saavuttaa tavoitteeni.
+23;AvsB;4 vs 8;Jokin sinulle tärkeä asia menee pieleen.;Jään helposti miettimään tapahtunutta ja sitä, miltä se minusta tuntuu.;Tartun asiaan ja yritän saada tilanteen korjattua.
+24;AvsB;9 vs 3;Olet tilaisuudessa, jossa on paljon ennestään tuntemattomia ihmisiä.;Jään mieluummin juttelemaan rauhassa yhden tai kahden ihmisen kanssa.;Tutustun mielelläni useisiin ihmisiin ja teen uusia tuttavuuksia.
+25;AvsB;9 vs 8;Olet mukana yhteisessä tekemisessä ja huomaat, että asiat eivät etene sovitulla tavalla.;Jatkan rauhassa omaa osuuttani ja annan tilanteelle aikaa.;Otan asian puheeksi ja yritän saada toiminnan takaisin raiteilleen.
+26;AvsB;9 vs 8;Olet mukana porukassa, jossa syntyy erimielisyyttä siitä, miten jokin asia pitäisi tehdä.;Haluan ensin kuulla muiden näkemyksiä ja ymmärtää, miksi he ajattelevat eri tavalla.;Kerron suoraan oman näkemykseni ja pyrin saamaan asian etenemään.
+27;AvsB;4 vs 3;Kukaan ei tunnu ymmärtävän sinua.;Yritän selittää, miltä tämä minusta tuntuu, jotta toinen ymmärtäisi paremmin.;Siirryn eteenpäin ja keskityn tuloksiin, jotka puhuvat puolestaan.
+28;AvsB;4 vs 8;Olet saanut aikaan jotain tärkeää, mutta muut eivät ole tyytyväisiä tapaasi toimia.;Minua jää vaivaamaan, etteivät muut ymmärtäneet tapaani tehdä asiaa.;Minulle riittää, että sain asian hoidettua, vaikka muut eivät pitäisi tavastani toimia.
+29;AvsC;4 vs 1–5–6;Edessäsi on tärkeä päätös, mutta et ole vielä varma, mikä vaihtoehto olisi paras.;Mietin, mikä vaihtoehto tuntuisi minulle itselleni sopivimmalta.;Haluan selvittää vaihtoehtojen hyvät ja huonot puolet ennen päätöstä.
 30;AvsC;4 vs 1–5–6;Sinua ohjataan noudattamaan uusia sääntöjä.;Mietin hetken, sopiiko tämä tapa minulle ja tuntuuko se luontevalta.;Noudatan ohjeita tarkasti, sillä ne tuovat selkeyttä.
 31;AvsC;4 vs 1–5–6;Saat palautetta, joka ei tunnu mukavalta.;Tämä herättää minussa tunteita, ja pohdin, miksi se tuntuu tältä.;Erotan faktat tunteista ja etsin käytännön kehityskohtia.
 32;AvsC;4 vs 1–5–6;Olet uudessa sosiaalisessa tilanteessa.;Hakeudun mieluummin tilanteisiin, joissa voin olla oma itseni.;Tarkkailen tilannetta ja etsin rakenteita, joiden kautta toimia.
@@ -35,7 +35,7 @@
 34;AvsC;4 vs 1–5–6;Suunnittelet tulevaa.;Mietin, millainen suunta tuntuisi minulle hyvältä ja omalta.;Laadin realistisen suunnitelman resurssien ja riskien mukaan.
 35;AvsC;4 vs 1–5–6;Koet vaikeuksia arjessa.;Pysähdyn miettimään, miksi tämä painaa minua ja mitä tarvitsisin voidakseni paremmin.;Etsin syyn ja teen ratkaisusuunnitelman.
 36;AvsD;4 vs 2–6–9;Teet päätöksen, joka vaikuttaa myös muihin.;Valitsen sen, mikä tuntuu minulle oikealta.;Valitsen vaihtoehdon, joka tukee yhteistä hyvää ja pitää ilmapiirin tasapainoisena.
-37;AvsD;4 vs 2–6–9;Et tunne olevasi osa ryhmää.;Tämä tuntuu minusta ikävältä, ja mietin, miksi en oikein löydä paikkaani.;Hakeudun rauhallisesti mukaan ja pyrin luomaan ystävällisen yhteyden muihin.
+37;AvsD;4 vs 2–6–9;Ystäväsi kertoo sinulle asiasta, joka on ollut hänelle vaikea;Haluan kuulla tarkemmin, miltä asia on hänestä tuntunut.;Kysyn, voisinko jotenkin auttaa häntä.
 38;AvsD;4 vs 2–6–9;Sinulla on ristiriita läheisen kanssa.;Tämä herättää minussa paljon tunteita, ja haluan ymmärtää, mistä ne tulevat.;Pyrin kuuntelemaan toista ja löytämään sovittelevan tavan edetä ilman vastakkainasettelua.
 39;AvsD;4 vs 2–6–9;Joku ei ymmärrä sinua.;Yritän kertoa selkeämmin, miltä asia minusta tuntuu.;Yritän selittää asian lempeästi ja huomioida toisen tunteet, jotta yhteys säilyy.
 40;AvsD;4 vs 2–6–9;Et saa tarvitsemaasi huomiota.;Tämä tuntuu minusta pahalta ja mietin, miksi se koskettaa minua näin.;Pidän tilanteen rauhallisena ja etsin tapaa olla yhteydessä toisiin ilman, että syntyy kitkaa.
