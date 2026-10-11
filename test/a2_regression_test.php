@@ -32,7 +32,7 @@ for ($i = 0; $i < count($tokens); $i++) {
             }
             $replacement = $name === 'data_dir'
                 ? 'function data_dir(): string { return __DIR__ . "/data"; }'
-                : 'function send_result_email(array $row): void {}';
+                : 'function send_result_email(array $row): void { $GLOBALS["test_result_emails"][] = $row; }';
             $replacements[] = [$offset, $end - $offset, $replacement];
         }
     }
@@ -116,6 +116,8 @@ try {
     $cache = $_SESSION['cached_quiz_data'];
     $blocks = $cache['phase2_blocks'];
     $tiebreaks = $cache['phase2_tiebreaks'];
+    srand(20261011); // Repeatable question ordering.
+    if (!in_array('--tiebreak-only', $argv, true)) {
     $expectedIds = array_merge(range(340,355,3), range(367,382,3), range(395,410,3));
     check(count($blocks['A2']) === 18, '18 A2 questions');
     check(array_column($blocks['A2'], 'question_number') === array_map('strval', $expectedIds), 'A2 CSV order and IDs');
@@ -254,15 +256,16 @@ try {
 
     seed($cache); handle_single_winner('A1'); $_SESSION['state'] = 'phase2';
     foreach ($_SESSION['blocks2'] as $b) handle_phase2_answer(0, 'neutral');
-    check($_SESSION['state'] === 'phase2_tb' && $_SESSION['tb2_pair'] === [4,7], 'All neutral: existing first-two tie policy');
+    check($_SESSION['state'] === 'phase2_tb' && $_SESSION['tb2_pair'] === ['4','7','9'], 'All neutral: all three candidates');
+    check(count($_SESSION['tb2_set']) === count($tiebreaks['TA2']), 'All configured TA2 questions');
     check(str_contains(render_state($sandbox), h($_SESSION['tb2_set'][0]['desc'])), 'A2 TB UI');
     foreach ($_SESSION['tb2_set'] as $b) handle_phase2_tiebreak_answer(0, 'neutral');
-    check(in_array((string)$_SESSION['log_row']['finalVar'], ['4','7','9'], true), 'Unresolved tie random fallback');
+    check($_SESSION['log_row']['finalVar'] === 'RATKAISEMATON', 'Unresolved tie retained as completed test');
     seed($cache); handle_single_winner('A1');
     $_SESSION['varPoints'] = ['4'=>5,'9'=>5];
     $_SESSION['cached_quiz_data']['phase2_tiebreaks']['TA2'] = [];
     initialize_phase2_tiebreak(['4','9']);
-    check($_SESSION['state'] === 'done2' && in_array((string)$_SESSION['log_row']['finalVar'], ['4','9'], true), 'Missing TB random fallback');
+    check($_SESSION['state'] === 'phase2_unresolved' && $_SESSION['log_row']['finalVar'] === '', 'Missing TB explicitly unresolved');
     seed($cache); handle_single_winner('A1');
     $before = $_SESSION;
     handle_phase2_answer(3, 'left');
@@ -309,8 +312,10 @@ try {
     $_SESSION = json_decode(file_get_contents($sandbox . '/render-session.json'), true);
     check($_SESSION['tb2_index'] === 1 && $_SESSION['varPoints'][$b['right_var']] === 11, 'Phase 2 TB answer POST');
     echo "PASS actual POST dispatch and invitation-token route\n";
-    check(hash_file('sha256', $root.'/index.php') === hash('sha256', $original), 'Project source unchanged by tests');
     echo "PASS exceptional flows, old cache refresh, comma/semicolon/BOM/comments, UI rendering\n";
+    }
+    require __DIR__ . '/phase2_threeway_cases.php';
+    check(hash_file('sha256', $root.'/index.php') === hash('sha256', $original), 'Project source unchanged by tests');
     echo "PASS $checks checks; isolated data and email; no production writes\n";
 } finally {
     session_write_close();

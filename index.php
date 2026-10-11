@@ -1010,7 +1010,7 @@ function session_initialize(): void {
  * @return void
  */
 function session_validate_state(): void {
-  $validStates = ['intro', 'quiz1', 'tiebreak_intro', 'tiebreak', 'tb1_new_intro', 'tb1_new', 'a1_result', 'phase2_intro', 'phase2', 'phase2_tb', 'done2'];
+  $validStates = ['intro', 'quiz1', 'tiebreak_intro', 'tiebreak', 'tb1_new_intro', 'tb1_new', 'a1_result', 'phase2_intro', 'phase2', 'phase2_tb', 'phase2_unresolved', 'done2'];
     $currentState = $_SESSION['state'] ?? 'intro';
     
     if (!in_array($currentState, $validStates, true)) {
@@ -1124,7 +1124,7 @@ function session_is_valid(): bool {
     }
     
     // Tarkista tilan validius
-    $validStates = ['intro', 'quiz1', 'tiebreak', 'a1_result', 'phase2_intro', 'phase2', 'phase2_tb', 'done2'];
+    $validStates = ['intro', 'quiz1', 'tiebreak', 'a1_result', 'phase2_intro', 'phase2', 'phase2_tb', 'phase2_unresolved', 'done2'];
     return in_array($_SESSION['state'], $validStates, true);
 }
 
@@ -2067,6 +2067,7 @@ function initialize_phase2(string $winner): void {
     $_SESSION['varPoints'] = [];
     $_SESSION['pairs2']    = [];
     $_SESSION['tb2_pairs'] = [];
+    unset($_SESSION['tb2_context']);
     $_SESSION['log_row']['track'] = $track;
 
     $codes = []; 
@@ -2080,11 +2081,8 @@ function initialize_phase2(string $winner): void {
     $codes = array_values(array_unique(array_keys($codes))); 
     natsort($codes);
     $_SESSION['varCodes'] = array_slice(array_values($codes), 0, 3);
-    // A2 must also resolve an all-neutral response set as a tie between 4, 7 and 9.
-    // Preserve the existing zero-score behavior of the other pilot groups.
-    if ($track === 'A2') {
-        $_SESSION['varPoints'] = array_fill_keys($_SESSION['varCodes'], 0);
-    }
+    // Include every candidate even when all standard answers are neutral.
+    $_SESSION['varPoints'] = array_fill_keys($_SESSION['varCodes'], 0);
 
     $_SESSION['state'] = 'phase2_intro';
     index_log('STATE CHANGE: quiz1 -> phase2_intro (winner=' . $winner . ', track=' . $track . ', blocks=' . count($_SESSION['blocks2']) . ')');
@@ -2796,9 +2794,17 @@ function handle_phase2_completion(): void {
  * @return void
  */
 function initialize_phase2_tiebreak(array $leaders): void {
+    $leaders = array_values(array_unique(array_map('strval', $leaders)));
     natsort($leaders);
-    $pair = array_slice(array_values($leaders), 0, 2);
-    $_SESSION['tb2_pair'] = $pair;
+    $leaders = array_values($leaders);
+    $_SESSION['tb2_pair'] = $leaders; // Retained for the existing debug display.
+    $requiredPairs = [];
+    for ($i = 0; $i < count($leaders); $i++) {
+        for ($j = $i + 1; $j < count($leaders); $j++) {
+            $pair = [$leaders[$i], $leaders[$j]];
+            $requiredPairs[implode('-', $pair)] = $pair;
+        }
+    }
     
     $allTiebreaks = get_cached_phase2_tiebreaks();
     $track = $_SESSION['track'] ?? 'B2';
@@ -2807,34 +2813,57 @@ function initialize_phase2_tiebreak(array $leaders): void {
     
     $candidates = $allTiebreaks[$group] ?? [];
     $filtered = [];
+    $counts = array_fill_keys(array_keys($requiredPairs), 0);
     
     foreach ($candidates as $candidate) {
         $candidatePair = $candidate['pair'] ?? null;
-        if (!$candidatePair || count($candidatePair) < 2) continue;
-        
-        if (((string)$candidatePair[0] === (string)$pair[0] && (string)$candidatePair[1] === (string)$pair[1]) ||
-            ((string)$candidatePair[0] === (string)$pair[1] && (string)$candidatePair[1] === (string)$pair[0])) {
-            $filtered[] = $candidate;
-        }
+        if (!is_array($candidatePair) || count($candidatePair) !== 2) continue;
+        $candidatePair = array_map('strval', array_values($candidatePair));
+        natsort($candidatePair);
+        $candidatePair = array_values($candidatePair);
+        $key = implode('-', $candidatePair);
+        if (!isset($requiredPairs[$key])) continue;
+        // Reject a malformed question rather than crediting a type outside its pair.
+        $mappedTypes = [(string)($candidate['left_var'] ?? ''), (string)($candidate['right_var'] ?? '')];
+        natsort($mappedTypes);
+        if (array_values($mappedTypes) !== $candidatePair ||
+            trim($candidate['desc'] ?? '') === '' ||
+            trim($candidate['left_text'] ?? '') === '' || trim($candidate['right_text'] ?? '') === '') continue;
+        $filtered[] = $candidate;
+        $counts[$key]++;
     }
-    
-    if (!empty($filtered)) {
-        shuffle($filtered);
-        $_SESSION['tb2_set'] = $filtered; // Käytetään kaikki löytyneet tiebreak-kysymykset
-        $_SESSION['tb2_pairs'] = [];
-        $_SESSION['tb2_index'] = 0;
-        $_SESSION['state'] = 'phase2_tb';
-        index_log('STATE CHANGE: phase2 -> phase2_tb (tie between ' . implode(',', $pair) . 
-                  ', tb_cases=' . count($_SESSION['tb2_set']) . ')');
-    } else {
-        // Ei tiebreak-kysymyksiä, arvotaan voittaja
-        $finalVar = $pair[array_rand($pair)];
-        $_SESSION['log_row']['finalVar'] = $finalVar;
-        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
-        write_full_log_row($_SESSION['log_row']);
-        $_SESSION['state'] = 'done2';
-        index_log('STATE CHANGE: phase2 -> done2 (tie resolved randomly, finalVar=' . $finalVar . ')');
+
+    $_SESSION['tb2_context'] = [
+        'session_id' => $_SESSION['sessionId'] ?? session_id(),
+        'track' => $track,
+        'candidates' => $leaders,
+        'scores_before' => $_SESSION['varPoints'] ?? [],
+        'comparison_pairs' => array_values($requiredPairs),
+    ];
+    $_SESSION['tb2_pairs'] = [];
+    $_SESSION['tb2_index'] = 0;
+    $_SESSION['tb2_set'] = [];
+    $missingPairs = array_keys(array_filter($counts, fn($count) => $count === 0));
+    if ($missingPairs || !in_array(count($leaders), [2, 3], true)) {
+        $_SESSION['log_row']['finalVar'] = '';
+        $_SESSION['state'] = 'phase2_unresolved';
+        index_log('PHASE2_TB CONFIG_ERROR: ' . json_encode(array_merge($_SESSION['tb2_context'], [
+            'missing_pairs' => $missingPairs,
+            'comparison_pairs_used' => [],
+            'scores_after' => $_SESSION['varPoints'] ?? [],
+            'resolution_method' => 'configuration_error',
+            'final_type' => '',
+        ]), JSON_UNESCAPED_UNICODE));
+        // No partial round, random result, completed invite, result email or survey row.
+        return;
     }
+
+    shuffle($filtered);
+    $_SESSION['tb2_set'] = $filtered;
+    $_SESSION['state'] = 'phase2_tb';
+    index_log('PHASE2_TB START: ' . json_encode(array_merge($_SESSION['tb2_context'], [
+        'question_counts' => $counts,
+    ]), JSON_UNESCAPED_UNICODE));
 }
 
 /**
@@ -2927,15 +2956,25 @@ function handle_phase2_tiebreak_completion(): void {
     }
     index_log('PHASE2_TB: Complete (varPoints=' . trim($pointsStr) . ', leaders=' . implode(',', $leaders) . ')');
     
-    // Valitaan voittaja
+    // Report a completed but unresolved test without inventing a winning type.
     $finalVar = '';
     if (count($leaders) === 1) {
         $finalVar = $leaders[0];
     } elseif (count($leaders) > 1) {
-        $finalVar = $leaders[array_rand($leaders)];
+        $finalVar = 'RATKAISEMATON';
     }
-    
+    $_SESSION['log_row']['tied_types'] = count($leaders) > 1 ? array_map('strval', $leaders) : [];
     $_SESSION['log_row']['finalVar'] = $finalVar;
+    index_log('PHASE2_TB RESOLUTION: ' . json_encode(array_merge($_SESSION['tb2_context'] ?? [
+        'track' => $_SESSION['track'] ?? '',
+        'candidates' => $_SESSION['tb2_pair'] ?? [],
+    ], [
+        'scores_after' => $varPoints,
+        'remaining_leaders' => array_map('strval', $leaders),
+        'tied_types' => $_SESSION['log_row']['tied_types'],
+        'resolution_method' => count($leaders) > 1 ? 'UNRESOLVED_TIE' : 'points',
+        'final_type' => (string)$finalVar,
+    ]), JSON_UNESCAPED_UNICODE));
     if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
     write_full_log_row($_SESSION['log_row']);
     $_SESSION['state'] = 'done2';
@@ -4567,7 +4606,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
   <div style="height:16px"></div>
 
   <?php if ($TEST_MODE): ?>
-    <div class="debug"><strong>TB2-pari:</strong> <?= h(implode(' vs ', $pair)) ?> — caset: <?= (int)$total ?></div>
+    <div class="debug"><strong>TB2-tyypit:</strong> <?= h(implode(' vs ', $pair)) ?> — caset: <?= (int)$total ?></div>
   <?php endif; ?>
 
   <?php if ($blk): ?>
@@ -4615,8 +4654,13 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
       </div>
     </div>
   <?php else: ?>
-    <p class="muted">Tiebreak-caseja ei löydy valitulle parille. Ratkaistaan satunnaisesti.</p>
+    <p class="muted">Tasapelikysymystä ei voitu näyttää. Yritä myöhemmin uudelleen.</p>
   <?php endif; ?>
+
+<?php elseif (($_SESSION['state'] ?? '') === 'phase2_unresolved'): ?>
+  <h2>Tulos jäi ratkaisematta</h2>
+  <p>Testin tulosta ei voitu määrittää teknisen ongelman vuoksi. Yritä myöhemmin uudelleen.</p>
+  <div class="footer"><a class="linkbtn" href="?reset=1">Aloita alusta</a></div>
 
 <?php elseif (($_SESSION['state'] ?? '') === 'done2'):
     $vars = $_SESSION['varPoints'] ?? []; arsort($vars);
@@ -4636,11 +4680,17 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
     <?php endif; ?>
   <?php endif; ?>
 
+  <?php if ($topVar === 'RATKAISEMATON'): ?>
+    <p class="leadLarge">Testi ei pystynyt erottamaan yhtä enneagrammityyliä.</p>
+    <p>Korkeimpiin pisteisiin päätyivät tasapisteissä tyylit: <strong><?= h(implode(', ', $_SESSION['log_row']['tied_types'] ?? [])) ?></strong>.</p>
+    <p>Testisi on suoritettu ja vastauksesi on tallennettu tutkimusaineistoon.</p>
+  <?php else: ?>
   <p class="leadLarge">Enneagrammityylisi tämän testin perusteella vaikuttaisi olevan TYYLI <?= h($topVar !== '' ? $topVar : '—') ?></p>
   <?php if ($desc!==''): ?>
     <div class="block"><p style="margin:0"><?= h($desc) ?></p></div>
   <?php else: ?>
     <p class="muted">Kuvausta ei löytynyt tälle tyypille.</p>
+  <?php endif; ?>
   <?php endif; ?>
   <div class="footer">
     <a class="linkbtn" href="?reset=1">Aloita alusta</a>
