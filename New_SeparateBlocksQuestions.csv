@@ -1,0 +1,75 @@
+/* t‰m‰ on kommenttirivin aloitusmerkki;;
+;;
+/* T‰ss‰ tiedosssa on v‰itt‰mi‰ testausta varten;;
+/* T‰ss‰ v‰itt‰mi‰ testausta varten;;
+;;
+"/* A1 -tagilla merkityt rivit on 4-tyyppiv‰itt‰mi‰,johon mahdollinen 4-tyyppi reagoi myˆnteisesti, ""kyll‰"" vastauksella";;
+/* A11 -tagilla merkityt rivit on samanlaisia 4-tyyppiv‰itt‰mi‰,jmutta n‰m‰ ovat lis‰kysymyksi‰, jos ensimm‰isille‰ kysymyksill‰ ei saada selke‰‰ tulosta;;
+/* B, C ja D tagit ovat vastaavasti koodattuja. B tarkoittaa 3,7,8 v‰itt‰mi‰, C tarkoittaa 2,6,9 v‰itt‰mi‰ ja D tarkoittaa 1,5,6 v‰itt‰mi‰;;
+;;
+/* Huom! Tyyppi 6 on tarkoituksella mukna C ja D v‰itt‰miss‰;;
+;;
+/* Huom! Perusv‰itt‰mi‰ voi olla maksimissaan 40 kpl (eli 8 per ryhm‰) ja lis‰kysymyksi‰10 (eli 5 per ryhm‰);;
+/* Kopioitu EG testikansiosta 15.9 ;;
+/* Nyt  n‰it‰ on 7 peruskysymyst‰ ja 3 lis‰kysymyst‰ - tavoite on 6+3;;
+/* 23.9.25 Nyt  n‰it‰ on 9 peruskysymyst‰ ja 3 lis‰kysymyst‰ - tavoite on 6+3;;
+;;
+/* T‰ss‰ nelosv‰itt‰m‰t;;
+/* Huom! A11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+A1;1;Minusta tuntuu usein, etten aivan kuulu joukkoon, vaikka olisin osa ryhm‰‰.
+A1;2;Minulle on tyypillist‰ ilmaista tunteitani ja persoonallisuuttani luovalla ja omaper‰isell‰ tavalla
+A1;3;Palaan mieless‰ni usein menneisiin kokemuksiin ja niiden her‰tt‰miin tunteisiin.
+A1;4;Minulle aitous jopa t‰rke‰mp‰‰, kuin se ett‰ kaikki hyv‰ksyisiv‰t minut.
+A1;5;Olen erityisen herkk‰ estetiikalle, kauneudelle tai ymp‰ristˆni tunnelmille.
+A1;6;Luulen ett‰ tunteeni ovat syvempi‰ tai monimutkaisempia  kuin ihmisll‰ keskim‰‰rin.
+A1;7;Minulle on tyypillist‰ ryhm‰ss‰  aistia, miss‰ tunnetilassa muut ovat, ja n‰m‰ tunnetilat vaikuttavat voimakkaasti omaan olotilaani.
+A1;8;"Ajatellaan, ett‰ olet onnistunut liittym‰‰n johonkin ryhm‰‰n tai  tyˆyhteisˆˆn, jossa voit hyvin. Kun sinulta kysytt‰isiin, miksi olet tyytyv‰inen kuulumisestasi t‰h‰n ryhm‰‰n, vastauksesi voisi luontevasti olla esimerkiksi:"" Vaikka ryhm‰ss‰ on v‰lill‰ voimakkaitakin erilaisia mielipiteit‰, se tuntuu aidosti erilaiselta. Ihmiset ovat luovia ja syvi‰ ja arvostavat yksilˆllisyytt‰."""
+A1;9;Minun on vaikea teeskennell‰ olevani hyv‰ntuulinen, jos oikeasti en ole.
+A11;10;Minun on vaikea teeskennell‰ olevani hyv‰ntuulinen, jos oikeasti en ole.
+A11;11;Minulle on tyypillist‰ ryhm‰ss‰  aistia, miss‰ tunnetilassa muut ovat, ja n‰m‰ tunnetilat vaikuttavat voimakkaasti omaan olotilaani.
+A11;12;Minulle aitous jopa t‰rke‰mp‰‰, kuin se ett‰ kaikki hyv‰ksyisiv‰t minut.
+;;
+/* ; T‰ss‰ on 3-7-8 v‰itt‰m‰t;
+/* Huom! B11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella, paitsi #24, joka on uusi v‰itt‰m‰;;
+B1;14;Minulla on usein tapana ottaa ohjat, kun ryhm‰n johtoasema on ep‰selv‰.
+B1;15;Minulle on luontevaa esitell‰ aikaansaannoksiani, tai ideoitani muille tuntematta siit‰ ep‰mukavuutta.
+B1;16;Minulle on luontevaa l‰hte‰ liikkeelle jonkin asian suhteen, vaikka tilanteessa olisikin viel‰ ep‰selvyytt‰.
+B1;17;Minulla on taipumus lis‰t‰ vauhtia ja etsi‰ mahdollisuuksia ennemmin kuin hidastaa, kun kohtaan vastoink‰ymisi‰.
+B1;18;Minulle on tyypillist‰ tarttua uuteen mahdollisuuteen heti, vaikka en olisi ehtinyt analysoida kaikkia riskej‰.
+B1;19;Paine ja kilpailu sytytt‰v‰t minut parhaaseen suoritukseeni.
+B1;20;Minulle on luontevaa ottaa tilaa keskustelussa ja vied‰ sit‰ johonkin suuntaan, varsinkin jos alkuper‰inen suunta ei minua miellyt‰.
+B1;21;Jos jotakin asiaa pit‰isi edist‰‰,  ja se edellytt‰isi tuntemattomalle ihmiselle soittamista, min‰ kuulun niihin, jotka eiv‰t koe asiassa mit‰‰n ep‰mukavaa. 
+B1;22;Minulle on luontevaa tarttua tilaisuuteen heti, vaikka en olisi t‰ysin valmistautunut. Luotan siihen, ett‰ onnistun viem‰‰n asian loppuun.
+B11;23;"Minulla on hyv‰ kyky muuttaa valittua harkittuakin suunnitelmaa ""lennosta"", jos n‰in p‰‰st‰‰n nopeammin tai varmemmin tavoitteeseen."
+B11;24;Joskus on ihan ok oikaista v‰h‰n s‰‰nnˆist‰, jos se auttaa saavuttamaan t‰rke‰n tavoitteen.
+B11;25;Minulla on taipumus mieluummin lis‰t‰ vauhtia ja mahdollisuuksia, kuin hidastaa, silloin kun kohtaan vastoink‰ymisi‰ jossain asiassa.
+;;
+/* ; T‰ss‰ on 1-5-6 v‰itt‰m‰t;
+/* Huom! C11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+C1;27;Viet‰n usein aikaa yksin pohdiskellen.
+C1;28;Koen, ett‰ minun on ker‰tt‰v‰ paljon tietoa ennen kuin voit tehd‰ p‰‰tˆksen tai aloittaa toiminnan.
+C1;29;Huomaan usein virheet, riskit ja puutteet jo varhaisessa vaiheessa, koska koen vastuukseni varmistaa, ett‰ asiat tehd‰‰n oikein ja turvallisesti.
+C1;30;Minusta tuntuu eritt‰in ep‰mukavalta improvisoida t‰rke‰ss‰ tilanteessa ilman etuk‰teisvalmistautumista.
+C1;31;Haluan yleens‰ tarkistaa faktojen paikkansapit‰vyyden itse ennen kuin voit luottaa niihin.
+C1;32;Pys‰hdyn usein miettim‰‰n seurauksia ennen kuin sanon jotakin t‰rke‰‰, koska pelk‰‰n, ett‰ v‰‰rin muotoiltu viesti voisi johtaa virheisiin tai v‰‰rink‰sityksiin.
+C1;33;Haluan mieluummin varmistaa asian oikeellisuuden useasta l‰hteest‰ kuin luottaa kuulemaani tietoon.
+C1;34;Minusta on t‰rke‰‰ valmistautua kunnolla etuk‰teen, jotta voin olla varma onnistumisesta.
+C1;35;Pys‰hdyn usein miettim‰‰n seurauksia ennen kuin toimin, koska en halua tehd‰ virheit‰.
+C11;36;Minusta tuntuu eritt‰in ep‰mukavalta, jos joudun improvisoimaan t‰rke‰ss‰ tilanteessa ilman etuk‰teisvalmistautumista
+C11;37;Haluan mieluummin varmistaa asian oikeellisuuden useasta l‰hteest‰, kuin luottaa kuulemaani tietoon.
+C11;38;Haluan yleens‰ tarkistaa faktojen paikkansapit‰vyyden itse, ennen kuin voit luottaa niihin.
+;;
+/* ; T‰ss‰ on 2-6-9 v‰itt‰m‰t;
+/* Huom! D11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+D1;40;Minulle on t‰rke‰mp‰‰ s‰ilytt‰‰ hyv‰ ilmapiiri ja v‰ltt‰‰ ristiriitoja kuin ajaa mielipiteit‰ni ihmissuhteiden kustannuksella.
+D1;41;Minulle on tyypillist‰ mukautua muiden odotuksiin tai tarpeisiin, vaikka se olisi ristiriidassa oman alkuper‰isen ajatukseni kanssa.
+D1;42;"Minun on vaikeaa sanoa ""ei"", jos pelk‰‰n sen loukkaavan toista, vaikka tiet‰isin, ett‰ pyyntˆ ei sovi minulle."
+D1;43;Minulle on tyypilllist‰ asettaa ihmissuhteiden s‰ilyminen edelle, vaikka se tarkoittaisi omien toiveideni lykk‰‰mist‰.
+D1;44;Huomaan joskus muuttavani omaa mielipidett‰ni kesken keskustelun, jotta v‰ltt‰sin suuremman erimielisyyden.
+D1;45;Huomioin usein muiden tunteet tai reaktiot jo ennen kuin pys‰hdyn miettim‰‰n, mit‰ itse haluan tai tarvitsen.
+D1;46;Minulle on silloin t‰llˆin tyypillist‰ olla ulkoisesti myˆt‰mielinen asiaan, vaikka sis‰isesti kokisinkin asian toisin. Toimin n‰in, koska en halua rikkoa ryhm‰n harmoniaa.
+D1;47;Pid‰n usein mielipiteeni itsell‰ni, jos sen ilmaiseminen voisi horjuttaa hyv‰‰ ilmapiiri‰.
+D1;48;Minusta on helpompi mukautua ryhm‰n p‰‰tˆkseen kuin yritt‰‰ saada muut n‰kem‰‰n asiat minun tavallani.
+D11;49;Minusta on helpompi mukautua ryhm‰n p‰‰tˆkseen kuin yritt‰‰ saada muut n‰kem‰‰n asiat minun tavallani.
+D11;50;Pid‰n usein mielipiteeni itsell‰ni, jos sen ilmaiseminen voisi horjuttaa hyv‰‰ ilmapiiri‰.
+D11;51;Huomaan joskus muuttavani omaa mielipidett‰ni kesken keskustelun, jotta v‰ltt‰sin suuremman erimielisyyden.

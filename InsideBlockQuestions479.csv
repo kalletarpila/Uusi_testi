@@ -1,0 +1,58 @@
+﻿/*  4 vs 7 kysymykset;;
+A2-4vs7;335;Sinulla on ollut erityisen huono päivä.  
+A2a-4;336;Haluan mieluummin olla hetken sen ikävän tunteen kanssa.
+A2b-7;337;Haluan mieluummin keksiä jotain piristävää tekemistä.
+A2-4vs7;338;Olet odottanut mukavaa viikonloppusuunnitelmaa, mutta se peruuntuu.  
+A2a-4;339;Jään helposti miettimään sitä, mitä odotin ja mikä nyt jäi kokematta.
+A2b-7;340;Alan nopeasti miettiä, mitä muuta mukavaa voisin tehdä.
+A2-4vs7;341;Olet surullisella mielellä ja haluat kuunnella musiikkia.  
+A2a-4;342;Kuuntelen mieluummin musiikkia, joka sopii senhetkiseen surulliseen olooni.
+A2b-7;343;Kuuntelen mieluummin musiikkia, joka piristää minua.
+A2-4vs7;344;Keskustelet ystävän kanssa aiheesta, joka kiinnostaa teitä molempia.  
+A2a-4;345;Haluan jatkaa keskustelua ja päästä asiassa pintaa syvemmälle.
+A2b-7;346;Keskustelun aikana mieleeni tulee helposti uusia aiheita, joista haluan puhua.
+A2-4vs7;347;Sinulla on vapaapäivä ja saat itse päättää, mitä teet.  
+A2a-4;348;Haluan tehdä jotain, jossa voin toteuttaa itseäni omalla tavallani.
+A2b-7;349;Haluan kokeilla jotain uutta ja innostavaa.
+A2-4vs7;350;Olet kokenut jotain erityisen hienoa, mikä on jäänyt mieleesi.  
+A2a-4;351;Palaan mielelläni muistelemaan kokemusta ja sitä, miltä se tuntui.
+A2b-7;352;Alan helposti miettiä, mitä muuta yhtä hienoa voisin vielä kokea.
+/*  4 vs 9 kysymykset;;
+A2-4vs9;361;Sinulle tulee erimielisyyttä läheisen ihmisen kanssa.  
+A2a-4;362;Haluan puhua asiasta ja kertoa, miltä se minusta tuntuu.
+A2b-9;363;Haluan mieluummin antaa tilanteen rauhoittua ennen kuin mahdollisesti palaan asiaan.
+A2-4vs9;364;Sinulle tapahtuu jotain ikävää, ja asia jää vaivaamaan mieltäsi.  
+A2a-4;365;Palaan asiaan mielessäni, vaikka se tuntuu ikävältä.
+A2b-9;366;Haluan päästä asian yli ja saada taas mielenrauhan.
+A2-4vs9;367;Joku sanoo sinulle jotain, mikä tuntuu pahalta.  
+A2a-4;368;Näytän yleensä, että hänen sanansa loukkasivat minua.
+A2b-9;369;Yritän olla näyttämättä, että hänen sanansa loukkasivat minua.
+A2-4vs9;370;Päivässä on ollut sekä mukavia että harmillisia tapahtumia.  
+A2a-4;371;Minulle jää helposti mieleen se, mikä ei mennyt niin kuin toivoin.
+A2b-9;372;Olen yleensä tyytyväinen päivään, vaikka kaikki ei mennyt suunnitelmien mukaan.
+A2-4vs9;373;Saat tehdä jonkin työn tai askarrella jotain itse. Voit päättää, miten sen toteutat.  
+A2a-4;374;Haluan tehdä siitä oman näköiseni, vaikka lopputulos olisi vähän erilainen kuin tavallisesti.
+A2b-9;375;Haluan tehdä siitä toimivan ja laadukkaan, vaikka lopputulos olisi aivan tavallinen.
+A2-4vs9;376;Olet mukana porukassa, jossa ihmisillä on erilaisia mielipiteitä.  
+A2a-4;377;Minulle on tärkeää, että myös oma näkemykseni tulee esiin, vaikka se poikkeaisi muiden mielipiteistä.
+A2b-9;378;Minulle on tärkeää, että kaikilla säilyy hyvä yhteishenki.
+;;
+/*  7 vs 9 kysymykset;;
+A2-7vs9;385;Sinulla on kokonaan vapaa lauantai eikä mitään sovittua tekemistä.  
+A2a-7;386;Alan helposti keksiä, mitä kaikkea mukavaa voisin tehdä.
+A2b-9;387;Vietän mielelläni päivän ilman sen kummempia suunnitelmia.
+A2-7vs9;388;Sinulla on mahdollisuus tehdä jotain uutta tai valita tuttu tekeminen, josta olet aiemmin pitänyt.  
+A2a-7;389;Kokeilen mieluummin jotain uutta, vaikka tuttu tekeminen olisi mukavaa.
+A2b-9;390;Valitsen mieluummin tutun tekemisen, jonka tiedän olevan mukavaa.
+A2-7vs9;391;Olet päiväretkellä ja huomaat, että lähistöllä olisi vielä monta kiinnostavaa paikkaa.  
+A2a-7;392;Haluan käydä katsomassa vielä muitakin kiinnostavia paikkoja.
+A2b-9;393;Viihdyn mieluummin pidempään yhdessä mukavassa paikassa.
+A2-7vs9;394;Sinulla on jo paljon tekemistä, mutta eteen tulee mahdollisuus osallistua johonkin mukavaan.  
+A2a-7;395;Innostun helposti ja yritän järjestää aikaa myös uudelle tekemiselle.
+A2b-9;396;Jätän mieluummin uuden tekemisen väliin, jotta minulle jää myös omaa rauhaa.
+A2-7vs9;397;Olet viettämässä mukavaa päivää, ja joku ehdottaa, että lähtisitte vielä johonkin muualle.  
+A2a-7;398;Innostun ehdotuksesta ja lähden mielelläni mukaan.
+A2b-9;399;Haluan mieluummin jatkaa päivää rauhassa ilman uusia suunnitelmia.
+A2-7vs9;400;Olet ystävien kanssa ja mietitte, mitä tekisitte yhdessä.  
+A2a-7;401;Ehdotan vaihtoehtoja yhteiseksi tekemiseksi.
+A2b-9;402;Kuuntelen mielelläni muiden ehdotuksia.

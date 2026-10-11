@@ -9,26 +9,57 @@
 ;;
 /* Huom! Tyyppi 6 on tarkoituksella mukna C ja D väittämissä;;
 ;;
-/* Huom! Perusväittämiä voi olla maksimissaan 32 kpl (eli 8 per ryhmä) ja lisäkysymyksiä 6 (eli 3 per ryhmä);;
+/* Huom! Perusväittämiä voi olla maksimissaan 40 kpl (eli 8 per ryhmä) ja lisäkysymyksiä10 (eli 5 per ryhmä);;
 /* Kopioitu EG testikansiosta 15.9 ;;
-/* Nyt  näitä on 9 peruskysymystä ja 3 lisäkysymystä - tavoite on 6+3;;
+/* Nyt  näitä on 7 peruskysymystä ja 3 lisäkysymystä - tavoite on 6+3;;
+/* 23.9.25 Nyt  näitä on 9 peruskysymystä ja 3 lisäkysymystä - tavoite on 6+3;;
+;;
+/* Tässä nelosväittämät;;
+/* Huom! A11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+A1;1;Minusta tuntuu usein, etten aivan kuulu joukkoon, vaikka olisin osa ryhmää.
+A1;2;Minulle on tyypillistä ilmaista tunteitani ja persoonallisuuttani luovalla ja omaperäisellä tavalla
 ;;
 ;;
 ;;
 ;;
-A1;1;4 Ajatellaan, että olet onnistunut liittymään johonkin ryhmään tai vaikka työyhteisöön, jossa voit hyvin. Kun sinulta kysyttäisiin, miksi olet tyytyväinen tähän ryhmään kuulumisesta, kuinka luontevasti vastauksesi voisi olla: Vaikka ryhmässä on välillä voimakkaitakin erilaisia mielipiteitä, se tuntuu aidosti erilaiselta. Ihmiset ovat luovia ja syviä ja arvostavat yksilöllisyyttä.
-/*A1;2;4 Minun on vaikea teeskennellä olevani hyväntuulinen, jos oikeasti en ole.
-A11;3;TB 4 Luulen että tunteeni ovat syvempiä, tai monimutkaisempia, kuin ihmisllä keskimäärin.
-A11;4;TB4 Minulle on tyypillistä, että ilmaisen tunteitani ja persoonallisuuttani luovalla ja omaperäisellä tavalla.
-B1;5;378 Jos jotakin asiaa pitäisi edistää,  ja se edellyttäisi tuntemattomalle ihmiselle soittamista, minä kuulun niihin, jotka eivät koe asiassa mitään epämukavaa. 
-/*B1;6;"378 Minulle on luontevaa tarttua tilaisuuteen heti, vaikka en olisi täysin valmistautunut. Luotan siihen, että onnistun luovimaan onnistuneesti ""maaliin""."
-B11;7;"TB 378Minulla on hyvä kyky muuttaa valittua harkittuakin suunnitelmaa ""lennosta"", jos näin päästään nopeammin tai varmemmin tavoitteeseen."
-B11;8;TB 378 Joskus on ihan ok oikaista vähän säännöistä, jos se auttaa saavuttamaan tärkeän tavoitteen.
-C1;9;156  Pidän usein mielipiteeni itselläni, jos sen ilmaiseminen voisi horjuttaa hyvää ilmapiiriä .
-/*C1;10;156 Minusta on helpompi mukautua ryhmän päätökseen, kuin yrittää saada muut näkemään asiat minun tavallani.
-C11;11;TB 156 Minusta on helpompi mukautua ryhmän päätökseen, kuin yrittää saada muut näkemään asiat minun tavallani.
-C11;12;TB156 Pidän usein mielipiteeni itselläni, jos sen ilmaiseminen voisi horjuttaa hyvää ilmapiiriä .
-/*D1;13;269 Minusta on tärkeää valmistautua kunnolla etukäteen, jotta voin olla varma onnistumisesta.
-D1;14;269 Pysähdyn usein miettimään seurauksia ennen kuin toimin, koska en halua tehdä virheitä.
-D11;15;TB 269 Minusta tuntuu erittäin epämukavalta, jos joudun improvisoimaan tärkeässä tilanteessa ilman etukäteisvalmistautumista
-D11;16;TB 269 Haluan mieluummin varmistaa asian oikeellisuuden useasta lähteestä, kuin luottaa kuulemaani tietoon.
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+/* ; Tässä on 3-7-8 väittämät;
+/* Huom! B11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella, paitsi #24, joka on uusi väittämä;;
+B1;14;Minulla on usein tapana ottaa ohjat, kun ryhmän johtoasema on epäselvä.
+B1;15;Minulle on luontevaa esitellä aikaansaannoksiani, tai ideoitani muille tuntematta siitä epämukavuutta.
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+/* ; Tässä on 1-5-6 väittämät;
+/* Huom! C11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+C1;27;Vietän usein aikaa yksin pohdiskellen.
+C1;28;Koen, että minun on kerättävä paljon tietoa ennen kuin voit tehdä päätöksen tai aloittaa toiminnan.
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+;;
+/* ; Tässä on 2-6-9 väittämät;
+/* Huom! D11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+D1;40;Minulle on tärkeämpää säilyttää hyvä ilmapiiri ja välttää ristiriitoja kuin ajaa mielipiteitäni ihmissuhteiden kustannuksella.
+D1;41;Minulle on tyypillistä mukautua muiden odotuksiin tai tarpeisiin, vaikka se olisi ristiriidassa oman alkuperäisen ajatukseni kanssa.

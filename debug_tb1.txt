@@ -1,0 +1,29 @@
+2025-12-06 18:33:59 - POST handler reached
+REQUEST_METHOD: NOT SET
+State: intro
+POST keys: 
+2025-12-06 18:33:59 - TB1_NEW_ANSWER called
+POST: {"tb1_new_choice":"B"}
+State: tb1_new
+2025-12-06 18:34:42 - POST handler reached
+REQUEST_METHOD: NOT SET
+State: intro
+POST keys: 
+2025-12-06 18:34:50 - POST handler reached
+REQUEST_METHOD: NOT SET
+State: intro
+POST keys: 
+2025-12-06 18:34:50 - TB1_NEW_ANSWER called
+POST: {"tb1_new_choice":"B"}
+State: tb1_new
+2025-12-06 18:43:50 - POST handler reached
+REQUEST_METHOD: NOT SET
+State: intro
+POST keys: 
+2025-12-06 18:43:58 - POST handler reached
+REQUEST_METHOD: NOT SET
+State: intro
+POST keys: 
+2025-12-06 18:43:58 - TB1_NEW_ANSWER called
+POST: {"tb1_new_choice":"B"}
+State: tb1_new

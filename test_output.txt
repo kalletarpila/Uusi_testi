@@ -1,0 +1,630 @@
+﻿
+Warning: Undefined array key "REQUEST_METHOD" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 1676
+
+Warning: Undefined array key "REQUEST_URI" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 1676
+
+Warning: Undefined array key "REQUEST_METHOD" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 2442
+
+Warning: Undefined array key "REQUEST_METHOD" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 2483
+
+Warning: Undefined array key "REQUEST_METHOD" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 2932
+
+Warning: Undefined array key "REQUEST_METHOD" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 2951
+
+Warning: Undefined array key "REQUEST_METHOD" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 2959
+
+Warning: Undefined array key "REQUEST_METHOD" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 2979
+
+Warning: Undefined array key "REQUEST_METHOD" in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 2984
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=yes">
+<title>ENNEAGRAMMITESTI-pilotti</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root{
+  --card-w: 800px;
+  --p1-left-bg:#ffe5ea; --p1-left-bd:#f5a8b5;
+  --p1-right-bg:#e6f7e6; --p1-right-bd:#9cd39c;
+  --left-bg:#fff7cc; --left-bd:#e6d88a;
+  --right-bg:#e8f1ff; --right-bd:#a6c0f3;
+  --left-mild-bg:#ede499; --left-strong-bg:#ede499;
+  --right-mild-bg:#b8d1ff; --right-strong-bg:#b8d1ff;
+}
+.ripple {
+  position: relative;
+  overflow: hidden;
+}
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  animation: ripple-animation 1.1s cubic-bezier(.4,0,.2,1);
+  background: rgba(220, 0, 60, 0.7);
+  pointer-events: none;
+  z-index: 2;
+}
+@keyframes ripple-animation {
+  to {
+    transform: scale(4.5);
+    opacity: 0;
+  }
+}
+
+/* === NAVIGATION CONTROLS === */
+.navigation-controls {
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: none;
+}
+
+@media (max-width: 520px) {
+  .navigation-controls {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+  
+  .navigation-controls > div:nth-child(2) {
+    order: -1;
+  }
+}
+
+/* === MOBILE TOUCH OPTIMOINTI === */
+@media (max-width: 768px) {
+  .ripple-effect {
+    background: rgba(220, 0, 60, 0.8); /* vahvempi v├ñri mobiilissa */
+    z-index: 10; /* varmistetaan, ett├ñ n├ñkyy */
+  }
+  
+  /* Touch-laitteiden optimointi */
+  .btn {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+    /* Vahvennetut fade-efektit mobiilissa */
+    transition: all 0.3s cubic-bezier(.4,0,.2,1) !important;
+  }
+  
+  .btn:active {
+    transform: translateY(-1px) scale(0.98);
+    transition: all 0.1s ease;
+  }
+
+  /* Vaihe 1 ja tiebreak valintanapit samanlevyisiksi mobiilissa */
+  .choice-btn,
+  .tb-choice-btn {
+    width: auto !important;
+    min-width: 120px !important;
+    max-width: 100% !important;
+    font-size: 20px !important;
+    margin: 0 8px 16px 8px !important;
+    padding: 0 !important;
+    box-sizing: border-box !important;
+    border-radius: 12px !important;
+    display: inline-block !important;
+    text-align: center !important;
+    vertical-align: middle !important;
+  }
+
+  /* Keskitet├ñ├ñn napit mobiilissa */
+  .phase1-choices,
+  .tb-choice-form {
+    display: flex !important;
+    justify-content: center !important;
+    flex-wrap: wrap;
+    gap: 0;
+    width: 100%;
+  }
+
+  .btn.selected {
+    transition: all 0.3s cubic-bezier(.4,0,.2,1) !important;
+  }
+}
+/* === PERUSTYYLIT === */
+*{box-sizing:border-box}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin:0;padding:40px 24px 24px 24px;background:url('SEGRY_turkoositausta_1.png') repeat;color:#111;line-height:1.5;min-height:100vh;display:flex;flex-direction:column;justify-content:flex-start;align-items:center}
+
+/* === LAYOUT-KOMPONENTIT === */
+.card{max-width:var(--card-w);width:100%;margin:0;padding:20px;border:1px solid #ddd;border-radius:14px;box-shadow:0 1px 6px rgba(0,0,0,.06);background:#fff}
+.header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.block{padding:12px;border:1px solid #eee;border-radius:10px;background:#fcfcfc}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.footer{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+
+/* === PERUSTEKSTIT === */
+.lead{font-size:22px;margin:16px 0}
+.leadLarge{font-size:28px;margin:16px 0}
+.muted{color:#444;font-size:15px}
+.small{font-size:12px;color:#666}
+.credits{margin-top:56px;text-align:center;color:#6b6b6b;font-size:12px}
+
+/* === PAINIKKEET - PERUSTYYLIT === */
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:10px 14px;border:2px solid #ccc;border-radius:10px;background:#fafafa;cursor:pointer;font-size:18px;min-width:44px;min-height:44px;text-align:center;color:#000;-webkit-text-fill-color:#000;-webkit-appearance:none;appearance:none;transition:all 0.2s ease;box-shadow:0 2px 4px rgba(0,0,0,0.1);margin:2px;}
+.btn:hover{background:#e0e0e0;border-color:#999;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.15);}
+.btn:active{transform:translateY(0);box-shadow:0 1px 2px rgba(0,0,0,0.1);}
+.btn.selected{background:#4589e5 !important;border-color:#34508f !important;color:#fff !important;-webkit-text-fill-color:#fff !important;box-shadow:0 4px 16px rgba(69,137,229,0.25);transform:translateY(-2px) scale(1.08);transition:all 0.25s cubic-bezier(.4,0,.2,1);}
+
+/* === LINKIT JA MUUT ELEMENTIT === */
+.linkbtn{display:inline-block;padding:12px 16px;border:1px solid #ccc;border-radius:10px;background:#fafafa;text-decoration:none;color:#000;-webkit-text-fill-color:#000}
+.linkbtn:hover{background:#f0f0f0}
+
+/* === NAVIGOINTIPAINIKKEET === */
+.navigation-controls button {
+  background: none !important;
+  border: none !important;
+  color: #007cba !important;
+  text-decoration: none !important;
+  padding: 8px 12px !important;
+  font-size: 18px !important;
+  cursor: pointer !important;
+  font-family: inherit !important;
+}
+.navigation-controls button:hover {
+  background: none !important;
+  color: #005a87 !important;
+  text-decoration: none !important;
+}
+.badge{padding:2px 8px;border-radius:999px;background:#eef;border:1px solid #ccd;font-size:12px}
+.badge-off{background:#fee;border-color:#fbb}
+.sep{padding:0 6px;color:#999}
+.logo{height:96px;width:auto;object-fit:contain}
+.spacer{height:28px}
+
+/* === PROGRESS BAR === */
+.progress{width:100%;height:12px;background:#e9ecf3;border-radius:8px;overflow:hidden}
+.progress-bar{height:100%;background:linear-gradient(90deg,#6b8cff,#3f6bff);border-radius:8px;transition:width .25s ease}
+
+/* === BUTTON-VARIANTIT === */
+/* Phase 1 buttons */
+.btn-p1-left{background:var(--p1-left-bg);border-color:#f591a8;}
+.btn-p1-left:hover{background:#ffc0cf;border-color:#f56b8b;}
+.btn-p1-right{background:var(--p1-right-bg);border-color:#7ac47a;}
+.btn-p1-right:hover{background:#c4e8c4;border-color:#5cb85c;}
+
+/* Phase 2 buttons */
+/* Vasemmanpuoleiset painonapit - liev├ñsti */
+.btn-left-mild{background:#f5f0c0;border-color:#e5e0a0;font-size:14px;padding:6px 8px;line-height:1.2;min-height:40px;max-width:120px;word-break:keep-all;hyphens:auto;}
+.btn-left-mild:hover{background:#f8f3cc;border-color:#e8e3a6;}
+
+/* Vasemmanpuoleiset painonapit - selv├ñsti */
+.btn-left-strong{background:#e6d555;border-color:#d4c04a;font-size:14px;padding:6px 8px;line-height:1.2;min-height:40px;max-width:120px;word-break:keep-all;hyphens:auto;}
+.btn-left-strong:hover{background:#ead966;border-color:#d8c450;}
+
+/* Oikeanpuoleiset painonapit - liev├ñsti */
+.btn-right-mild{background:#d8e5f8;border-color:#c0d0f0;font-size:14px;padding:6px 8px;line-height:1.2;min-height:40px;max-width:120px;word-break:keep-all;hyphens:auto;}
+.btn-right-mild:hover{background:#e0ebfa;border-color:#c8d6f2;}
+
+/* Oikeanpuoleiset painonapit - selv├ñsti */
+.btn-right-strong{background:#a5c2ff;border-color:#90b0eb;font-size:14px;padding:6px 8px;line-height:1.2;min-height:40px;max-width:120px;word-break:keep-all;hyphens:auto;}
+.btn-right-strong:hover{background:#b5ccff;border-color:#a0baef;}
+
+/* Automaattinen fontin pienennys pitkille teksteille */
+@media (max-width: 1200px) {
+  .btn-left-mild, .btn-left-strong, .btn-right-mild, .btn-right-strong {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .btn-left-mild, .btn-left-strong, .btn-right-mild, .btn-right-strong {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 600px) {
+  .btn-left-mild, .btn-left-strong, .btn-right-mild, .btn-right-strong {
+    font-size: 10px;
+    padding: 4px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-left-mild, .btn-left-strong, .btn-right-mild, .btn-right-strong {
+    font-size: 9px;
+    padding: 3px 4px;
+    max-width: none;
+    width: 100%;
+  }
+  .btn-eos {
+    max-width: none;
+    width: 100%;
+  }
+  .choice2-form, .tb2-form {
+    width: 100% !important;
+    display: block !important;
+  }
+}
+
+.btn-zero{background:#f5f5f5;border-color:#cfcfcf;font-size:14px;padding:16px;line-height:1.5;min-height:80px;width:100%;max-width:100%;}
+.btn-zero:hover{background:#e0e0e0;border-color:#999;}
+
+.btn-eos{background:#f5f5f5;color:#333;border:2px solid #ccc;border-radius:10px;padding:6px 8px;font-size:14px;font-weight:normal;cursor:pointer;transition:all 0.2s ease;min-height:40px;max-width:120px;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,0.1);line-height:1.2;word-break:keep-all;hyphens:auto;}
+.btn-eos:hover{background:#f8f8f8;border-color:#aaa;transform:translateY(-2px);box-shadow:0 4px 8px rgba(0,0,0,0.15);}
+.btn-eos.selected{background:#ffe066 !important;border-color:#e6c200 !important;color:#222 !important;box-shadow:0 4px 16px rgba(255,224,102,0.4);transform:translateY(-2px) scale(1.08);transition:all 0.25s cubic-bezier(.4,0,.2,1);}
+
+/* EOS-painikkeen teksti: desktop = "En osaa sanoa", mobile = "En osaa sanoa" */
+.btn-eos::before{content:"En osaa sanoa";} /* Desktop-teksti */
+.btn-eos{font-size:0;} /* Piilottaa alkuper├ñisen tekstin */
+.btn-eos::before{font-size:14px;} /* Sama fonttikoko kuin muut painonapit desktopissa */
+
+/* === LAYOUT-KOMPONENTIT === */
+.case-wrap{display:grid;grid-template-columns:1fr 0.5fr 1fr;grid-auto-rows:auto;row-gap:20px;column-gap:7px;align-items:stretch;padding:16px 0;margin:0;} /* Keskimm├ñinen 0.5fr */
+.opt-left{grid-column:1;display:flex;flex-direction:column;}
+.opt-center{grid-column:2;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;} /* Painike alareunaan kuten muissa */
+.mobile-eos-button{display:none;} /* N├ñkyy vain mobiilissa */
+.mobile-options-container{display:block;} /* N├ñkyy kaikilla n├ñyt├Âill├ñ */
+.opt-right{grid-column:3;display:flex;flex-direction:column;}
+.opt-box{flex:1;display:flex;flex-direction:column;border-radius:12px;border:1px solid transparent;padding:15px;font-size:18px;word-break:break-word;color:#000;min-height:120px;box-sizing:border-box;}
+.opt-box-content{flex-grow:1;}
+.opt-box.left .opt-box-content{font-style:italic;} /* Vasemman puolen kysymysteksti kursiivilla */
+.opt-box.right .opt-box-content{font-style:italic;} /* Oikean puolen kysymysteksti kursiivilla */
+.opt-box.center .opt-box-content{font-style:italic;display:none;} /* Piilotetaan "En osaa sanoa" teksti desktopissa */
+.opt-box.left{background:var(--left-bg);border-color:var(--left-bd);text-align:center}
+.opt-box.right{background:var(--right-bg);border-color:var(--right-bd);text-align:center}
+.opt-box.center{background:#e0e0e0;border-color:#bbb;text-align:center;padding:15px;min-height:120px;display:flex;flex-direction:column;justify-content:flex-end;box-sizing:border-box;width:100%;} /* Painike alareunaan */
+.opt-box .btn-group{margin-top:10px;}
+.opt-left .btn-group, .opt-right .btn-group{display:flex;gap:8px;}
+.opt-left .btn-group form, .opt-right .btn-group form{flex:1;}
+
+/* Desktop/tablet: oikean puolen painikkeet tekstin alle */
+.opt-box.right{display:flex;flex-direction:column;}
+.opt-box.right .btn-group{order:2;margin-top:10px;}
+.opt-box.right .opt-box-content{order:1;}
+.case-desc{grid-column:1 / -1;font-size:18px;margin:0 0 5px 0;}
+.mobile-hint{display:none;grid-column:1 / -1;text-align:center;color:#666;font-size:14px;margin-top:10px;}
+/* === SCALE-KOMPONENTIT === */
+.scale-row{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;margin:10px 0 0;position:relative;min-height:60px;width:100%;gap:8px;}
+.scale-left,.scale-right{display:flex;align-items:center;gap:4px;padding:0 4px;justify-content:center;flex-wrap:wrap;}
+.scale-zero{display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 4px;margin:0;position:relative;top:0;justify-content:center;flex:0 0 auto;}
+.scale-zero .bar{font-weight:700;color:#999;line-height:1;}
+
+/* === FORM-ELEMENTIT === */
+.textarea{width:100%;min-height:120px;padding:10px;border:1px solid #ccc;border-radius:10px;font-size:16px;resize:vertical}
+.center-row{display:flex;justify-content:center;gap:8px;flex-wrap:nowrap}
+.alert{padding:10px;border-radius:8px;margin:10px 0}
+.alert-ok{background:#e7f7e7;border:1px solid #a7d3a7}
+.alert-err{background:#fdeaea;border:1px solid #e7b0b0}
+
+/* === DEBUG JA APULUOKAT === */
+.help{grid-column:1/-1;color:#555}
+.debug{margin-top:10px;padding:10px;border:1px dashed #bbb;background:#fafcff;border-radius:10px;font-size:14px}
+
+/* === UUDET CSS-LUOKAT INLINE-TYYLIEN KORVAAMISEEN === */
+.error-messages{margin-bottom:20px}
+.error-message{background-color:#ffebee;color:#c62828;padding:12px;border-radius:4px;margin-bottom:8px;border-left:4px solid #c62828}
+.confidence-container{display:none;margin-top:12px}
+.confidence-container.show{display:block}
+.question-layout{display:flex;flex-direction:column;align-items:center}
+.scale-container{margin:16px 0;align-items:center;gap:8px;width:100%;max-width:800px}
+.scale-label{flex:1;font-size:14px;color:#555}
+.scale-label.left{text-align:right;padding-right:10px}
+.scale-label.right{text-align:left;padding-left:10px}
+.scale-buttons{display:flex;gap:4px;align-items:center;justify-content:center}
+.scale-divider{display:inline-flex;height:48px;align-items:center;margin:0 8px;color:#ccc}
+.question-text{font-size:18px;margin:0 0 16px 0}
+.scale-help{text-align:center;margin-top:8px}
+.badge-off{background:#fee;border-color:#fbb}
+.form-spacing{height:14px}
+.form-spacing-small{height:8px}
+.form-margin{margin-top:12px}
+.input-margin{margin-bottom:6px}
+.text-small{margin:4px 0 0 0;color:#666}
+.text-required{color:#b00}
+/* === RESPONSIIVISUUS === */
+.mobile-scale-label{display:none}
+.mobile-only{display:none}
+.desktop-only{display:block}
+
+/* Varmistetaan ett├ñ orientaation vaihtaminen toimii - koko sivu scrollaa */
+@media screen and (orientation: landscape) {
+  .card{max-height:none;overflow-y:visible}
+  body{overflow-y:auto;height:auto}
+}
+
+/* Varmistetaan ett├ñ kaikissa koossa sivu voi scrollata normaalisti */
+@media (max-width: 768px) {
+  .card{max-height:none !important;overflow-y:visible !important}
+  body{overflow-y:auto !important;height:auto !important}
+}
+
+/* Tablet-koko (769px - 1024px) */
+@media (max-width:1024px){
+  .card{max-width:95%;margin:0}
+  body{padding:20px 10px 10px 10px}
+}
+
+/* Pieni tablet / suuri mobiili (521px - 768px) */
+@media (max-width:480px){
+  .card{padding:16px;max-width:98%;margin:0}
+  body{padding:15px 5px 5px 5px}
+  .logo{height:72px}
+  .opt-box,.case-desc{font-size:17px}
+  .scale-container{flex-direction:column;gap:12px}
+  .scale-label{text-align:center;padding:0}
+  .case-wrap{grid-template-columns:1fr;gap:15px}
+  .linkbtn{padding:10px 12px;font-size:16px}
+  
+  /* Phase 2 Mobile optimointi */
+  .opt-left,.opt-right,.opt-center{grid-column:1;width:100%;margin:0}
+  .case-wrap{grid-template-columns:1fr;grid-template-rows:auto auto auto auto auto;gap:15px;}
+  .opt-center{display:none !important;} /* Piilotettu mobiilissa */
+  .opt-right{order:3;}
+  .opt-left .btn-group, .opt-right .btn-group{flex-direction:column;gap:10px;}
+  .mobile-hint{display:block !important;order:4;}
+  .phase2-instructions{order:3;} /* Ohjeteksti n├ñkyy kysymyslaatikoiden j├ñlkeen mobiilissa */
+  .opt-box{margin:0;padding:12px;min-height:auto}
+  .opt-box .btn-group{margin-top:8px;justify-content:center;display:flex;flex-wrap:wrap;gap:4px}
+  
+  /* Lis├ñ├ñ tilaa kysymystekstin ja painonappien v├ñliin mobiilissa */
+  .opt-left .opt-box-content{margin-bottom:24px;} /* Vasemman puolen kysymyksen alle extra tila */
+  .opt-right .opt-box-content{margin-top:24px;} /* Oikean puolen kysymyksen ylle extra tila */
+  
+  .scale-row{gap:6px;margin:8px 0;min-height:auto;justify-content:center;width:100%}
+  .scale-row[style*="grid-column"]{padding:0;margin:8px 0}
+  .btn-group form{display:inline-block;margin:2px}
+  
+  /* Iso py├Âre├ñreunaisuu kehys kaikkien vaihtoehtojen ymp├ñrille mobiilissa */
+  .mobile-options-container{
+    background:#ffffff;
+    border:2px solid #ddd;
+    border-radius:20px;
+    padding:20px;
+    margin:10px 0;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    order:1;
+  }
+  
+  /* Mobiilissa oikean puolen painikkeet palautuvat yl├Âs */
+  .opt-box.right .btn-group{order:1;margin-top:0;margin-bottom:8px;}
+  .opt-box.right .opt-box-content{order:2;}
+  
+  /* En osaa sanoa -painike mobiilissa erillisen├ñ */
+  .mobile-eos-button{display:block !important;width:100%;margin:15px 0;order:2;}
+  .mobile-eos-button form{width:100%;}
+  .mobile-eos-button .btn-eos{width:100%;max-width:none;flex:none;background:#d0d0d0;color:#333;border-color:#bbb;font-size:14px;} /* Koko leveys mobiilissa */
+  .mobile-eos-button .btn-eos:hover{background:#c0c0c0;border-color:#999;}
+  .mobile-eos-button .btn-eos::before{display:none;} /* Piilottaa "EOS" mobiilissa */
+  
+  /* Mobiili asteikko-tekstit */
+  .desktop-only{display:none}
+  .mobile-scale-label{display:block;font-size:14px;margin:4px 0}
+  .mobile-scale-label.top-left{color:#8B0000;text-align:left;margin-bottom:8px}
+  .mobile-scale-label.bottom-right{color:#006400;text-align:right;margin-top:8px}
+  
+  /* Mobiili Phase 1 layout - pystysuora */
+  .scale-buttons{flex-direction:column;align-items:center;gap:8px}
+  .scale-buttons .choice-form{width:100%;max-width:200px}
+  .scale-buttons .btn{width:100%;justify-content:center;padding:12px 16px;min-height:48px}
+  .scale-divider{display:none} /* Piilottaa | merkki mobiilissa */
+  
+  .mobile-only{display:block}
+  .desktop-only{display:none}
+}
+
+/* Mobiili (max 520px) */
+@media (max-width:520px){
+  .card{padding:12px;margin:0}
+  body{padding:12px 2px 2px 2px}
+  .logo{height:60px}
+  .btn{font-size:16px;min-width:42px;min-height:42px;padding:8px 12px}
+  .scale-buttons{flex-wrap:wrap;gap:4px;justify-content:flex-end}
+  .linkbtn{padding:8px 10px;font-size:15px}
+  h1{font-size:24px}
+  h2{font-size:20px}
+  .progress{height:10px}
+  
+  /* Phase 2 & Tiebreak optimointi pienille n├ñyt├Âille */
+  .case-wrap{gap:12px}
+  .opt-box{padding:10px;font-size:16px}
+  .btn-group{margin-top:6px}
+  .btn-group .btn{margin:2px;min-width:auto;padding:6px 8px;font-size:14px}
+  .case-desc{font-size:16px;margin-bottom:8px}
+  
+  /* Keskimm├ñinen nappi optimointi - koko leveys */
+  .scale-row[style*="grid-column"] .btn-zero{width:100%;max-width:none;margin:0;padding:10px}
+}
+
+/* Eritt├ñin pieni mobiili (max 360px) */
+@media (max-width:360px){
+  .card{padding:8px;margin:0}
+  body{padding:8px 1px 1px 1px}
+  .btn{font-size:15px;min-width:40px;min-height:40px;padding:6px 10px;margin:1px}
+  .linkbtn{padding:6px 8px;font-size:14px}
+  h1{font-size:22px}
+  .mobile-scale-label{font-size:13px}
+  .scale-help{font-size:14px}
+  
+  /* Phase 2 pienimmille n├ñyt├Âille */
+  .case-wrap{gap:10px;padding:8px 0}
+  .opt-box{padding:8px;font-size:15px;min-height:auto}
+  .case-desc{font-size:15px;margin-bottom:6px}
+  .btn-left-mild,.btn-left-strong,.btn-right-mild,.btn-right-strong{font-size:12px;padding:4px 6px;min-height:36px;max-width:100px;margin:1px}
+  .btn-zero{font-size:13px;padding:8px;min-height:auto;max-width:none;width:100%}
+  .scale-row{gap:4px;margin:6px 0}
+}
+
+/* Desktop ja tablet (yli 480px) - piilota mobile container */
+@media (min-width: 481px) {
+  .mobile-options-container {
+    display: contents; /* Tekee containerista "n├ñkym├ñt├Ân" CSS Grid layoutille */
+  }
+}
+
+/* === RIPPLE-EFEKTI === */
+</style>
+</head>
+<body>
+<div class="card">
+    <div class="header" role="banner">
+    <div>
+      <h1>ENNEAGRAMMITESTI-pilotti</h1>
+          </div>
+  </div>
+
+
+  <h2>Tervetuloa</h2>
+  <p class="lead">
+    Katso ensimm├ñisen├ñ ohjevideo alla, niin saat k├ñsityksen mist├ñ testiss├ñ on kyse ja kuinka tehd├ñ testi. Varaa rauhallista aikaa n. 10-15 minuuttia testin tekemiseen.
+  </p>
+  <div class="block" role="region" aria-label="Esittelyvideo">
+    <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; margin: 0 auto;">
+      <div id="video-thumbnail" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('video-thumbnail.png'); background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        <div style="width: 80px; height: 80px; background: rgba(0,0,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
+          <div style="width: 0; height: 0; border-left: 25px solid #fff; border-top: 15px solid transparent; border-bottom: 15px solid transparent; margin-left: 5px;"></div>
+        </div>
+      </div>
+      <div id="video-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;">
+      </div>
+    </div>
+    <script nonce="wQRtGpHsHxJfJOrBYNBnsw==">
+    document.getElementById('video-thumbnail').addEventListener('click', function() {
+      var thumbnail = document.getElementById('video-thumbnail');
+      var iframeContainer = document.getElementById('video-iframe');
+      
+      // Luo iframe autoplay-parametrilla
+      var iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px;';
+      iframe.src = 'https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1';
+      iframe.title = 'Enneagrammitesti esittelyvideo';
+      iframe.allowFullscreen = true;
+      
+      // Piilota thumbnail ja n├ñyt├ñ video
+      thumbnail.style.display = 'none';
+      iframeContainer.appendChild(iframe);
+      iframeContainer.style.display = 'block';
+    });
+    
+    // Hover-efekti play-napille
+    document.getElementById('video-thumbnail').addEventListener('mouseenter', function() {
+      var playBtn = this.querySelector('div');
+      playBtn.style.transform = 'scale(1.1)';
+      playBtn.style.background = 'rgba(255,255,255,0.2)';
+    });
+    
+    document.getElementById('video-thumbnail').addEventListener('mouseleave', function() {
+      var playBtn = this.querySelector('div');
+      playBtn.style.transform = 'scale(1)';
+      playBtn.style.background = 'rgba(0,0,0,0.8)';
+    });
+    </script>
+  </div>
+
+  
+  
+  
+      <form id="startForm" method="post" class="form-margin" novalidate>
+          <label for="invite_code">Kutsukoodi (jos sait kutsun)</label>
+      <input type="text" id="invite_code" name="invite_code" value="" placeholder="Esim. ABCD1234">
+      <div class="form-spacing"></div>
+    
+    <label for="nickname">Nimimerkki</label>
+    <input type="text" id="nickname" name="nickname" value="" autocomplete="nickname" class="input-margin">
+    <div class="form-spacing-small"></div>
+
+    <label for="ennea">Mik├ñ on sinun enneagrammityylisi? <span class="text-required">*</span></label>
+    <select id="ennea" name="ennea" required>
+      <option value="">-- Valitse --</option>
+              <option value="1" >1</option>
+              <option value="2" >2</option>
+              <option value="3" >3</option>
+              <option value="4" >4</option>
+              <option value="5" >5</option>
+              <option value="6" >6</option>
+              <option value="7" >7</option>
+              <option value="8" >8</option>
+              <option value="9" >9</option>
+            <option value="en tied├ñ" >en tied├ñ</option>
+    </select>
+    <p class="small text-small">Valitse enneagrammityylisi. Jos et tied├ñ, valitse "en tied├ñ".</p>
+    
+    <div id="confidenceContainer" class="confidence-container">
+      <label for="confidence">Kuinka varma olet arvioistasi omasta tyypist├ñsi? <span class="text-required">*</span></label>
+      <select id="confidence" name="confidence" required class="form-control">
+        <option value="">-- Valitse --</option>
+        <option value="1" >En ole lainkaan varma</option>
+        <option value="2" >Olen melko varma</option>
+        <option value="3" >Olen t├ñysin varma</option>
+      </select>
+    </div>
+    <script nonce="wQRtGpHsHxJfJOrBYNBnsw==">
+    function toggleConfidence() {
+        const ennea = document.getElementById('ennea');
+        const container = document.getElementById('confidenceContainer');
+        const confidence = document.getElementById('confidence');
+        
+        if (ennea?.value && ennea.value !== 'en tied├ñ') {
+            container?.classList.add('show');
+            if (confidence) confidence.required = true;
+        } else {
+            container?.classList.remove('show');
+            if (confidence) confidence.required = false;
+        }
+    }
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('startForm');
+        const ennea = document.getElementById('ennea');
+        const confidence = document.getElementById('confidence');
+        
+        ennea?.addEventListener('change', toggleConfidence);
+        toggleConfidence(); // Initialize state
+        
+        form?.addEventListener('submit', function(event) {
+            if (!ennea?.value) {
+                event.preventDefault();
+                alert('Valitse enneagrammityyli (1-9) tai "en tied├ñ" jatkaaksesi');
+                ennea?.focus();
+                return;
+            }
+            
+            if (ennea.value !== 'en tied├ñ' && !confidence?.value) {
+                event.preventDefault();
+                alert('Valitse varmuustasosi');
+                confidence?.focus();
+            }
+        });
+    });
+    </script>
+
+    <div class="footer">
+      <button class="btn" type="submit" name="start" value="1">Aloita kysely</button>
+    </div>
+  </form>
+
+
+  <div class="credits">Suomen Enneagrammiyhdistys, 2025</div>
+</div>
+
+</body>
+</html>
+
+<h2>tb1_new_test.php</h2><pre>
+
+Notice: session_start(): Ignoring session_start() because a session is already active (started from D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 972) in D:\DevPhp\EG uusi testi\Uusi_testi\test\tb1_new_test.php on line 12
+Test 1: CSV-tiedoston lataus
+Ô£ô Ladattu 7 kysymyst├ñ
+  Ensimm├ñinen kysymys: Saat uuden teht├ñv├ñn, mutta ohjeita on vain v├ñh├...
+  Block left: B
+  Block right: C
+
+Test 2: Cache-funktio
+Ô£ô Cache palauttaa 7 kysymyst├ñ
+
+Test 3: Tiebreak-alustus
+Ô£ô Tila asetettu: tb1_new
+Ô£ô Kysymykset alustettu (7 kpl BvsC parille)
+Ô£ô Kaikki kysymykset ovat oikeaa blokkiparia
+Ô£ô Index alustettu: 0
+Ô£ô Laskurit alustettu
+
+Test 4: Vastauksen k├ñsittely
+
+Warning: Cannot modify header information - headers already sent by (output started at D:\DevPhp\EG uusi testi\Uusi_testi\index.php:1676) in D:\DevPhp\EG uusi testi\Uusi_testi\index.php on line 2322
