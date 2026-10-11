@@ -4,48 +4,9 @@
 // Execute the real application in a temporary copy, redirecting only persistence
 // and result email. No historical data, repository logs, or mail are touched.
 $root = dirname(__DIR__);
-$sandbox = sys_get_temp_dir() . '/enneagram-a2-' . bin2hex(random_bytes(8));
-mkdir($sandbox, 0700, true);
-mkdir($sandbox . '/data', 0700);
-file_put_contents($sandbox . '/data/invites.json', '[]');
-$source = file_get_contents($root . '/index.php');
-$original = $source;
-$tokens = token_get_all($source);
-$offset = 0;
-$replacements = [];
-for ($i = 0; $i < count($tokens); $i++) {
-    $token = $tokens[$i];
-    $text = is_array($token) ? $token[1] : $token;
-    if (is_array($token) && $token[0] === T_FUNCTION) {
-        $j = $i + 1;
-        while (is_array($tokens[$j]) && $tokens[$j][0] === T_WHITESPACE) $j++;
-        $name = is_array($tokens[$j]) ? $tokens[$j][1] : '';
-        if (in_array($name, ['data_dir', 'send_result_email'], true)) {
-            $end = $offset;
-            $depth = 0;
-            $opened = false;
-            for ($k = $i; $k < count($tokens); $k++) {
-                $part = $tokens[$k];
-                $end += strlen(is_array($part) ? $part[1] : $part);
-                if ($part === '{') { $depth++; $opened = true; }
-                if ($part === '}' && --$depth === 0 && $opened) break;
-            }
-            $replacement = $name === 'data_dir'
-                ? 'function data_dir(): string { return __DIR__ . "/data"; }'
-                : 'function send_result_email(array $row): void { $GLOBALS["test_result_emails"][] = $row; }';
-            $replacements[] = [$offset, $end - $offset, $replacement];
-        }
-    }
-    $offset += strlen($text);
-}
-if (count($replacements) !== 2) throw new RuntimeException('Isolation hooks not found');
-foreach (array_reverse($replacements) as [$start, $length, $replacement]) {
-    $source = substr_replace($source, $replacement, $start, $length);
-}
-file_put_contents($sandbox . '/index.php', $source);
-foreach (['InsideBlockQuestions.csv', 'SeparateBlocksQuestions.csv', 'SeparateBlocksQuestionsTiebreak.csv', 'TypeDescriptions.csv'] as $csv) {
-    copy($root . '/' . $csv, $sandbox . '/' . $csv);
-}
+require_once __DIR__ . '/isolated_app.php';
+$original = file_get_contents($root . '/index.php');
+$sandbox = create_isolated_app($root);
 chdir($sandbox);
 ini_set('session.save_path', $sandbox . '/data');
 $_SERVER['REQUEST_METHOD'] = 'GET';
@@ -88,10 +49,12 @@ ini_set('session.save_path', __DIR__ . '/data');
 session_id('renderfixture');
 session_start();
 $_SESSION = json_decode(file_get_contents(__DIR__ . '/state.json'), true);
+$_SESSION['workflow_token'] = 'render-fixture-token';
 session_write_close();
 $request = json_decode(file_get_contents(__DIR__ . '/request.json'), true);
 $_GET = $request['get'];
 $_POST = $request['post'];
+if ($_POST) $_POST['workflow_token'] = 'render-fixture-token';
 $_SERVER['REQUEST_METHOD'] = $_POST ? 'POST' : 'GET';
 $_SERVER['PHP_SELF'] = '/index.php';
 $_SERVER['REQUEST_URI'] = '/index.php';
@@ -272,7 +235,7 @@ try {
     check($_SESSION === $before, 'Invalid answer rejected without advancing');
     $_SESSION['blocks2'] = [];
     handle_phase2_answer(1, 'left');
-    check($_SESSION['state'] === 'done2' && $_SESSION['log_row']['finalVar'] === '', 'Missing block preserves existing behavior');
+    check($_SESSION['state'] === 'phase2_unresolved' && $_SESSION['log_row']['finalVar'] === '', 'Missing block is a technical failure');
 
     seed($cache);
     unset($_SESSION['cached_quiz_data']['version'], $_SESSION['cached_quiz_data']['phase2_blocks']['A2']);
@@ -320,16 +283,5 @@ try {
 } finally {
     session_write_close();
     chdir($root);
-    // Resolve and constrain every deletion to the unique test directory.
-    $resolved = realpath($sandbox);
-    $tempRoot = realpath(sys_get_temp_dir());
-    if ($resolved !== false && dirname($resolved) === $tempRoot && str_starts_with(basename($resolved), 'enneagram-a2-')) {
-        $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($resolved, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
-        foreach ($files as $file) {
-            $path = $file->getRealPath();
-            if ($path === false || !str_starts_with($path, $resolved . DIRECTORY_SEPARATOR)) throw new RuntimeException('Unsafe cleanup path');
-            $file->isDir() ? rmdir($path) : unlink($path);
-        }
-        rmdir($resolved);
-    }
+    remove_isolated_app($sandbox);
 }

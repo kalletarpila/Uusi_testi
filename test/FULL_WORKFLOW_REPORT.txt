@@ -1,0 +1,237 @@
+ENNEAGRAMMITESTI: KOKO TYONKULUN INTEGRAATIOTESTAUS
+Paivays: 2026-10-11. PHP CLI / paikallinen HTTP-palvelin: PHP 8.4.13.
+
+RAJAUS JA GIT
+Alku-HEAD: 16faf735d0f4f25df00666bdcc9c9d88e157818b (dev).
+Loppu-HEAD: taman raportin sisaltava commit; tarkka tunniste komennolla
+git log -1 --format=%H -- test/FULL_WORKFLOW_REPORT.txt.
+Ei pushia eika julkaisua. Ei tuotanto-osoitteita, oikeita kutsumuutoksia,
+historiallisten lokien muokkauksia tai oikeita tulossahkoposteja.
+
+Commitin tiedostot:
+  index.php
+  test/a2_regression_test.php
+  test/isolated_app.php
+  test/http_workflow_test.php
+  test/http_workflow_cases.php
+  test/FULL_WORKFLOW_REPORT.txt
+
+SeparateBlocksQuestionsTiebreak.csv:n kysymykset 26 ja 29 muuttuivat
+tyoskentelyn aikana ulkopuolisesti. Niita ei ole muokattu testeissa eika
+sisallytetty tahan commitiin. HTTP-testit lukevat oikean tyohakemiston CSV:n
+tilapaiskopion, mukaan lukien nama nykyiset kysymystekstit.
+
+ALKUTARKASTUS JA TESTILAJIT
+Nykyinen tilakone:
+intro -> quiz1 -> phase2_intro -> phase2 -> phase2_tb (tarvittaessa) -> done2.
+Phase 1:n lisapolut: tb1_new_intro -> tb1_new tai
+tiebreak_intro -> tiebreak (legacy), sitten voittajan phase2_intro.
+Tekninen virhe: phase2_unresolved. Se ei ole RATKAISEMATON-tulos.
+a1_result on vanha yhteensopivuustila, ei uusien A1-voittajien normaali reitti.
+
+1. Funktio- ja tilakoneintegraatio: a2_regression_test.php seka sen kautta
+   phase2_threeway_cases.php. Suorat kasittelijakutsut, ladatut CSV:t,
+   sessiot, tutkimus-CSV ja erillisen PHP-prosessin HTML/POST-renderointi.
+   Naita ei raportoida HTTP-paasta-paahan-testeina.
+2. Oikea HTTP: http_workflow_test.php kaynnistaa PHP:n loopback-palvelimen
+   satunnaiseen paikallisporttiin. GET/POST, PHPSESSID-evasteet, oikeat
+   lomaketunnisteet ja 302/303-uudelleenohjaukset kaytetaan oikeasti.
+   Normaalipolkujen pisteita tai reititysta ei siemenna suoraan sessioon.
+   Testikopio tallentaa session lukusnapshotin jokaisen pyynnon lopussa.
+   Vain puuttuvan/vioittuneen session virhetesteissa kaytetaan erillista
+   paikallista testifixturea session rikkomiseen.
+3. Selain/UI: NOT EXECUTED. CUA-inventaario ei tarjonnut yhtaan selainta.
+   HTML-sisallon tarkistus ei todista CSS-asettelua, JavaScriptia tai
+   mobiilin kosketuskayttoa.
+
+ERISTYS
+Jaettu isolated_app.php kopioi oikean index.php:n ja nelja oikeaa CSV:ta
+jarjestelman enneagram-test-<satunnainen>-tilapaishakemistoon.
+Vain data_dir, send_mail ja send_result_email korvataan IO-rajoina.
+Sahkopostiyritykset tallennetaan paikalliseen fixture-lokiin; mitaan ei laheteta.
+HTTP-testikopion srand(42) tekee satunnaistamisesta toistettavan muuttamatta
+tuotannon satunnaistamista. Odotukset perustuvat kysymystunnisteisiin ja
+todellisiin vasen/oikea-ryhmamappauksiin, eivat tiettyyn kysymysjarjestykseen.
+Palvelin pysaytetaan ja tilapaishakemisto poistetaan lopuksi.
+--keep sailyttaa vain eristetyn hakemiston tutkintaa varten.
+
+PHASE 1:N CSV JA PARIKATTAVUUS
+SeparateBlocksQuestionsTiebreak.csv: puolipiste-erotin, ei otsikkorivia,
+42 vertailua, yksilolliset numerot 1-42, kuusi saraketta:
+numero;ryhmapari;selittava tyyppiryhmaluokka;tilanne;vasen vaihtoehto;oikea vaihtoehto.
+Kolmas sarake on selittavaa metadataa; nykyinen PHP-lataaja ei kayta sita
+pisteytykseen. Pisteattribuutio tulee toisesta sarakkeesta ja puolten mappauksesta.
+
+Pari    Tunnisteet  Kysymyksia  HTTP-voittajat  Jatkopolut
+BvsC     1-7          7         B ja C         B2 ja C2
+BvsD     8-14         7         B ja D         B2 ja D2
+DvsC    15-21         7         D ja C         D2 ja C2
+AvsB    22-28         7         A ja B         A2 ja B2
+AvsC    29-35         7         A ja C         A2 ja C2
+AvsD    36-42         7         A ja D         A2 ja D2
+
+Jokainen pari ajetaan molemmilla voittajilla loppuun: 12 kokonaista HTTP-polkua.
+Jokainen nykyinen vertailu luetaan ja esitetaan. Lataajaa verrataan erikseen
+suoraan CSV:sta luettuun numeroon, pariin, tilanteeseen ja molempiin vaihtoehtoihin.
+Puolten vaihdon jalkeen vaihtoehdon teksti tarkistetaan alkuperaiseen ryhmaan.
+Kunkin vastauksen laskureita verrataan itsenaisesti vastausrekisteriin.
+
+Nykyisessa tavallisessa Phase 1 -aineistossa on 9 kysymysta / ryhma,
+yhteensa 36. Sovelluksen enimmainen on 10 / ryhma, tutkimus-CSV:ssa Q1-Q40.
+Tyhjat Q37-Q40 tarkistetaan. Testin alkuperainen 10/ryhma-oletus korjattiin;
+sovelluksen pisteytykseen ei tehty tata varten muutosta.
+
+KOKO TYONKULUN KATTAVUUSMATRIISI
+Kohde                         Oikea HTTP                     Funktio/tilakone
+Normaalit A/B/C/D-polut        12 ryhma/tyyppi-lopputulosta    Kaikki nelja ryhmaa
+Phase 1 uudet vertailut        6 paria x 2 voittajaa           Lataus/HTML
+Phase 1 legacy                4 voittajaryhmaa loppuun       A1-reititys
+Phase 1 puuttuva uusi CSV      Legacy-varapolku loppuun       Poikkeustarkistukset
+Phase 1 molemmat lahteet rikki Tekninen virhe                 -
+Phase 1 laheiset pisteet       3 tasan + 47/46/45 top-two      Nykyinen saanto
+Phase 1 laskurit tasan         6 kysymyksen temp-fixture,     -
+                              alkuperaiset pisteet ratkaisevat
+Phase 1 valittu pari puuttuu   Muut 5 paria edelleen olemassa; legacy-fallback
+                              loppuun, tai tekninen virhe jos sekin puuttuu
+Phase 2 kaksittaiset tasat     4 ryhmaa x 3 paria x           Molemmat puolet,
+                              ratkaistu/ratkaisematon        pisteet ja CSV
+Phase 2 kolmittaiset tasat     4 ryhmaa x jokainen voittaja,   Kaikki parit, 0 ja
+                              2/3 jaljelle jaavaa johtajaa,   positiiviset pisteet
+                              myos positiivinen alkutasa
+Kaikki neutraalit             Kaikki 4 ryhmaa loppuun        Kaikki 4 ryhmaa
+Kutsutut                      Token/koodi, normaali ja       Kutsuelinkaari ja
+                              ratkaisematon loppuun          ratkaisematon
+Kelpaamattomat kutsut         Koodi JA token: virheellinen,  Token-POST-fixture
+                              expired, completed, paattynyt aika
+Tallennus/HTML                Jokainen valmistunut polku     CSV/HTML-erikoistapaukset
+Navigointi/uusintapyynnot      Phase 1, uusi ja legacy-TB1,    Kasittelijoiden
+                              Phase 2/TB2 uusinta, reset      piste- ja tilatarkistukset
+Virhetilanteet                CSV/tunniste/ryhma/sessio/      Puuttuvat ja
+                              lokitallennus/siirtyma          virheelliset parit
+
+Phase 2:n tavallisia kysymyksia on 18 jokaisessa ryhmassa. Kolmittaisen
+tasakierroksen koko nykyisella aineistolla: A2=6, B2=6, C2=9, D2=9;
+vastaavasti 2/2/3/3 kysymysta kutakin tyyppiparia kohti.
+
+NAVIGOINTI JA TUTKIMUSAINEISTON EHEYS
+Kaikissa kuudessa uudessa Phase 1 -parissa palataan taakse, vaihdetaan
+vastaus toiselle ryhmalle ja vastataan uudelleen alkuperaiselle. Ei ylimaaraisia
+pisteita eika vastausriveja. Legacy-polku tarkistetaan kaikkien neljan voittajan
+kautta. Tavallisen Phase 1 -vastauksen korjaus korvaa pisteet ja kylla-laskurin.
+Vanhentuneen lomakkeen uusinta ei vastaa seuraavaan kysymykseen missaan
+neljassa vastaustilassa. Valmistuneen tuloksen GET-paivitys ja POST-uusinta
+eivat lisaa toista tulosrivia.
+
+Jokainen valmis HTTP-testi tarkistaa yhden tutkimus-CSV-rivin, oikean
+session_id:n, lopputyypin, johtavan pistemaaran, Q/Case/TB2-vastauskoodit,
+tyhjat paikat, tarkalleen nykyisen 136 sarakkeen otsikon ja jarjestyksen,
+seka yhden RESULT-lokitapahtuman pisteineen ja ratkaisumenetelmineen.
+Uudet TB1-polut tarkistavat myos kaikki TB1-koodit ja nelja loppulaskuria.
+RATKAISEMATON tallentuu valmiiksi tulokseksi; kutsu paivittyy completed-tilaan.
+Tekninen virhe ei tallennu persoonallisuustulokseksi eika paivita kutsua valmiiksi.
+Suomenkielinen ratkaisemattoman ilmoitus ja vain oikeat karki-tyypit tarkistetaan.
+
+LOYDETYT VIRHEET JA RAJATUT KORJAUKSET
+1. Korkea: puolipiste nimimerkissa rikkoi CSV-rivin sarakkeet.
+   Toisto: CSV Unicode and semicolon nickname. Korjaus: fputcsv-lainaus;
+   otsikko, sarakkeet ja niiden jarjestys sailyvat ennallaan.
+2. Korkea: saman POSTin uusinta saattoi vastata seuraavaan kysymykseen.
+   Toisto: Repeated answer POST cannot answer the next question.
+   Korjaus: kertakayttoinen lomaketunniste ja POST -> GET -ohjaus.
+3. Korkea: puuttuva Phase 2 -CSV johti tyhjaan kyselyyn; puuttuva nykyinen
+   kysymys saattoi tallentaa tyhjan tyypin valmiina tuloksena.
+   Korjaus: puuttuva kysymyssarja/kysymys/pisteisto tai aktiivisen Phase 2
+   session olennaiset puuttuvat tiedot ohjataan tekniseksi virheeksi.
+4. Korkea: lokikirjoituksen epaonnistuminen ei estanyt valmis-tilaa ja kutsun
+   merkitsemista suoritetuksi. Toisto: Log write failure cannot complete an
+   invitation. Korjaus: tallennus palauttaa onnistumisen; tulos/kutsu valmistuu
+   vasta onnistuneen tutkimus-CSV-kirjoituksen jalkeen.
+5. Keskitaso: TB1 hyvaksyi myos ryhman, joka ei kuulu nykyiseen pariin.
+   Toisto: TB1 rejects group outside current comparison.
+   Korjaus: valinta sallitaan vain kysymyksen omille kahdelle ryhmalle.
+6. Keskitaso: kutsun expires_at-aikaleimaa ei tarkistettu.
+   Toisto: invitation rejected past-expiry. Korjaus: yhteinen voimassaolon
+   tarkistus seka koodi- etta token-polulle; tyhja vanha paattymisaika sallitaan.
+7. Keskitaso: molempien TB1-konfiguraatioiden puuttuessa syntyi tyhja legacy-
+   kierros. Toisto: Missing both Phase1 tiebreak sources fails safely.
+   Korjaus: tekninen virhe tyhjan kierroksen sijaan; kelvollinen legacy-fallback
+   ja nykyiset Phase 1 -ratkaisusaannot sailyvat.
+8. Keskitaso: ei-numeerinen Phase 2 -POST muuttui nollaksi ja neutraali/puoli-
+   yhdistelma saattoi edeta ristiriitaisella arvolla.
+   Toisto: Invalid Phase2 values do not advance or corrupt points.
+   Korjaus: kokonaislukutarkistus ja neutraali <=> nollapisteet -ehto.
+
+Virheet 1-4 toistuivat ennen korjauksia probe-ajossa (12 PASS / 4 FAIL).
+Virheet 5-8 toistuivat ennen korjauksia rajatussa lisatestiajossa
+(3 PASS / 4 FAIL; 89 muuta skenaariota suodatettu pois).
+Myos puuttuvan Phase 2 -tasaparikonfiguraation virhe luokitellaan nyt
+TECHNICAL_ERROR-tapahtumaksi. RESULT-loki nimeaa VALID_RESULT/UNRESOLVED_TIE-
+tilat ja resolution_method-kentan eksplisiittisesti. Tutkimus-CSV ei laajentunut.
+
+PISTEYTYSSAANTOJEN HUOMIOT (EI MUUTETTU)
+Phase 1 vie lisavertailuun kaksi korkeinta ryhmaa, jos ero on enintaan 2.
+Kolmas tasoissa/lahella oleva ryhma jaa nykyisen kaytannon mukaan ulkopuolelle.
+Uusi TB1 ratkaisee tasan olevat laskurit alkuperaisilla Phase 1 -pisteilla;
+myos alkuperaispisteiden ollessa tasan jarjestys voi suosia ensimmaista ryhmaa.
+Legacy-TB1:n viimeisessa tasatilanteessa on edelleen satunnainen valinta.
+Nama ovat nykyisen Phase 1 -algoritmin rajoitteita, eivat tassa hyvaksyttyja
+algoritmimuutoksia. Phase 2:n lopputyypin satunnaisvalintaa ei ole.
+
+VALIDOINTI
+php test/http_workflow_test.php: 110 PASS, 0 FAIL, 0 suodatettua skenaariota;
+69727 tarkistusta ja 12061 oikeaa HTTP-pyyntoa. Kaikki 110 skenaariota ajettiin
+yhdessa lopullisessa ajossa, mukaan lukien puuttuvan yksittaisen TB1-parin
+molemmat fallback-/virhetilanteet.
+php test/a2_regression_test.php: PASS 3857 tarkistusta.
+php test/a2_regression_test.php --tiebreak-only: PASS 2343 tarkistusta.
+Kolmittaistestit sisaltyvat laajaan regressioajoon; luvut eivat ole erillisia
+yhteenlaskettavia kattavuusyksikoita.
+PHP -l: kaikki viisi muutettua/lisattya PHP-tiedostoa PASS.
+git diff --check: PASS; vain Gitin normaalit LF/CRLF-ilmoitukset.
+
+Lopullisen HTTP-ajon syotteiden SHA256:
+InsideBlockQuestions.csv
+  a06bbc0d3bc58b6f35a8be33326d7d2e217cb298647582313ab71a2ebe0b8c60
+SeparateBlocksQuestions.csv
+  35baf95c1f63647d270f0e15513e24f70a4e219461aae770e52a5ec72e198e1a
+SeparateBlocksQuestionsTiebreak.csv (nykyinen tyohakemisto, ei commitissa)
+  01ffef4795a30f3f76fafe2b2f944377a6e224371f4c7d5228405c7f320f47a6
+TypeDescriptions.csv
+  cf177422eac1e8621288168b19e3295e6c81ae99023327c1d6353c6974d97ed2
+
+Ajo-ohjeet repojuuresta:
+  php test/http_workflow_test.php
+  php test/http_workflow_test.php --probe
+  php test/http_workflow_test.php "--match=Phase1 pair"
+  php test/a2_regression_test.php
+  php test/a2_regression_test.php --tiebreak-only
+PHP_BINARY kaynnistaa saman PHP:n paikallispalvelimeksi. Ei uusia riippuvuuksia.
+
+JALJELLE JAAVAT / AJAMATTOMAT TAPAUKSET
+- Desktop- ja mobiiliselain, todellinen JavaScript, ulkoasu ja kosketus:
+  NOT EXECUTED. Tarkista manuaalisesti koko A1 -> A2 -polku, molempien
+  TB1-puolten painikkeet, takaisinpaluu ja normaali/ratkaisematon tulos
+  kutsulla ja ilman kutsua seka palaute/reset-painikkeet.
+- Paluu TB1:sta tavalliseen Phase 1:een ei ole nykyisen HTTP-reitityksen/UI:n
+  tarjoama siirtyma. handle_return_to_phase1 on olemassa mutta ei kytketty;
+  sita ei raportoida suoritetuksi HTTP-kattavuudeksi.
+- Vanha test/run_all_tests.php ei ole eristetty runneri ja voi koskea oikeaa
+  sovellusdataa; sita ei ajettu. Relevantit nykyiset A2/kolmittaissarjat ajettiin
+  eristettyina. Vanhaa kokoelmaa ei raportoida PASS-tulokseksi.
+- Ei kaikkien satunnaissiementen, kaikkien vastausyhdistelmien tai kaikkien
+  virheellisten CSV-muotojen tyhjentavaa testausta.
+- Ei rinnakkaisten osallistujien tiedostokilpailu-, prosessin kaatumis-,
+  levytila-/osittaiskirjoitus- tai kutsutiedoston kirjoitusvirheen injektiota.
+  Perakkaisten refresh/retry-pyyntojen eheys ei todista kaatumisatomisuutta.
+- Ei tuotantopalvelimen PHP/FS-asetusten tai oikean sahkopostitoimituksen testi.
+- CSV-valimuistin paivitys tarkistetaan uuden/reset-session kautta; kesken
+  olevan kyselyn kuumaa siirtoa uuteen kysymysaineistoon ei luvata.
+- Lomaketunniste vaatii vanhan, ennen paivitysta avatun lomakkeen lataamisen
+  uudelleen. Palautelomakkeen oikeaa sahkopostitoimitusta ei ajettu.
+
+HALLITUN PILOTIN ARVIO
+Automatisoidut PHP/HTTP-polut antavat pohjan rajatulle pilotille, kun kaikki
+lopulliset ajot ovat vihreita. Ennen pilottia tee ylla oleva desktop/mobiili-
+smoke, varmista palvelimen kirjoitusoikeudet ja varmuuskopiointi seka aloita
+uusilla sessioilla. Suuren rinnakkaisen tutkimusajon valmiutta ei talla
+paikallisella sarjallisella ajolla ole osoitettu. Ei automaattista julkaisua.

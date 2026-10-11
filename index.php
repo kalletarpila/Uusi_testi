@@ -241,6 +241,14 @@ function invite_find_by_code(array $items, string $code): ?array {
     return null;
 }
 
+function invite_is_usable(array $invite): bool {
+    if (!in_array($invite['status'] ?? '', ['sent', 'accepted'], true)) return false;
+    $expires = $invite['expires_at'] ?? null;
+    if ($expires === null || $expires === '') return true;
+    $time = strtotime((string)$expires);
+    return $time !== false && $time > time();
+}
+
 /**
  * Päivittää kutsun statuksen ID:n perusteella
  * 
@@ -546,13 +554,13 @@ function load_phase1_tiebreak_blocks(string $filename): array {
         }
         
         // Parse blocks (e.g., "BvsC" -> ["B", "C"])
-        if (preg_match('/^([A-D])vs([A-D])$/i', $blocks_str, $m)) {
+        if (preg_match('/^([A-D])vs([A-D])$/i', $blocks_str, $m) && strtoupper($m[1]) !== strtoupper($m[2])) {
             $block_left = strtoupper($m[1]);
             $block_right = strtoupper($m[2]);
             
             $blocks[] = [
                 'question_num' => $question_num,
-                'blocks_str' => $blocks_str,
+                'blocks_str' => $block_left . 'vs' . $block_right,
                 'statement' => $statement,
                 'block_left' => $block_left,
                 'option_left' => $option_left,
@@ -1017,6 +1025,22 @@ function session_validate_state(): void {
         index_log('STATE: Invalid state "' . $currentState . '" reset to intro');
         $_SESSION['state'] = 'intro';
     }
+    if (in_array($_SESSION['state'], ['phase2_intro', 'phase2', 'phase2_tb'], true) &&
+        (!in_array($_SESSION['track'] ?? '', ['A2','B2','C2','D2'], true) ||
+         empty($_SESSION['blocks2']) || count($_SESSION['varCodes'] ?? []) !== 3 ||
+         !isset($_SESSION['varPoints']) || !is_array($_SESSION['varPoints']) ||
+         ($_SESSION['state'] === 'phase2_tb' && empty($_SESSION['tb2_set'])))) {
+        quiz_technical_error('missing_or_invalid_phase2_session');
+    }
+}
+
+function quiz_technical_error(string $reason): void {
+    $_SESSION['state'] = 'phase2_unresolved';
+    $_SESSION['log_row']['finalVar'] = '';
+    index_log('TECHNICAL_ERROR: ' . json_encode([
+        'session_id' => session_id(), 'track' => $_SESSION['track'] ?? '',
+        'reason' => $reason, 'scores' => $_SESSION['varPoints'] ?? [],
+    ], JSON_UNESCAPED_UNICODE));
 }
 
 /**
@@ -1362,7 +1386,7 @@ function send_result_email(array $row): void {
 }
 
 /* Uusi survey log: 25 kiinteää kolumnia + kysymyskohtaiset vastaukset */
-function ensure_log_header(): void {
+function ensure_log_header(): bool {
     $lp = log_path();
     if (!file_exists($lp)) {
     // Fixed columns (expanded): original 25 plus 4 tiebreak-only columns = 29
@@ -1414,8 +1438,10 @@ function ensure_log_header(): void {
   $headerLine = "\xEF\xBB\xBF" . implode(';', $cols) . PHP_EOL;
     if (!safe_file_append($lp, $headerLine)) {
       handle_error('FILE_IO', "Failed to write log header to: $lp");
+      return false;
     }
     }
+    return is_file($lp);
 }
 
 /**
@@ -1476,7 +1502,7 @@ function safe_file_append(string $path, string $data, int $retries = 20, int $wa
   index_log('FILE_APPEND: giving up after ' . $retries . ' attempts for ' . $path);
   return false;
 }
-function write_full_log_row(array $row): void {
+function write_full_log_row(array $row): bool {
   // Varmista että kutsutiedot kopioidaan log_row:iin
   if (!empty($_SESSION['InviteId'])) {
     $row['invite_id'] = $_SESSION['InviteId'];
@@ -1595,7 +1621,7 @@ function write_full_log_row(array $row): void {
         index_log('DEBUG: Final parts count=' . count($parts) . ' (should be 121: 25+40+10+36+10)');
         index_log('DEBUG: TB2_1-TB2_4 samples: [' . ($parts[111] ?? 'empty') . ',' . ($parts[112] ?? 'empty') . ',' . ($parts[113] ?? 'empty') . ',' . ($parts[114] ?? 'empty') . '] (format: var-qnum-value)');
         
-        ensure_log_header();
+        if (!ensure_log_header()) return false;
         
   // Debug: show raw and mapped confidence values right before writing
   $raw_conf = $row['confidence'] ?? null;
@@ -1610,11 +1636,15 @@ function write_full_log_row(array $row): void {
     }
     return $s;
   }, $parts);
-  $csvLine = implode(';', $parts) . PHP_EOL;
+  $csvBuffer = fopen('php://temp', 'r+');
+  fputcsv($csvBuffer, $parts, ';', '"', '\\');
+  rewind($csvBuffer);
+  $csvLine = stream_get_contents($csvBuffer);
+  fclose($csvBuffer);
         
     if (!safe_file_append($logPath, $csvLine)) {
       handle_error('FILE_IO', "Failed to write log row to: $logPath");
-      return;
+      return false;
     }
 
     // Also write a debug copy into repository-local logs directory for inspection during development
@@ -1632,14 +1662,31 @@ function write_full_log_row(array $row): void {
             'scores' => $_SESSION['varPoints'] ?? [],
             'tiebreak_answers' => $_SESSION['tb2_pairs'] ?? [],
             'final_type' => $row['finalVar'] ?? '',
+            'result_status' => ($row['finalVar'] ?? '') === 'RATKAISEMATON' ? 'UNRESOLVED_TIE' : 'VALID_RESULT',
+            'resolution_method' => ($row['finalVar'] ?? '') === 'RATKAISEMATON' ? 'UNRESOLVED_TIE' : 'points',
         ], JSON_UNESCAPED_UNICODE));
         
         // Lähetetään sähköposti tuloksista
         send_result_email($row);
+        return true;
         
     } catch (Exception $e) {
         handle_error('FILE_IO', "Exception in write_full_log_row", $e);
+        return false;
     }
+}
+
+function complete_quiz_result(): bool {
+    if (empty($_SESSION['result_saved'])) {
+        if (!write_full_log_row($_SESSION['log_row'])) {
+            quiz_technical_error('result_log_write_failed');
+            return false;
+        }
+        $_SESSION['result_saved'] = true;
+    }
+    if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+    $_SESSION['state'] = 'done2';
+    return true;
 }
 
 /**
@@ -1681,6 +1728,28 @@ if (isset($_GET['reset']) || (isset($_POST['reset_session']))) {
 
 session_initialize();
 
+// One-use form token binds a POST to the displayed step, including navigation.
+// A browser retry or an old tab cannot answer the next question accidentally.
+$_SESSION['workflow_token'] ??= bin2hex(random_bytes(16));
+$workflowPostAccepted = false;
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
+    $submittedToken = $_POST['workflow_token'] ?? null;
+    if (!is_string($submittedToken) || !hash_equals($_SESSION['workflow_token'], $submittedToken)) {
+        index_log('POST_REJECTED: stale or missing workflow token');
+        $_POST = [];
+    } else {
+        $_SESSION['workflow_token'] = bin2hex(random_bytes(16));
+        $workflowPostAccepted = true;
+        foreach (['choice','tb_choice','choice2_value','tb2_value'] as $field) {
+            if (isset($_POST[$field]) && filter_var($_POST[$field], FILTER_VALIDATE_INT) === false) {
+                index_log('POST_REJECTED: non-integer ' . $field);
+                $_POST = [];
+                break;
+            }
+        }
+    }
+}
+
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 $state = session_get_safe('state', 'intro', 'string');
 
@@ -1708,7 +1777,7 @@ function handle_intro_form(): ?string {
     if (INVITES_ENABLED && $code !== '' && empty($_SESSION['InviteId'])) {
         $items = invites_load();
         $inv = invite_find_by_code($items, $code);
-        if ($inv && (($inv['status'] ?? '') === 'sent' || ($inv['status'] ?? '') === 'accepted')) {
+        if ($inv && invite_is_usable($inv)) {
             $_SESSION['RefGuessType'] = (string)($inv['guess_type'] ?? '');
             $_SESSION['RefGuessProb'] = (string)($inv['guess_prob'] ?? '');
             $_SESSION['InviteId']     = (string)($inv['id'] ?? '');
@@ -1736,6 +1805,7 @@ function handle_intro_form(): ?string {
  * @param string $ennea Enneagrammityyli tai "en tiedä"
  */
 function initialize_phase1_session(string $nick, string $ennea): void {
+    unset($_SESSION['result_saved']);
     $phase1_all_preview = get_cached_phase1_questions();
     $phase1_index = [];
     foreach ($phase1_all_preview as $q) $phase1_index[(int)$q['id']] = $q['class'];
@@ -2033,6 +2103,10 @@ function initialize_phase2(string $winner): void {
     $track = $winner[0] . '2';
     $_SESSION['track']     = $track;
     $_SESSION['blocks2']   = $_SESSION['cases_all'][$track] ?? [];
+    if (!in_array($track, ['A2','B2','C2','D2'], true) || empty($_SESSION['blocks2'])) {
+        quiz_technical_error('missing_phase2_questions');
+        return;
+    }
     
     // Shuffle Phase 2 kysymykset satunnaiseen järjestykseen
     if (!empty($_SESSION['blocks2'])) {
@@ -2282,6 +2356,10 @@ function handle_quiz1_tie_old(array $tops): void {
     $new_set_id = md5(json_encode($tbPool));
     $old_set_id = $_SESSION['tiebreak_set_id'] ?? null;
     $_SESSION['tiebreak_set']   = $tbPool;
+    if (empty($tbPool)) {
+        quiz_technical_error('missing_phase1_tiebreak_questions');
+        return;
+    }
     $_SESSION['tiebreak_set_id'] = $new_set_id;
     // Restore answers
     if (!empty($restored_answers)) {
@@ -2322,7 +2400,7 @@ function handle_tb1_new_answer(): void {
     $q = $questions[$index];
     
     // Validate selected block
-    if (!in_array($selectedBlock, ['A', 'B', 'C', 'D'])) {
+    if (!in_array($selectedBlock, [$q['block_left'], $q['block_right']], true)) {
         index_log('TB1_NEW ERROR: Invalid block=' . $selectedBlock);
         return;
     }
@@ -2684,7 +2762,8 @@ function handle_phase2_answer(int $value, string $side = ''): void {
         $value = abs($value);
     }
     
-    if ($value < 0 || $value > 2 || !in_array($side, ['left', 'right', 'neutral'])) {
+    if ($value < 0 || $value > 2 || !in_array($side, ['left', 'right', 'neutral'], true) ||
+        (($side === 'neutral') !== ($value === 0))) {
         index_log('PHASE2: Invalid choice value=' . $value . ' side=' . $side);
         return;
     }
@@ -2693,11 +2772,7 @@ function handle_phase2_answer(int $value, string $side = ''): void {
     $block = $_SESSION['blocks2'][$index] ?? null;
     
     if (!$block) {
-        $_SESSION['log_row']['finalVar'] = '';
-        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
-        write_full_log_row($_SESSION['log_row']);
-        $_SESSION['state'] = 'done2';
-        index_log('STATE CHANGE: phase2 -> done2 (missing block, finalVar=empty)');
+        quiz_technical_error('missing_phase2_block');
         return;
     } else {
         index_log('PHASE2 DISPLAY: Q' . ($index + 1) . '/' . count($_SESSION['blocks2']) . 
@@ -2751,6 +2826,7 @@ function handle_phase2_answer(int $value, string $side = ''): void {
  */
 function handle_phase2_completion(): void {
   $varPoints = $_SESSION['varPoints'] ?? [];
+  if (empty($varPoints)) { quiz_technical_error('missing_phase2_scores'); return; }
   // Ensure numeric values
   $varPoints = array_map('intval', $varPoints);
     $leaders = [];
@@ -2777,9 +2853,7 @@ function handle_phase2_completion(): void {
         // Selvä voittaja tai ei pisteitä
         $finalVar = $leaders ? $leaders[0] : '';
         $_SESSION['log_row']['finalVar'] = $finalVar;
-        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
-        write_full_log_row($_SESSION['log_row']);
-        $_SESSION['state'] = 'done2';
+        if (!complete_quiz_result()) return;
         index_log('STATE CHANGE: phase2 -> done2 (finalVar=' . $finalVar . ', leaders=' . implode(',', $leaders) . ')');
     } else {
         // Tasatilanne - tiebreak
@@ -2845,8 +2919,7 @@ function initialize_phase2_tiebreak(array $leaders): void {
     $_SESSION['tb2_set'] = [];
     $missingPairs = array_keys(array_filter($counts, fn($count) => $count === 0));
     if ($missingPairs || !in_array(count($leaders), [2, 3], true)) {
-        $_SESSION['log_row']['finalVar'] = '';
-        $_SESSION['state'] = 'phase2_unresolved';
+        quiz_technical_error('missing_phase2_tiebreak_pairs:' . implode(',', $missingPairs));
         index_log('PHASE2_TB CONFIG_ERROR: ' . json_encode(array_merge($_SESSION['tb2_context'], [
             'missing_pairs' => $missingPairs,
             'comparison_pairs_used' => [],
@@ -2879,7 +2952,8 @@ function handle_phase2_tiebreak_answer(int $value, string $side = ''): void {
         $value = abs($value);
     }
     
-    if ($value < 0 || $value > 2 || !in_array($side, ['left', 'right', 'neutral'])) {
+    if ($value < 0 || $value > 2 || !in_array($side, ['left', 'right', 'neutral'], true) ||
+        (($side === 'neutral') !== ($value === 0))) {
         index_log('PHASE2_TB: Invalid choice value=' . $value . ' side=' . $side);
         return;
     }
@@ -2933,6 +3007,7 @@ function handle_phase2_tiebreak_answer(int $value, string $side = ''): void {
  */
 function handle_phase2_tiebreak_completion(): void {
     $varPoints = $_SESSION['varPoints'] ?? [];
+    if (empty($varPoints)) { quiz_technical_error('missing_phase2_tiebreak_scores'); return; }
     $leaders = [];
     
     if (!empty($varPoints)) {
@@ -2975,9 +3050,7 @@ function handle_phase2_tiebreak_completion(): void {
         'resolution_method' => count($leaders) > 1 ? 'UNRESOLVED_TIE' : 'points',
         'final_type' => (string)$finalVar,
     ]), JSON_UNESCAPED_UNICODE));
-    if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
-    write_full_log_row($_SESSION['log_row']);
-    $_SESSION['state'] = 'done2';
+    if (!complete_quiz_result()) return;
     index_log('STATE CHANGE: phase2_tb -> done2 (finalVar=' . $finalVar . ' after tiebreak)');
 }
 
@@ -3055,7 +3128,7 @@ if (INVITES_ENABLED && ($_SESSION['state'] ?? '') === 'intro' && isset($_GET['in
   if ($token !== '') {
     $items = invites_load();
     $inv = invite_find_by_token($items, $token);
-    if ($inv && (($inv['status'] ?? '') === 'sent' || ($inv['status'] ?? '') === 'accepted')) {
+    if ($inv && invite_is_usable($inv)) {
       $_SESSION['RefGuessType'] = (string)($inv['guess_type'] ?? '');
       $_SESSION['RefGuessProb'] = (string)($inv['guess_prob'] ?? '');
       $_SESSION['InviteId']     = (string)($inv['id'] ?? '');
@@ -3074,6 +3147,17 @@ if (INVITES_ENABLED && ($_SESSION['state'] ?? '') === 'intro' && isset($_GET['in
   }
 }
 
+// Render ordinary successful POST transitions as GETs, preserving intro errors
+// and feedback confirmations on their current response.
+if ($workflowPostAccepted && empty($error) &&
+    !isset($_POST['show_feedback']) && !isset($_POST['send_feedback'])) {
+    header('Location: ' . $_SERVER['PHP_SELF'], true, 303);
+    exit;
+}
+ob_start(static function(string $html): string {
+    $hidden = '<input type="hidden" name="workflow_token" value="' . h($_SESSION['workflow_token']) . '">';
+    return preg_replace('/(<form\b[^>]*\bmethod=["\x27]post["\x27][^>]*>)/i', '$1' . $hidden, $html);
+});
 ?>
 <!doctype html>
 <html lang="fi">
