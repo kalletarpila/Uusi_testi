@@ -45,7 +45,7 @@ function invites_path(): string {
  * 
  * TIEDOSTORAKENNE:
  * - /quiz1.csv: Vaiheen 1 kysymykset (A1, B1, C1, D1 kategoriat)
- * - /quiz_phase2_*.csv: Vaiheen 2 kysymykset rateittain (B2, C2, D2)
+ * - /InsideBlockQuestions.csv: Vaiheen 2 kysymykset (A2, B2, C2, D2)
  * - /types.csv: Persoonallisuustyyppien kuvaukset
  * - /logs/: Tulosloki CSV-muodossa
  * 
@@ -85,6 +85,7 @@ header('Permissions-Policy: geolocation=(), camera=(), microphone=()');
 /* ========= Konfiguraatio ========= */
 const PHASE1_FILE_BASE   = 'SeparateBlocksQuestions';
 const PHASE2_FILE_BASE   = 'InsideBlockQuestions';
+const QUIZ_CACHE_VERSION = 2; // Reload pre-A2 session caches after this change.
 const TYPEDESC_FILE_BASE = 'TypeDescriptions'; // tyyppikuvaukset
 
 // Count only options 5 and 6 as a "yes" for tiebreak heuristics
@@ -569,7 +570,7 @@ function load_phase1_tiebreak_blocks(string $filename): array {
  * Loads phase 2 question blocks for detailed enneagram assessment
  * 
  * Parses CSV data into structured blocks for phase 2 testing, supporting
- * both simple blocks (B2, C2, D2) and comparison blocks with 'vs' syntax
+ * both simple blocks (A2, B2, C2, D2) and comparison blocks with 'vs' syntax
  * for detailed personality differentiation.
  * 
  * @param string $base Base file path to CSV file containing phase 2 blocks
@@ -577,11 +578,11 @@ function load_phase1_tiebreak_blocks(string $filename): array {
  */
 function load_phase2_blocks(string $base): array {
     $rows = read_tag_text_rows($base);
-    $cases = ['B2'=>[], 'C2'=>[], 'D2'=>[]];
+    $cases = ['A2'=>[], 'B2'=>[], 'C2'=>[], 'D2'=>[]];
     $n = count($rows);
     for ($i=0; $i<$n; $i++) {
         [$tag, $desc] = $rows[$i];
-        if (preg_match('/^([BCD])2(?:-([A-Za-z0-9]+)vs([A-Za-z0-9]+))?$/i', $tag, $m)) {
+        if (preg_match('/^([ABCD])2(?:-([A-Za-z0-9]+)vs([A-Za-z0-9]+))?$/i', $tag, $m)) {
             $letter = strtoupper($m[1]);
             $pairL = $m[2] ?? null; $pairR = $m[3] ?? null;
             if (!isset($rows[$i+1], $rows[$i+2])) continue;
@@ -629,7 +630,7 @@ function load_phase2_blocks(string $base): array {
 /**
  * Loads phase 2 tiebreaker questions for detailed result resolution
  * 
- * Organizes CSV data into tiebreaker groups (TB2, TC2, TD2) with support
+ * Organizes CSV data into tiebreaker groups (TA2, TB2, TC2, TD2) with support
  * for both simple and 'vs' comparison formats for resolving phase 2 ties.
  * 
  * @param string $base Base file path to CSV file containing phase 2 tiebreakers
@@ -637,11 +638,11 @@ function load_phase2_blocks(string $base): array {
  */
 function load_phase2_tiebreak_all(string $base): array {
     $rows = read_tag_text_rows($base);
-    $out = ['TB2'=>[], 'TC2'=>[], 'TD2'=>[]];
+    $out = ['TA2'=>[], 'TB2'=>[], 'TC2'=>[], 'TD2'=>[]];
     $n = count($rows);
     for ($i=0; $i<$n; $i++) {
         [$tag, $desc] = $rows[$i];
-        if (preg_match('/^T([BCD])2(?:-([A-Za-z0-9]+)vs([A-Za-z0-9]+))?$/i', $tag, $m)) {
+        if (preg_match('/^T([ABCD])2(?:-([A-Za-z0-9]+)vs([A-Za-z0-9]+))?$/i', $tag, $m)) {
             $letter = strtoupper($m[1]);
             $pairL = $m[2] ?? null; $pairR = $m[3] ?? null;
             $group = 'T'.$letter.'2';
@@ -718,8 +719,9 @@ function load_type_descriptions(string $base): array {
  */
 function load_and_cache_quiz_data(): void {
     // Lataa vain jos ei ole vielä välimuistissa
-    if (!isset($_SESSION['cached_quiz_data'])) {
+    if (($_SESSION['cached_quiz_data']['version'] ?? null) !== QUIZ_CACHE_VERSION) {
         $_SESSION['cached_quiz_data'] = [
+            'version' => QUIZ_CACHE_VERSION,
             'phase1_questions' => load_phase1_questions(PHASE1_FILE_BASE),
             'tiebreak_questions' => load_tiebreak_questions(PHASE1_FILE_BASE),
             'phase2_blocks' => load_phase2_blocks(PHASE2_FILE_BASE),
@@ -1622,6 +1624,15 @@ function write_full_log_row(array $row): void {
     @file_put_contents($debugPath, $csvLine, FILE_APPEND | LOCK_EX);
         
         index_log('CSV: Row written (finalVar="' . (string)($row['finalVar'] ?? '') . '", nick="' . ($row['nick'] ?? '') . '")');
+        // Keep the research CSV schema unchanged; persist group and full scores in the app log.
+        index_log('RESULT: ' . json_encode([
+            'session_id' => $_SESSION['sessionId'] ?? session_id(),
+            'winner' => $row['winner'] ?? ($_SESSION['topClass'] ?? ''),
+            'track' => $row['track'] ?? ($_SESSION['track'] ?? ''),
+            'scores' => $_SESSION['varPoints'] ?? [],
+            'tiebreak_answers' => $_SESSION['tb2_pairs'] ?? [],
+            'final_type' => $row['finalVar'] ?? '',
+        ], JSON_UNESCAPED_UNICODE));
         
         // Lähetetään sähköposti tuloksista
         send_result_email($row);
@@ -2009,15 +2020,7 @@ function handle_single_winner(string $winner): void {
     $_SESSION['log_row']['winner'] = $winner;
     $_SESSION['log_row']['Phase1_tb'] = 'Ei';  // Ei tiebreakkia ollenkaan
 
-    if ($winner === 'A1') {
-        $_SESSION['log_row']['finalVar'] = '4';
-        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
-        write_full_log_row($_SESSION['log_row']);
-        $_SESSION['state'] = 'a1_result';
-        index_log('STATE CHANGE: quiz1 -> a1_result (A1 winner, finalVar=4)');
-    } else {
-        initialize_phase2($winner);
-    }
+    initialize_phase2($winner);
 }
 
 /**
@@ -2077,6 +2080,11 @@ function initialize_phase2(string $winner): void {
     $codes = array_values(array_unique(array_keys($codes))); 
     natsort($codes);
     $_SESSION['varCodes'] = array_slice(array_values($codes), 0, 3);
+    // A2 must also resolve an all-neutral response set as a tie between 4, 7 and 9.
+    // Preserve the existing zero-score behavior of the other pilot groups.
+    if ($track === 'A2') {
+        $_SESSION['varPoints'] = array_fill_keys($_SESSION['varCodes'], 0);
+    }
 
     $_SESSION['state'] = 'phase2_intro';
     index_log('STATE CHANGE: quiz1 -> phase2_intro (winner=' . $winner . ', track=' . $track . ', blocks=' . count($_SESSION['blocks2']) . ')');
@@ -2411,17 +2419,8 @@ function handle_tb1_new_completion(): void {
     
     index_log('TB1_NEW: Complete (winner=' . $winner . ', counters: A=' . $counters['A'] . ', B=' . $counters['B'] . ', C=' . $counters['C'] . ', D=' . $counters['D'] . ')');
     
-    // Check if A1 wins
-    if ($winner === 'A1') {
-        $_SESSION['log_row']['finalVar'] = '4';
-        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
-        write_full_log_row($_SESSION['log_row']);
-        $_SESSION['state'] = 'a1_result';
-        index_log('STATE CHANGE: tb1_new -> a1_result (finalVar=4)');
-    } else {
-        initialize_phase2($winner);
-        index_log('STATE CHANGE: tb1_new -> phase2_intro (winner=' . $winner . ')');
-    }
+    initialize_phase2($winner);
+    index_log('STATE CHANGE: tb1_new -> phase2_intro (winner=' . $winner . ')');
 }
 
 /**
@@ -2670,17 +2669,8 @@ function handle_tiebreak_completion(): void {
   $_SESSION['log_row']['winner'] = $top;
   $_SESSION['log_row']['Phase1_tb'] = 'Kyllä';
 
-    if ($top === 'A1') {
-        $_SESSION['log_row']['finalVar'] = '4';
-        if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
-        write_full_log_row($_SESSION['log_row']);
-        $_SESSION['state'] = 'a1_result';
-        index_log('STATE CHANGE: tiebreak -> a1_result (A1 winner after tiebreak, finalVar=4)');
-        index_log('TIEBREAK: Complete (final_winner=' . $top . ', final_scores: A1=' . ($_SESSION['points1']['A1'] ?? 0) . ', B1=' . ($_SESSION['points1']['B1'] ?? 0) . ', C1=' . ($_SESSION['points1']['C1'] ?? 0) . ', D1=' . ($_SESSION['points1']['D1'] ?? 0) . ')');
-    } else {
-        initialize_phase2($top);
-        index_log('TIEBREAK: Complete -> PHASE2 (final_winner=' . $top . ', track=' . ($_SESSION['track'] ?? '') . ', blocks=' . count($_SESSION['blocks2'] ?? []) . ')');
-    }
+    initialize_phase2($top);
+    index_log('TIEBREAK: Complete -> PHASE2 (final_winner=' . $top . ', track=' . ($_SESSION['track'] ?? '') . ', blocks=' . count($_SESSION['blocks2'] ?? []) . ')');
 }
 
 /**
