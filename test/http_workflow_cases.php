@@ -14,6 +14,8 @@ function assert_technical(Participant $p): void {
     foreach(research_rows($p->dir) as $r) verify($r['session_id']!==$p->cookie,'No technical failure research result');
 }
 
+if ($navigationOnly ?? false) return;
+
 // Independent direct CSV expectation: every field and group attribution in the loader.
 $raw=[];$fp=fopen($sandbox.'/SeparateBlocksQuestionsTiebreak.csv','r');
 while(($row=fgetcsv($fp,0,';','"','\\'))!==false) if(count($row)>=6&&ctype_digit(trim($row[0]))&&preg_match('/^([ABCD])vs([ABCD])$/',$row[1],$m)) $raw[trim($row[0])]=['pair'=>[$m[1],$m[2]],'statement'=>trim($row[3]),'left'=>trim($row[4]),'right'=>trim($row[5])];
@@ -31,7 +33,7 @@ foreach($p1pairs as $key=>$count) foreach(explode('-',$key) as $winner) scenario
         $b=$p->s['tb1_new_questions'][$p->s['tb1_new_index']];
         verify(str_contains($p->html,htmlspecialchars($b['statement'],ENT_QUOTES|ENT_SUBSTITUTE,'UTF-8')),'TB1 statement rendered');
         $seen[$b['question_num']]=true;$p->submit(['tb1_new_choice'=>$winner]);$n++;
-        if($n===2){$p->submit(['tb1_new_navigate'=>'back']);verify($p->s['tb1_new_index']===1&&count($p->s['tb1_new_answers'])===1,'Back removes previous answer');$other=$pair[0]===$winner?$pair[1]:$pair[0];$p->submit(['tb1_new_choice'=>$other]);$p->submit(['tb1_new_navigate'=>'back']);$p->submit(['tb1_new_choice'=>$winner]);}
+        if($n===2){$p->submit(['tb1_new_navigate'=>'back']);verify($p->s['tb1_new_index']===1&&count($p->s['tb1_new_answers'])===2,'Back preserves previous answers');$other=$pair[0]===$winner?$pair[1]:$pair[0];$p->submit(['tb1_new_choice'=>$other]);$p->submit(['tb1_new_navigate'=>'back']);$p->submit(['tb1_new_choice'=>$winner]);}
         $expected=array_fill_keys(['A','B','C','D'],0);foreach($p->s['tb1_new_answers'] as $a)$expected[substr($a,-1)]++;
         verify($p->s['tb1_new_counters']===$expected,'Exactly one point per current answer, no navigation duplicates');
         verify(count($p->s['tb1_new_answers'])===$n,'One record per question');

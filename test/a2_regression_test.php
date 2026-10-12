@@ -98,7 +98,7 @@ try {
     // Compare B/C/D parsing against the actual initial Git revision, not copied fixtures.
     // The caller supplies that source through git show; only the two pure loaders run.
     $pipes = [];
-    $p = proc_open(['git', '-C', $root, 'show', '1b88bfbcf9fa3b4b03e0af86af03c978dac4cad4:index.php'], [1=>['pipe','w'],2=>['pipe','w']], $pipes);
+    $p = proc_open(['git', '-c', 'safe.directory='.str_replace('\\','/',$root), '-C', $root, 'show', '1b88bfbcf9fa3b4b03e0af86af03c978dac4cad4:index.php'], [1=>['pipe','w'],2=>['pipe','w']], $pipes);
     $baseline = stream_get_contents($pipes[1]);
     $error = stream_get_contents($pipes[2]);
     fclose($pipes[1]); fclose($pipes[2]);
@@ -121,12 +121,13 @@ try {
         seed($cache);
         if ($route === 'normal') handle_quiz1_completion();
         if ($route === 'new_tb') {
-            $_SESSION['tiebreak_classes'] = ['A1','B1'];
-            $_SESSION['tb1_new_counters'] = ['A'=>5,'B'=>2,'C'=>0,'D'=>0];
+            handle_quiz1_tie_new(['A1','B1']);
+            foreach ($_SESSION['tb1_new_questions'] as $i=>$q) $_SESSION['tb1_new_answers'][$i] = $q['question_num'].'A';
             handle_tb1_new_completion();
         }
         if ($route === 'old_tb') {
-            $_SESSION['tiebreak_points'] = ['A1'=>12,'B1'=>6,'C1'=>0,'D1'=>0];
+            handle_quiz1_tie_old(['A1','B1']);
+            foreach ($_SESSION['tiebreak_set'] as $i=>$q) $_SESSION['tiebreak_answers'][$i] = $q['class']==='A1'?6:1;
             handle_tiebreak_completion();
         }
         check($_SESSION['state'] === 'phase2_intro' && $_SESSION['track'] === 'A2', "$route A1 routing");

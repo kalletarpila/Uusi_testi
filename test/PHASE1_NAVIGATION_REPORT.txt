@@ -1,0 +1,236 @@
+PHASE 1 BACK NAVIGATION AND SELECTED ANSWERS
+Date: 2026-10-12. Initial HEAD: 2af6470f74ad52ab3516ffae666357399b2e16d0.
+Final HEAD: the commit containing this report (git log -1 --format=%H -- this file).
+No push or deployment. Existing user CSV edits are preserved, not authored here.
+
+PRE-IMPLEMENTATION TRANSITION MATRIX
+This matrix was written before the navigation tests and implementation.
+Modes: current pairwise TB1 and legacy TB1. Pairs: AB, AC, AD, BC, BD, CD.
+Canonical CD corresponds to DvsC in the actual CSV.
+
+Case                 Initial state/action                 Expected transition
+A0 intro review      TB intro -> last ordinary question   Unchanged -> same intro
+A1 first review      First TB question, no TB answers      Unchanged -> same TB index
+A2 partial review    Several TB answers -> ordinary       Preserve order/answers/index
+A3 final review      Last TB question -> ordinary          Preserve all earlier selections
+B same pair edit     Change ordinary answer, same pair    Restart TB, empty prior answers
+C changed pair       Change ordinary answers, new pair    Fresh questions/counters for pair
+D clear winner       Change ordinary answers, gap > 2     Correct phase2_intro, no stale TB
+E 3/4 close groups   Existing top-two selection            Approved Phase 1 policy retained
+F TB review          Back/forward over answered questions Preserve selected value and scores
+G TB replacement     Change answered left/right or 1-6    Replace exactly one record/recount
+H repeated review    Same/different/same pair; repeat      Never resurrect obsolete TB state
+I ordinary review    Edit first/middle/last ordinary      Fresh sums/yes counts, others retained
+J request integrity  Invalid/replayed token/index/action  Reject without mutation/advancement
+K configuration      Missing/malformed pair/mapping       Valid fallback or TECHNICAL_ERROR
+L session integrity  Missing answers/set/context/index    Repair derived counters or fail safely
+M final persistence  Normal/unresolved, invited/plain     One accurate CSV row, completion after IO
+N reset/feedback     Reset midway; feedback after result  Clean session; no duplicate result
+
+Reachability: with nine questions per group, answering 4 for both candidate
+groups and 3 for the others yields 36/36 versus 27/27. By reviewing ordinary
+answers one can assign these scores to any target pair. All 30 directed
+different-pair transitions are therefore reachable (including disjoint pairs),
+in both modes. Tests must exercise both target winners and complete Phase 2.
+There are no excluded directed pair changes under these permitted multi-answer
+edits. This is branch/transition coverage, not exhaustive mathematical coverage.
+
+State policy: ordinary answers by question ID are authoritative. Scores,
+yes counts and research records are recalculated from those latest answers.
+Review with no answer change retains the active TB state, question order,
+selections and current index. Any actual ordinary answer change invalidates
+the current TB, even if the same pair remains eligible or the value is later
+changed back. Cached question data, ordinary answers and invitation metadata
+are retained. New/legacy TB aggregates remain separate from Phase 1 totals.
+
+CRITICAL REVIEW AND CORRECTIONS
+The return handler existed at initial HEAD, but the POST dispatcher did not
+call it from either TB mode and no usable return control was rendered. The
+ordinary-question return-to-TB block was disabled. Reproduction before the
+application changes failed in both modes on the missing rendered control.
+The old handler also depended on overlapping point/question/answer backups;
+legacy reinitialization could restore answers from an obsolete comparison.
+New TB Back deleted the answer and its point. Its buttons did not display a
+stored choice, and increment-only answer handling was unsafe for replacement.
+Ordinary Next could skip an unanswered question or advance past the last one.
+
+Both modes now expose the existing-style return control, including TB intro.
+The session retains one real round plus its review-state marker and a context
+fingerprint covering ordinary answers, candidates and the actual ordered TB
+questions/mappings. Back/forward preserves answers; a selected CSS class and
+aria-pressed expose the stored left/right choice or legacy 1-6 value. Replacing
+an answer writes its indexed record and derives the counters again. Previously
+answered questions have a forward control and need no new answer submission.
+Ordinary Next requires an existing answer and evaluates completion at the end.
+Incomplete TB completion, wrong-state requests, forged targets, mixed actions
+and stale tokens cannot bypass the round. Existing POST/redirect/GET remains.
+Invalid primary state fails explicitly; only derived totals are repaired.
+Legacy fallback requires questions for BOTH candidates, avoiding an apparently
+valid result when only one side is configured. No scoring rule was changed.
+
+The fingerprint is intentionally not a migration of pre-update active rounds.
+An old active TB session without the new context fails safely and needs reset.
+
+EXECUTED WORKFLOW MATRIX
+Final full-run results and generated per-scenario JSON are recorded below.
+The JSON records each initial state, scores, original pair, action, whether
+answers changed, expected pair/state/track/category and observed HTTP result.
+
+Family                                      Planned scenarios
+Unchanged first/partial/final, both winners                 72
+Answer replacement + same-pair ordinary edit                24
+Every directed different-pair change, both winners         120
+Clear winner, both winners, invited                         24
+Unchanged review from TB intro                              12
+Three/four equal leaders, retained top-two policy             8
+Eligibility boundary: gap 2 vs gap 3                          4
+Three/four near leaders, C37/A36/B36, both winners             8
+Repeated AB -> CD -> AB -> clear A, invited unresolved         2
+Same-value ordinary answer POST                              2
+First/middle/last ordinary answer edited twice                6
+Request security, stale forms, refresh/session restart        2
+Reset and feedback                                           2
+Session fault injection (13 per mode)                       26
+CSV configuration failures/fallbacks                          4
+Result-write failure after pair change, invited               2
+TOTAL                                                      318
+
+Each pair AB/AC/AD/BC/BD/CD has 42 core workflows: 12 unchanged,
+4 same-pair/replacement, 20 outgoing pair changes, 4 clear-winner and 2 intro.
+All use real HTTP and finish the actual Phase 2/result path. CD is DvsC in CSV.
+The remaining 66 scenarios cover boundaries, repeated review and failures.
+The directed transition matrix is identical for both modes: each off-diagonal
+cell has two full workflows (one for each target winner); diagonal behavior
+is covered by unchanged review and explicit same-pair restart. No pair is
+excluded: all 30 directed changes are reached per mode, including AB <-> CD,
+AC <-> BD and AD <-> BC. This proves the specified transition branches,
+not every mathematical response combination or random shuffle seed.
+
+PAIR/CSV COVERAGE
+Actual SeparateBlocksQuestionsTiebreak.csv: semicolon CSV, 42 questions, six
+configured pairs, seven questions each. Each includes question number, pair,
+situation, statement, left/right option. Existing loader/mapping tests cover
+all rows and both outcomes for every pair. The real HTTP tests derive choices
+from actual shuffled question/group mappings and parse rendered forms with DOM.
+SeparateBlocksQuestions.csv supplies 36 ordinary questions (nine per group)
+and 12 legacy TB questions (three per group, six per selected pair).
+The legacy questionnaire has class/question_number identifiers, not ordinary
+question IDs. Restoration validates the real legacy structure accordingly.
+
+HTTP VS FUNCTION COVERAGE
+The 318 navigation scenarios use the real copied PHP app, local HTTP server,
+cookies, sessions, rendered controls, token checks and redirects. Ordinary
+scores are obtained by actual answers, not fabricated session totals. Session
+patching is restricted to explicitly named fault injections. The separate
+110-scenario existing HTTP suite covers all Phase 2 tracks, pair/three-way
+ties, invitations, caches, bad inputs and configuration failures. Function-
+level A2/Phase 2 regression counts are reported separately, not added to HTTP
+scenario counts. Both suites use isolated data and stub email IO only.
+
+RESEARCH AND INVITATION INTEGRITY
+Each successful workflow checks one final CSV row, latest ordinary answer
+codes/points/yes-counts, current TB question IDs and counters, Phase 2 mapping
+and final category. Abandoned pair/mode codes must be empty. Normal and
+RATKAISEMATON results are persisted and invitations completed on all A2-D2
+tracks; plain participants are covered too. Failed configuration/session/IO
+paths produce TECHNICAL_ERROR, no personality result and no completed invite.
+The write-failure cases also verify that no result email is triggered. Actual
+mail delivery is stubbed; real invites, historical logs and production data
+are untouched. The research CSV column structure is unchanged.
+
+EXISTING PHASE 1 LIMITATIONS (UNCHANGED)
+Eligibility remains top-two score gap <= 2; YES_MIN remains 5. Three/four
+equal or nearby leaders still admit only the highest two. Equal ordering may
+favor the first group; new TB counter ties use original Phase 1 scores then
+existing order. Legacy final ties retain the existing random choice. These
+are documented algorithm limitations, not approved changes in this task.
+The unused check_tiebreak_needed helper still mentions gap 4; it is not called
+by these routes. Tests verify the active gap-2/gap-3 boundary explicitly.
+Phase 2 unresolved ties retain RATKAISEMATON and completed-result semantics.
+
+FILES IN THE FOCUSED COMMIT
+index.php: navigation, selected display, lifecycle and integrity guards.
+test/phase1_navigation_cases.php: new table-driven real HTTP coverage.
+test/http_workflow_test.php: navigation runner and expired-cookie handling.
+test/http_workflow_cases.php: shared helpers and preserved-answer expectation.
+test/a2_regression_test.php: valid full-answer TB fixtures; scoped safe.directory.
+test/PHASE1_NAVIGATION_MATRIX.json: actual per-scenario machine-readable matrix.
+test/PHASE1_NAVIGATION_REPORT.txt: this plan, findings, results and limits.
+test/FULL_WORKFLOW_REPORT.txt: dated extension of the previous coverage report.
+SeparateBlocksQuestions.csv / SeparateBlocksQuestionsTiebreak.csv: user's
+pre-existing edits included under the standing instruction to include question
+CSVs. Their bytes were not edited by this implementation. All four input
+hashes are recorded with the validation results for reproducibility.
+
+REMAINING UNTESTED / UNSUPPORTED
+- Browser inventory on 2026-10-12 returned no apps or browsers. Desktop/mobile
+  visual layout, actual JavaScript and touch: NOT EXECUTED. DOM assertions prove
+  selected markup, not pixel appearance. Manually verify both TB modes and
+  ordinary selected values on desktop/mobile, return/replace/forward, all four
+  tracks, invited/plain normal/unresolved pages and reset/feedback.
+- Return after TB completion/from Phase 2 is not offered. Last TB answer
+  automatically completes; final-question review is tested before that answer.
+  Forward-from-an-answered-final-question is a defensive completion branch,
+  not normally reachable through this automatically advancing UI.
+- No exhaustive answer vectors, shuffle permutations, all corruption bytes,
+  concurrent requests, process-crash/partial-write/low-disk cases, invitation
+  file write-failure injection, production permissions or actual mail delivery.
+- Existing non-isolated test/run_all_tests.php is NOT EXECUTED because it can
+  touch real data. Isolated current full HTTP and regression suites replace it
+  for this task; it is not reported as PASS.
+- Existing sessions created before this patch are not migrated. Start fresh
+  sessions for the pilot; reset is required after explicit state failure.
+
+CONTROLLED-PILOT ASSESSMENT
+Automated branch coverage supports a limited pilot once the final runs pass.
+Complete the manual desktop/mobile smoke and verify deployment-side writable
+data directories, backup and fresh-session policy first. Concurrent production
+research readiness is not established by serial local tests. No push/deploy.
+
+VALIDATION RESULTS (2026-10-12)
+Existing full HTTP suite: 110 passed, 0 failed, 0 filtered; 69727 passed
+assertions and 12061 real requests. Includes all six pairs and A2-D2,
+two/three-way Phase 2 ties, neutral/unresolved and invitation scenarios.
+New full navigation HTTP suite: 318 passed, 0 failed, 0 filtered/skipped;
+520675 passed assertions, 0 failed assertions and 71516 real requests.
+All 318 were executed in one full run. The generated JSON totals were checked
+against that run; its two repaired-counter expected-track fields were clarified
+using the overlapping targeted revalidation below. No application code changed
+after the final full runs began. Matrix outcomes: 252 VALID_RESULT,
+38 UNRESOLVED_TIE and 28 TECHNICAL_ERROR. Each mode has all 30 directed
+different-pair transitions, with both target winners verified in every cell.
+Function-level full A2 regression: 3857 checks PASS.
+Function-level Phase 2 tiebreak regression: 2343 checks PASS (overlapping
+subset of the full regression, not additional HTTP scenarios).
+PHP syntax: all five changed/new PHP files PASS.
+Code-scoped git diff --check: PASS. Whole-worktree diff --check reports two
+pre-existing user CSV trailing spaces at SeparateBlocksQuestions.csv:53,55;
+these bytes are preserved rather than changing question content in this task.
+Git LF/CRLF notices are normal working-tree conversion notices.
+
+Harness corrections during development: the cookie jar previously retained
+PHP's deleted session cookie literal after reset, allowing test participants
+to collide. It now honors Max-Age=0. The feedback regression submits the actual
+rendered button value. Legacy validation uses its actual class/question_number
+shape. A final targeted repair-counter run rechecked both modes and clarified
+the two repaired scenarios' expected A2 track in the generated metadata:
+2 PASS, 0 FAIL, 316 filtered, 1418 assertions, 265 requests. This is overlapping
+targeted revalidation, not two additional workflow coverage cases.
+
+All final runs used unchanged input SHA256 values:
+InsideBlockQuestions.csv
+  a06bbc0d3bc58b6f35a8be33326d7d2e217cb298647582313ab71a2ebe0b8c60
+SeparateBlocksQuestions.csv
+  fad1038e97f0889c62025c9b24f77e3f8f4e82c8e766e77a3f6b6b4773ebf4f7
+SeparateBlocksQuestionsTiebreak.csv
+  1f021ae3c2a018cd52243822f1c76f48f4ac931208f3bbab03ccfdafb7097483
+TypeDescriptions.csv
+  cf177422eac1e8621288168b19e3295e6c81ae99023327c1d6353c6974d97ed2
+
+REPRODUCE FROM REPOSITORY ROOT (PHP_BINARY starts the local server)
+  php test/http_workflow_test.php
+  php test/http_workflow_test.php --navigation-only --matrix=test/PHASE1_NAVIGATION_MATRIX.json
+  php test/a2_regression_test.php
+  php test/a2_regression_test.php --tiebreak-only
+Optional --match filters are reported as filtered, never counted as passes.
+No dependencies were added. Temporary test data and servers are cleaned up.

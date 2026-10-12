@@ -857,6 +857,7 @@ function generate_phase1_button(int $value, string $side, string $type = 'choice
     
     return '<button class="' . $cssClass . '" type="submit" ' .
            'aria-label="Valinta ' . $value . '" ' .
+           'aria-pressed="' . ($selected ? 'true' : 'false') . '" ' .
            $dataAttr . '="' . $value . '">' . $value . '</button>';
 }
 
@@ -1031,6 +1032,17 @@ function session_validate_state(): void {
          !isset($_SESSION['varPoints']) || !is_array($_SESSION['varPoints']) ||
          ($_SESSION['state'] === 'phase2_tb' && empty($_SESSION['tb2_set'])))) {
         quiz_technical_error('missing_or_invalid_phase2_session');
+    }
+    if (in_array($_SESSION['state'], ['quiz1','tb1_new_intro','tb1_new','tiebreak_intro','tiebreak'], true)) {
+        if (!recalculate_phase1_answers()) { quiz_technical_error('invalid_phase1_session'); return; }
+        if ($_SESSION['state'] === 'quiz1') {
+            $i = $_SESSION['q1_index'] ?? null;
+            if (!is_int($i) || $i < 0 || $i >= count($_SESSION['phase1'])) quiz_technical_error('invalid_phase1_index');
+            elseif (isset($_SESSION['tb1_review_state']) &&
+                (!is_string($_SESSION['tb1_review_state']) ||
+                 !in_array($_SESSION['tb1_review_state'], ['tb1_new','tb1_new_intro','tiebreak','tiebreak_intro'], true) ||
+                 !validate_phase1_tiebreak($_SESSION['tb1_review_state']))) quiz_technical_error('invalid_review_tiebreak');
+        } elseif (!validate_phase1_tiebreak($_SESSION['state'])) quiz_technical_error('invalid_phase1_tiebreak_session');
     }
 }
 
@@ -1747,6 +1759,15 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
                 break;
             }
         }
+        $actions = ['start','choice','navigate','return_to_phase1','return_to_tiebreak',
+                    'tb_choice','tiebreak_navigate','tb1_new_choice','tb1_new_navigate',
+                    'continue_tiebreak','continue_tb1_new','continue_phase2',
+                    'choice2_value','tb2_value','show_feedback','send_feedback'];
+        if (count(array_intersect_key($_POST, array_flip($actions))) > 1 ||
+            array_intersect_key($_POST, array_flip(['question_index','q1_index','tiebreak_index','tb1_new_index','target_index']))) {
+            index_log('POST_REJECTED: multiple actions or forged question index');
+            $_POST = [];
+        }
     }
 }
 
@@ -1806,6 +1827,7 @@ function handle_intro_form(): ?string {
  */
 function initialize_phase1_session(string $nick, string $ennea): void {
     unset($_SESSION['result_saved']);
+    clear_phase1_tiebreak();
     $phase1_all_preview = get_cached_phase1_questions();
     $phase1_index = [];
     foreach ($phase1_all_preview as $q) $phase1_index[(int)$q['id']] = $q['class'];
@@ -1857,6 +1879,126 @@ function initialize_phase1_session(string $nick, string $ennea): void {
     ];
 }
 
+/** Discard only the invalidated Phase 1 tiebreak, including obsolete backups. */
+function clear_phase1_tiebreak(): void {
+    foreach (['tb1_new_questions','tb1_new_answers','tb1_new_counters','tb1_new_index',
+              'tiebreak_classes','tiebreak_set','tiebreak_answers','tiebreak_index',
+              'tiebreak_points','tiebreak_yes','tiebreak_log','tiebreak_ord','tiebreak_set_id',
+              'tb1_context','tb1_review_state','phase1_points_backup','phase1_yes_backup',
+              'last_tiebreak_set','last_tiebreak_answers','original_tiebreak_set',
+              'original_tiebreak_classes','original_tiebreak_answers','prev_tiebreak_set','topClass'] as $key) unset($_SESSION[$key]);
+    foreach (['A1','B1','C1','D1'] as $g) {
+        unset($_SESSION['log_row'][$g.'_tiebreak_points'], $_SESSION['log_row'][$g.'_tiebreak_yes']);
+    }
+    unset($_SESSION['log_row']['tiebreak_log'], $_SESSION['log_row']['class1']);
+    $_SESSION['log_row']['winner'] = '';
+    $_SESSION['log_row']['Phase1_tb'] = 'Ei';
+}
+
+function phase1_tiebreak_context(bool $new): string {
+    $answers = $_SESSION['answers1_by_id'] ?? [];
+    ksort($answers);
+    return hash('sha256', json_encode([$answers, $_SESSION['tiebreak_classes'] ?? [],
+        $_SESSION[$new ? 'tb1_new_questions' : 'tiebreak_set'] ?? []]));
+}
+
+/** Question-ID answers are authoritative; aggregates and CSV records are derived. */
+function recalculate_phase1_answers(): bool {
+    $set = $_SESSION['phase1'] ?? null;
+    $answers = $_SESSION['answers1_by_id'] ?? null;
+    if (!is_array($set) || !$set || !is_array($answers)) return false;
+    $points = $yes = array_fill_keys(['A1','B1','C1','D1'], 0);
+    $records = $ids = [];
+    foreach ($set as $q) {
+        if (!is_array($q) || !isset($q['id'], $q['class'], $q['question_number'], $q['text']) ||
+            !is_int($q['id']) || !is_string($q['class']) || !is_string($q['text']) ||
+            !array_key_exists($q['class'], $points) || isset($ids[$q['id']])) return false;
+        $ids[$q['id']] = true;
+        if (!array_key_exists($q['id'], $answers)) continue;
+        $v = $answers[$q['id']];
+        if (!is_int($v) || $v < 1 || $v > 6) return false;
+        $points[$q['class']] += $v;
+        if ($v >= YES_MIN) $yes[$q['class']]++;
+        $records[] = ['class'=>$q['class'], 'question_number'=>$q['question_number'], 'value'=>$v];
+    }
+    if (array_diff_key($answers, $ids)) return false;
+    $_SESSION['points1'] = $points;
+    $_SESSION['yesCounts1'] = $yes;
+    $_SESSION['answers1'] = $records;
+    return true;
+}
+
+function recalculate_tb1_new_counters(): bool {
+    $questions = $_SESSION['tb1_new_questions'] ?? [];
+    $answers = $_SESSION['tb1_new_answers'] ?? null;
+    if (!is_array($answers)) return false;
+    $counters = array_fill_keys(['A','B','C','D'], 0);
+    foreach ($answers as $i=>$answer) {
+        $q = $questions[$i] ?? null;
+        if (!$q || !is_string($answer)) return false;
+        $g = substr($answer, -1);
+        if (!in_array($g, [$q['block_left'], $q['block_right']], true) || $answer !== $q['question_num'].$g) return false;
+        $counters[$g]++;
+    }
+    $_SESSION['tb1_new_counters'] = $counters;
+    return true;
+}
+
+/** Validate the round before displaying/restoring it; repair only derived totals. */
+function validate_phase1_tiebreak(string $state): bool {
+    $new = str_starts_with($state, 'tb1_new');
+    $set = $_SESSION[$new ? 'tb1_new_questions' : 'tiebreak_set'] ?? null;
+    $answers = $_SESSION[$new ? 'tb1_new_answers' : 'tiebreak_answers'] ?? null;
+    $i = $_SESSION[$new ? 'tb1_new_index' : 'tiebreak_index'] ?? null;
+    $classes = $_SESSION['tiebreak_classes'] ?? null;
+    if (!is_array($set) || !$set || !is_array($answers) || !is_array($classes) ||
+        count(array_filter($classes, 'is_string')) !== count($classes) ||
+        count($classes) !== 2 || count(array_unique($classes)) !== 2 ||
+        array_diff($classes, ['A1','B1','C1','D1']) ||
+        !is_int($i) || $i < 0 || $i >= count($set) || $i > count($answers) ||
+        ($answers && array_keys($answers) !== range(0, count($answers)-1)) ||
+        count($_SESSION['answers1_by_id']) !== count($_SESSION['phase1']) ||
+        ($_SESSION['tb1_context'] ?? '') !== phase1_tiebreak_context($new)) return false;
+    $ids = $present = [];
+    foreach ($set as $q) {
+        if (!is_array($q)) return false;
+        if ($new) {
+            if (!isset($q['question_num'],$q['block_left'],$q['block_right'],$q['statement'],$q['option_left'],$q['option_right']) ||
+                !is_scalar($q['question_num']) || !is_string($q['block_left']) || !is_string($q['block_right']) ||
+                !is_string($q['statement']) || !is_string($q['option_left']) || !is_string($q['option_right']) ||
+                !ctype_digit((string)$q['question_num']) || trim($q['statement']) === '' || trim($q['option_left']) === '' || trim($q['option_right']) === '') return false;
+            $pair = [$q['block_left'].'1', $q['block_right'].'1'];
+            if ($pair[0] === $pair[1] || array_diff($pair, $classes)) return false;
+            $id = $q['question_num'];
+            foreach ($pair as $g) $present[$g] = true;
+        } else {
+            if (!isset($q['class'],$q['question_number'],$q['text']) || !is_string($q['class']) || !is_scalar($q['question_number']) ||
+                !is_string($q['text']) || trim($q['text']) === '' || !in_array($q['class'],$classes,true)) return false;
+            $id = $q['class'].'-'.$q['question_number']; $present[$q['class']] = true;
+        }
+        if (isset($ids[$id])) return false;
+        $ids[$id] = true;
+    }
+    if (count($present) !== 2) return false;
+    if ($new) return recalculate_tb1_new_counters();
+    foreach ($answers as $j=>$v) if (!isset($set[$j]) || !is_int($v) || $v < 1 || $v > 6) return false;
+    recalculate_tiebreak_points();
+    return true;
+}
+
+function restore_phase1_tiebreak(array $tops): bool {
+    $previousState = $_SESSION['tb1_review_state'] ?? null;
+    if ($previousState === null) return false;
+    if (($_SESSION['tiebreak_classes'] ?? []) !== $tops || !validate_phase1_tiebreak($previousState)) {
+        quiz_technical_error('invalid_phase1_tiebreak_restoration');
+        return true;
+    }
+    unset($_SESSION['tb1_review_state']);
+    $_SESSION['state'] = $previousState;
+    index_log('TB1_RESTORE: existing order, selections and index retained');
+    return true;
+}
+
 /**
  * Käsittelee vaihe 1:n vastauksen
  * 
@@ -1889,36 +2031,12 @@ function handle_quiz1_answer(): void {
     $qid = (int)$q['id'];
     $question_number = $q['question_number'] ?? 'unknown';
 
-    // Tarkista onko tähän kysymykseen jo vastattu (uudelleenvastaus)
+    // A real edit invalidates this round; reviewing/submitting the same value does not.
     $previous_answer = $_SESSION['answers1_by_id'][$qid] ?? null;
     $is_revision = ($previous_answer !== null);
-
-    if ($is_revision) {
-        // Vähennetään vanha vastaus pisteistä
-        $_SESSION['points1'][$cls] = ($_SESSION['points1'][$cls] ?? 0) - $previous_answer;
-        if ($previous_answer >= YES_MIN) $_SESSION['yesCounts1'][$cls] = max(0, ($_SESSION['yesCounts1'][$cls] ?? 0) - 1);
-        
-        // Poista vanha vastaus answers1-listasta
-        foreach (($_SESSION['answers1'] ?? []) as $idx => $answer) {
-            if ($answer['class'] === $cls && $answer['question_number'] === $question_number) {
-                unset($_SESSION['answers1'][$idx]);
-                break;
-            }
-        }
-        $_SESSION['answers1'] = array_values($_SESSION['answers1']); // Reindex array
-    }
-
-    // Tallenna uusi vastaus
+    if ($is_revision && $previous_answer !== $n) clear_phase1_tiebreak();
     $_SESSION['answers1_by_id'][$qid] = $n;
-    $_SESSION['points1'][$cls] = ($_SESSION['points1'][$cls] ?? 0) + $n;
-    if ($n >= YES_MIN) $_SESSION['yesCounts1'][$cls] = ($_SESSION['yesCounts1'][$cls] ?? 0) + 1;
-
-    // Store answer with class, question_number and value for logging in order
-    $_SESSION['answers1'][] = [
-        'class' => $cls,
-        'question_number' => $question_number,
-        'value' => $n
-    ];
+    if (!recalculate_phase1_answers()) { quiz_technical_error('invalid_phase1_answers'); return; }
 
     // Siirry aina seuraavaan kysymykseen vastauksen jälkeen (myös uudelleenvastaus)
     $_SESSION['q1_index'] = $i + 1;
@@ -1943,9 +2061,9 @@ function handle_quiz1_navigation(): void {
     if ($direction === 'prev' && $current_index > 0) {
         $_SESSION['q1_index'] = $current_index - 1;
         index_log('QUIZ1 NAVIGATE: Moving back to question ' . ($_SESSION['q1_index'] + 1));
-    } elseif ($direction === 'next' && $current_index < $total) {
-        $_SESSION['q1_index'] = $current_index + 1;
-        index_log('QUIZ1 NAVIGATE: Moving forward to question ' . ($_SESSION['q1_index'] + 1));
+    } elseif ($direction === 'next' && isset($set[$current_index], $_SESSION['answers1_by_id'][$set[$current_index]['id']])) {
+        if ($current_index === $total - 1) handle_quiz1_completion();
+        else $_SESSION['q1_index'] = $current_index + 1;
     }
 }
 
@@ -1961,8 +2079,9 @@ function handle_tiebreak_navigation(): void {
     if ($direction === 'back' && $current_index > 0) {
         $_SESSION['tiebreak_index'] = $current_index - 1;
         index_log('TIEBREAK NAVIGATE: Moving back to question ' . ($_SESSION['tiebreak_index'] + 1));
-    } elseif ($direction === 'forward' && $current_index < $total - 1) {
-        $_SESSION['tiebreak_index'] = $current_index + 1;
+    } elseif ($direction === 'forward' && isset($_SESSION['tiebreak_answers'][$current_index])) {
+        if ($current_index < $total - 1) $_SESSION['tiebreak_index'] = $current_index + 1;
+        else handle_tiebreak_completion();
         index_log('TIEBREAK NAVIGATE: Moving forward to question ' . ($_SESSION['tiebreak_index'] + 1));
     }
 }
@@ -1971,37 +2090,13 @@ function handle_tiebreak_navigation(): void {
  * Käsittelee paluun Phase 1:een tiebreakista
  */
 function handle_return_to_phase1(): void {
-    $target_index = (int)($_POST['return_to_phase1'] ?? 0);
-    $phase1_set = $_SESSION['phase1'] ?? [];
-    
-  if ($target_index >= 0 && $target_index < count($phase1_set)) {
-    // Palauta pisteet ja kyllä-laskurit varmuuskopiosta
-    if (isset($_SESSION['phase1_points_backup'])) {
-      $_SESSION['points1'] = $_SESSION['phase1_points_backup'];
-      $_SESSION['yesCounts1'] = $_SESSION['phase1_yes_backup'] ?? [];
-    }
-    // Tallenna nykyinen tiebreak-setti ja vastaukset varmuuskopioon
-    if (isset($_SESSION['tiebreak_set']) && isset($_SESSION['tiebreak_answers'])) {
-      $_SESSION['last_tiebreak_set'] = $_SESSION['tiebreak_set'];
-      $_SESSION['last_tiebreak_answers'] = $_SESSION['tiebreak_answers'];
-    }
-    $_SESSION['q1_index'] = $target_index;
+    $last = count($_SESSION['phase1'] ?? []) - 1;
+    $target = filter_var($_POST['return_to_phase1'] ?? null, FILTER_VALIDATE_INT);
+    if ($target === false || $target !== $last || $last < 0) return;
+    $_SESSION['tb1_review_state'] = $_SESSION['state'];
+    $_SESSION['q1_index'] = $last;
     $_SESSION['state'] = 'quiz1';
-    index_log('RETURN TO PHASE1: Going back to Phase 1 question ' . ($target_index + 1));
-    // Kirjaa pisteet ja kyllä-laskurit lokiin
-    $pts = $_SESSION['points1'] ?? [];
-    $yes = $_SESSION['yesCounts1'] ?? [];
-    index_log('PHASE1 STATUS: points=' . json_encode($pts) . ', yesCounts=' . json_encode($yes));
-    $url = $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET);
-    // If headers already sent, set pending_redirect for JS fallback
-    if (!headers_sent()) {
-      header('Location: ' . $url);
-      exit;
-    } else {
-      $_SESSION['pending_redirect'] = $url;
-      index_log('RETURN TO PHASE1: Headers already sent, queued JS redirect to ' . $url);
-    }
-  }
+    index_log('RETURN TO PHASE1: reviewing ordinary answers; tiebreak retained');
 }
 
 /**
@@ -2028,6 +2123,9 @@ function check_tiebreak_needed(): bool {
  * Käsittelee vaihe 1:n loppuun saattamisen
  */
 function handle_quiz1_completion(): void {
+    if (isset($_SESSION['phase1']) && (!recalculate_phase1_answers() || count($_SESSION['answers1_by_id']) !== count($_SESSION['phase1']))) {
+        quiz_technical_error('incomplete_phase1_answers'); return;
+    }
     foreach (['A1','B1','C1','D1'] as $k) {
         $_SESSION['log_row'][$k]      = (int)($_SESSION['points1'][$k] ?? 0);
         $_SESSION['log_row'][$k.'_yes']= (int)($_SESSION['yesCounts1'][$k] ?? 0);
@@ -2073,6 +2171,7 @@ function handle_quiz1_completion(): void {
 
   index_log('QUIZ1: Phase1 complete (scores: A1=' . ($pts['A1'] ?? 0) . ', B1=' . ($pts['B1'] ?? 0) . ', C1=' . ($pts['C1'] ?? 0) . ', D1=' . ($pts['D1'] ?? 0) . ', candidates=' . implode(',', $tops) . ')');
 
+  if (restore_phase1_tiebreak($tops)) return;
   if (count($tops) === 1) {
     handle_single_winner($tops[0]);
   } else {
@@ -2199,6 +2298,7 @@ function handle_quiz1_tie(array $tops): void {
  * @param array $tops Tasapelissä olevat luokat
  */
 function handle_quiz1_tie_new(array $tops): void {
+  clear_phase1_tiebreak();
   // Alusta uusi tiebreak
   $allBlocks = get_cached_phase1_tiebreak_blocks();
   
@@ -2267,6 +2367,7 @@ function handle_quiz1_tie_new(array $tops): void {
   $_SESSION['tb1_new_counters'] = ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0];
   $_SESSION['tb1_new_answers'] = [];
   $_SESSION['tiebreak_classes'] = $tops; // Keep for compatibility
+  $_SESSION['tb1_context'] = phase1_tiebreak_context(true);
   
   $_SESSION['state'] = 'tb1_new_intro';
   $questionCount = count($filteredQuestions);
@@ -2281,6 +2382,7 @@ function handle_quiz1_tie_new(array $tops): void {
  * @param array $tops Tasapelissä olevat luokat
  */
 function handle_quiz1_tie_old(array $tops): void {
+  clear_phase1_tiebreak();
   // If more than two candidate classes, pick the two with highest "kyllä" counts
   if (count($tops) > 2) {
     $yc = $_SESSION['yesCounts1'] ?? [];
@@ -2307,28 +2409,6 @@ function handle_quiz1_tie_old(array $tops): void {
   $_SESSION['tiebreak_classes'] = $tops;
   $tbAll = get_cached_tiebreak_questions();
   $tbPool = [];
-  $tops_key = implode('-', $tops);
-  // Jos luokat ovat samat kuin edellisellä tiebreak-kerralla, käytä alkuperäistä järjestystä
-  $restored_answers = [];
-  $last_answered = 0;
-  if (isset($_SESSION['original_tiebreak_classes']) && $_SESSION['original_tiebreak_classes'] === $tops_key && isset($_SESSION['original_tiebreak_set'])) {
-    $tbPool = $_SESSION['original_tiebreak_set'];
-    index_log('TIEBREAK: Using original question order (no shuffle)');
-    // Palauta vanhat vastaukset vain tyhjiin kohtiin
-    if (isset($_SESSION['original_tiebreak_answers']) && is_array($_SESSION['original_tiebreak_answers'])) {
-      foreach ($tbPool as $idx => $q) {
-        if (isset($_SESSION['tiebreak_answers'][$idx]) && $_SESSION['tiebreak_answers'][$idx] !== null) {
-          // Käyttäjän uusi vastaus, älä ylikirjoita
-          $restored_answers[$idx] = $_SESSION['tiebreak_answers'][$idx];
-        } elseif (isset($_SESSION['original_tiebreak_answers'][$idx])) {
-          $restored_answers[$idx] = $_SESSION['original_tiebreak_answers'][$idx];
-          if ($_SESSION['original_tiebreak_answers'][$idx] !== null) $last_answered = $idx + 1;
-        } else {
-          $restored_answers[$idx] = null;
-        }
-      }
-    }
-  } else {
     foreach ($tops as $clsTB) {
       $tbKey = $clsTB[0].'11';
       $arr = $tbAll[$tbKey] ?? [];
@@ -2339,40 +2419,16 @@ function handle_quiz1_tie_old(array $tops): void {
       }
     }
     shuffle($tbPool);
-    // Tallenna alkuperäinen järjestys ja luokat
-    $_SESSION['original_tiebreak_set'] = $tbPool;
-    $_SESSION['original_tiebreak_classes'] = $tops_key;
-    // Tallenna myös vastaukset, jos niitä on
-    if (isset($_SESSION['tiebreak_answers']) && is_array($_SESSION['tiebreak_answers'])) {
-      $_SESSION['original_tiebreak_answers'] = $_SESSION['tiebreak_answers'];
-    } else {
-      $_SESSION['original_tiebreak_answers'] = [];
-    }
-    index_log('TIEBREAK: Shuffled and saved original question order');
-  }
-    // Backup original Phase 1 points before tiebreak
-    $_SESSION['phase1_points_backup'] = $_SESSION['points1'];
-    $_SESSION['phase1_yes_backup'] = $_SESSION['yesCounts1'];
-    $new_set_id = md5(json_encode($tbPool));
-    $old_set_id = $_SESSION['tiebreak_set_id'] ?? null;
     $_SESSION['tiebreak_set']   = $tbPool;
-    if (empty($tbPool)) {
+    if (empty($tbPool) || array_diff($tops, array_column($tbPool, 'class'))) {
         quiz_technical_error('missing_phase1_tiebreak_questions');
         return;
     }
-    $_SESSION['tiebreak_set_id'] = $new_set_id;
-    // Restore answers
-    if (!empty($restored_answers)) {
-        $_SESSION['tiebreak_answers'] = $restored_answers;
-        $_SESSION['tiebreak_index'] = ($last_answered < count($tbPool)) ? $last_answered : 0;
-    } else {
-        $_SESSION['tiebreak_answers'] = [];
-        $_SESSION['tiebreak_index'] = 0;
-    }
-    // Save current set for future restoration
-    $_SESSION['prev_tiebreak_set'] = $tbPool;
-    $_SESSION['tiebreak_log']   = [];
-    $_SESSION['tiebreak_ord']   = [];
+    $_SESSION['tiebreak_set_id'] = md5(json_encode($tbPool));
+    $_SESSION['tiebreak_answers'] = [];
+    $_SESSION['tiebreak_index'] = 0;
+    $_SESSION['tb1_context'] = phase1_tiebreak_context(false);
+    recalculate_tiebreak_points();
   // Enter tiebreak intro state (show instructions before actual tiebreak questions)
   $_SESSION['state'] = 'tiebreak_intro';
   index_log('STATE CHANGE: quiz1 -> tiebreak_intro_old (tied_classes=' . implode(',', $tops) . ', tb_questions=' . count($tbPool) . ')');
@@ -2389,6 +2445,7 @@ function handle_tb1_new_answer(): void {
     }
     
     $selectedBlock = $_POST['tb1_new_choice']; // Block letter: 'A', 'B', 'C', or 'D'
+    if (!is_string($selectedBlock)) return;
     $index = (int)($_SESSION['tb1_new_index'] ?? 0);
     $questions = $_SESSION['tb1_new_questions'] ?? [];
     
@@ -2405,11 +2462,10 @@ function handle_tb1_new_answer(): void {
         return;
     }
     
-    // Increment block counter
-    $_SESSION['tb1_new_counters'][$selectedBlock] = ($_SESSION['tb1_new_counters'][$selectedBlock] ?? 0) + 1;
-    
-    // Save answer for logging: \"questionNum+Block\" (e.g., \"2A\")
-    $_SESSION['tb1_new_answers'][] = $q['question_num'] . $selectedBlock;
+    // Replace the indexed selection, then derive counters from all latest answers.
+    $_SESSION['tb1_new_answers'][$index] = $q['question_num'] . $selectedBlock;
+    ksort($_SESSION['tb1_new_answers']);
+    if (!recalculate_tb1_new_counters()) { quiz_technical_error('invalid_tb1_answers'); return; }
     
     index_log('TB1_NEW ANSWER: Q' . ($index + 1) . '/7 block=' . $selectedBlock . ' (counters: A=' . ($_SESSION['tb1_new_counters']['A'] ?? 0) . ', B=' . ($_SESSION['tb1_new_counters']['B'] ?? 0) . ', C=' . ($_SESSION['tb1_new_counters']['C'] ?? 0) . ', D=' . ($_SESSION['tb1_new_counters']['D'] ?? 0) . ')');
     
@@ -2432,6 +2488,10 @@ function handle_tb1_new_answer(): void {
  * Määrittää uuden tiebreakn voittajan
  */
 function handle_tb1_new_completion(): void {
+    $questions = $_SESSION['tb1_new_questions'] ?? [];
+    if (!$questions || count($_SESSION['tb1_new_answers'] ?? []) !== count($questions) || !recalculate_tb1_new_counters()) {
+        quiz_technical_error('incomplete_tb1_answers'); return;
+    }
     $counters = $_SESSION['tb1_new_counters'] ?? ['A' => 0, 'B' => 0, 'C' => 0, 'D' => 0];
     $phase1_points = $_SESSION['points1'] ?? [];
     $tiedClasses = $_SESSION['tiebreak_classes'] ?? [];
@@ -2507,20 +2567,11 @@ function handle_tb1_new_navigation(): void {
     $current_index = (int)($_SESSION['tb1_new_index'] ?? 0);
     
     if ($direction === 'back' && $current_index > 0) {
-        // Move back one question
         $_SESSION['tb1_new_index'] = $current_index - 1;
-        
-        // Remove last answer and decrement corresponding counter
-        if (!empty($_SESSION['tb1_new_answers'])) {
-            $lastAnswer = array_pop($_SESSION['tb1_new_answers']);
-            // Extract block letter (last character of answer string like "2A")
-            $block = substr($lastAnswer, -1);
-            if (isset($_SESSION['tb1_new_counters'][$block]) && $_SESSION['tb1_new_counters'][$block] > 0) {
-                $_SESSION['tb1_new_counters'][$block]--;
-            }
-        }
-        
         index_log('TB1_NEW NAV: Back to Q' . ($_SESSION['tb1_new_index'] + 1));
+    } elseif ($direction === 'forward' && isset($_SESSION['tb1_new_answers'][$current_index])) {
+        if ($current_index < count($_SESSION['tb1_new_questions']) - 1) $_SESSION['tb1_new_index'] = $current_index + 1;
+        else handle_tb1_new_completion();
     }
     
     header('Location: ' . $_SERVER['PHP_SELF']);
@@ -2581,36 +2632,15 @@ if (isset($_GET['oldTB1']) && $_GET['oldTB1'] == '1') {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (($_SESSION['state'] ?? '') === 'intro') {
         $error = handle_intro_form();
+    } elseif (in_array($_SESSION['state'] ?? '', ['tb1_new','tb1_new_intro','tiebreak','tiebreak_intro'], true) && isset($_POST['return_to_phase1'])) {
+        handle_return_to_phase1();
     } elseif (($_SESSION['state'] ?? '') === 'quiz1' && isset($_POST['choice'])) {
         handle_quiz1_answer();
     } elseif (($_SESSION['state'] ?? '') === 'quiz1' && isset($_POST['navigate'])) {
         handle_quiz1_navigation();
   } elseif (($_SESSION['state'] ?? '') === 'quiz1' && isset($_POST['return_to_tiebreak'])) {
-    // Restore tiebreak state and go directly to tiebreak
-    if (!empty($_SESSION['last_tiebreak_set']) && !empty($_SESSION['last_tiebreak_answers'])) {
-      $_SESSION['tiebreak_set'] = $_SESSION['last_tiebreak_set'];
-      $_SESSION['tiebreak_answers'] = $_SESSION['last_tiebreak_answers'];
-      $_SESSION['tiebreak_set_id'] = md5(json_encode($_SESSION['tiebreak_set']));
-      $_SESSION['tiebreak_index'] = 0;
-      // Restore tiebreak classes
-      $classes = [];
-      foreach ($_SESSION['tiebreak_set'] as $tbq) {
-        if (isset($tbq['class']) && !in_array($tbq['class'], $classes)) {
-          $classes[] = $tbq['class'];
-        }
-      }
-      $_SESSION['tiebreak_classes'] = $classes;
-      $_SESSION['state'] = 'tiebreak';
-      index_log('RETURN TO TIEBREAK: Navigated directly from Phase 1 to tiebreak (classes=' . implode(',', $classes) . ')');
-      $url = $_SERVER['PHP_SELF'] . '?' . http_build_query($_GET);
-      if (!headers_sent()) {
-        header('Location: ' . $url);
-        exit;
-      } else {
-        $_SESSION['pending_redirect'] = $url;
-        index_log('RETURN TO TIEBREAK: Headers already sent, queued JS redirect to ' . $url);
-      }
-    }
+    // Compatibility action follows the same eligibility check as ordinary Next.
+    if (($_SESSION['q1_index'] ?? -1) === count($_SESSION['phase1']) - 1) handle_quiz1_completion();
     }
 }
 
@@ -2634,8 +2664,7 @@ function handle_tiebreak_answer(int $choice): void {
     
   // Store answer for this index
   $_SESSION['tiebreak_answers'][$i] = $choice;
-  // Päivitä myös original_tiebreak_answers
-  $_SESSION['original_tiebreak_answers'][$i] = $choice;
+  ksort($_SESSION['tiebreak_answers']);
     
     // Recalculate all points from tiebreak answers
     recalculate_tiebreak_points();
@@ -2712,6 +2741,11 @@ function recalculate_tiebreak_points(): void {
  * Käsittelee tiebreak-vaiheen loppuun saattamisen
  */
 function handle_tiebreak_completion(): void {
+  $set = $_SESSION['tiebreak_set'] ?? [];
+  if (!$set || count($_SESSION['tiebreak_answers'] ?? []) !== count($set)) {
+      quiz_technical_error('incomplete_legacy_tiebreak_answers'); return;
+  }
+  recalculate_tiebreak_points();
   // Use tiebreak-only aggregates to determine final path; do not mix with original phase1 points
   $tbPoints = $_SESSION['tiebreak_points'] ?? ['A1'=>0,'B1'=>0,'C1'=>0,'D1'=>0];
   $tbYes = $_SESSION['tiebreak_yes'] ?? ['A1'=>0,'B1'=>0,'C1'=>0,'D1'=>0];
@@ -3067,9 +3101,6 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && (($_SESSION['state'] ?? '')
     handle_tb1_new_answer();
   } elseif (isset($_POST['tb1_new_navigate'])) {
     handle_tb1_new_navigation();
-  } elseif (isset($_POST['tb1_new_skip'])) {
-    // Jos ei ole kysymyksiä, siirrytään suoraan lopputulokseen
-    handle_tb1_new_completion();
   }
 }
 
@@ -3743,6 +3774,13 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
   </div>
 <?php endif; ?>
 
+<?php if (in_array($_SESSION['state'] ?? '', ['tb1_new_intro','tb1_new','tiebreak_intro','tiebreak'], true)): ?>
+  <form method="post" class="navigation-controls">
+    <input type="hidden" name="return_to_phase1" value="<?= count($_SESSION['phase1']) - 1 ?>">
+    <button type="submit" class="btn">← Takaisin vaiheeseen 1</button>
+  </form>
+<?php endif; ?>
+
 <?php if (($_SESSION['state'] ?? '') === 'intro'):
     $oldNick  = h($_POST['nickname'] ?? ($_SESSION['nickname'] ?? ''));
     $oldEnnea = isset($_POST['ennea']) ? (string)$_POST['ennea'] : '';
@@ -3992,7 +4030,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
         <?php 
         // Näytä "Seuraava" -painike jos on jo vastattu tähän kysymykseen ja on lisää kysymyksiä
         $current_answer = $_SESSION['answers1_by_id'][$q['id']] ?? null;
-        if ($current_answer !== null && $i < $total - 1): ?>
+        if ($current_answer !== null): ?>
           <form method="post" style="margin: 0;">
             <input type="hidden" name="navigate" value="next">
             <button type="submit" class="btn" style="font-size: 14px; padding: 8px 12px;">
@@ -4003,32 +4041,6 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           <div></div>
         <?php endif; ?>
 
-          <?php
-          // Näytä "Seuraava (lisäkysymykset)" -painike vain viimeisen vaiheen 1 kysymyksen yhteydessä
-          if (
-            $i === $total - 1 &&
-            // Do not show navigation to tiebreak any more
-            false
-          ) {
-            // Varmista että tiebreak-luokat vastaavat nykyisiä pisteitä
-            $pts = $_SESSION['points1'] ?? [];
-            arsort($pts);
-            $max = reset($pts);
-            $tops = array_keys(array_filter($pts, function($v) use ($max) { return $v === $max; }));
-            $last_classes = [];
-            foreach ($_SESSION['last_tiebreak_set'] as $tbq) {
-              if (isset($tbq['class']) && !in_array($tbq['class'], $last_classes)) {
-                $last_classes[] = $tbq['class'];
-              }
-            }
-            // Jos tiebreak-luokat vastaavat nykyisiä pisteitä, näytä nappi
-            if (count(array_diff($tops, $last_classes)) === 0 && count($tops) === count($last_classes)) {
-              ?>
-              <!-- navigation to tiebreak disabled -->
-              <?php
-            }
-          }
-          ?>
       </div>
       
       <div class="mobile-hint">
@@ -4240,7 +4252,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           
           <?php 
           // Näytä "Seuraava" -painike jos on jo vastattu tähän kysymykseen ja on lisää kysymyksiä
-          if ($currentAnswer !== null && $i < $total - 1): ?>
+          if ($currentAnswer !== null): ?>
             <form method="post" style="margin: 0;">
               <input type="hidden" name="tiebreak_navigate" value="forward">
               <button type="submit" class="btn" style="font-size: 14px; padding: 8px 12px;">
@@ -4470,6 +4482,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
       $rightOpt = $q['option_right'] ?? '';
       $leftBlock = $q['block_left'] ?? '';
       $rightBlock = $q['block_right'] ?? '';
+      $currentGroup = isset($_SESSION['tb1_new_answers'][$i]) ? substr($_SESSION['tb1_new_answers'][$i], -1) : null;
     ?>
   
   <div class="row"><h2>Vaihe 1 - Lisäkysymykset</h2>
@@ -4496,7 +4509,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           <div style="padding: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
             <form method="post" style="margin: 0;">
               <input type="hidden" name="tb1_new_choice" value="<?= h($leftBlock) ?>">
-              <button type="submit" class="btn btn-left" style="width: 100%; font-size: 16px; padding: 12px;">
+              <button type="submit" class="btn btn-left<?= $currentGroup === $leftBlock ? ' selected' : '' ?>" aria-pressed="<?= $currentGroup === $leftBlock ? 'true' : 'false' ?>" style="width: 100%; font-size: 16px; padding: 12px;">
                 Enemmän tätä mieltä
               </button>
             </form>
@@ -4513,7 +4526,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           <div style="padding: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
             <form method="post" style="margin: 0;">
               <input type="hidden" name="tb1_new_choice" value="<?= h($rightBlock) ?>">
-              <button type="submit" class="btn btn-right" style="width: 100%; font-size: 16px; padding: 12px;">
+              <button type="submit" class="btn btn-right<?= $currentGroup === $rightBlock ? ' selected' : '' ?>" aria-pressed="<?= $currentGroup === $rightBlock ? 'true' : 'false' ?>" style="width: 100%; font-size: 16px; padding: 12px;">
                 Enemmän tätä mieltä
               </button>
             </form>
@@ -4538,7 +4551,12 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
       <?php else: ?>
         <div></div>
       <?php endif; ?>
-      <div></div>
+      <?php if ($currentGroup !== null): ?>
+        <form method="post" style="margin: 0;">
+          <input type="hidden" name="tb1_new_navigate" value="forward">
+          <button type="submit" class="btn">Seuraava →</button>
+        </form>
+      <?php endif; ?>
     </div>
     
     <div class="mobile-hint">

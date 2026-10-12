@@ -235,3 +235,26 @@ lopulliset ajot ovat vihreita. Ennen pilottia tee ylla oleva desktop/mobiili-
 smoke, varmista palvelimen kirjoitusoikeudet ja varmuuskopiointi seka aloita
 uusilla sessioilla. Suuren rinnakkaisen tutkimusajon valmiutta ei talla
 paikallisella sarjallisella ajolla ole osoitettu. Ei automaattista julkaisua.
+
+LAAJENNUS 2026-10-12: PHASE 1 PALUU JA VALINTOJEN SAILYMINEN
+Tama paivays korvaa ylla olevan vanhan rajoitteen, jonka mukaan paluu TB1:sta
+tavalliseen Phase 1:een ei ollut HTTP/UI-reitityksessa. Paluu on nyt toteutettu
+sekä nykyiselle parivertailulle etta legacylle. Aiempi valinta nakyy valittuna;
+takaisin/eteenpain sailyttaa vastaukset, muutos korvaa aiemman ja laskee pisteet
+uudelleen. Muuttumaton tavallisten kysymysten tarkistus palauttaa saman kierroksen.
+Todellinen tavallisen vastauksen muutos aloittaa tarvittaessa uuden TB-kierroksen.
+
+Yksityiskohtainen suunnitelma, kriittinen arvio, lopulliset ajoluvut, tiedostot,
+syotteiden nykyiset hashit, rajat ja pilottiarvio:
+  test/PHASE1_NAVIGATION_REPORT.txt
+Jokainen uuden 318-skenaarion sarjan tapaus ja sen todellinen HTTP-tulos:
+  test/PHASE1_NAVIGATION_MATRIX.json
+Kaikki kuusi paria ja kaikki 30 suunnattua parinvaihtoa molemmissa tiloissa;
+molemmat kohdevoittajat, valinnan korvaus, palautus, virheet ja koko Phase 2.
+Vanhan raportin hashit/ajoluvut kuvaavat sen omaa aiempaa ajoa; laajennuksen
+nykyiset ajot ja kayttajan jo muuttamien CSV:iden hashit ovat uudessa raportissa.
+
+Uusi eristetty ajo repojuuresta:
+  php test/http_workflow_test.php --navigation-only --matrix=test/PHASE1_NAVIGATION_MATRIX.json
+Vanha 110-skenaarion HTTP-sarja ja molemmat regressioajot ajetaan myos uudelleen.
+Pisteytyspolitiikka ja tutkimus-CSV:n sarakkeet sailyvat. Ei pushia/julkaisua.

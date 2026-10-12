@@ -1,90 +1,92 @@
-﻿/* tämä on kommenttirivin aloitusmerkki;;;
-;;;
-/* Tässä tiedosssa on väittämiä testausta varten;;;
-;;;
-;;;
-"/* A1 -tagilla merkityt rivit on 4-tyyppiväittämiä,johon mahdollinen 4-tyyppi reagoi myönteisesti, ""kyllä"" vastauksella";;;
-/* A11 -tagilla merkityt rivit on samanlaisia 4-tyyppiväittämiä,ja nämä ovat lisäkysymyksiä, jos ensimmäisilleä kysymyksillä ei saada selkeää tulosta ja joudutaantasapeliin toisen ryhmän kanssa;;;
-/* 9.10.2026, A-ryhmän kysymyksiä muokattu kattamaan myös 7 ja9 tyyppejä;;;
-/* B, C ja D tagit ovat vastaavasti koodattuja. B tarkoittaa 3,7,8 väittämiä, D tarkoittaa 2,6,9 väittämiä ja C tarkoittaa 1,5,6 väittämiä;;;
-;;;
-/* Huom! Tyyppi 6 on tarkoituksella mukna C ja D väittämissä;;;
-;;;
-/* Huom! Perusväittämiä voi olla maksimissaan 40 kpl (eli 8 per ryhmä) ja lisäkysymyksiä10 (eli 5 per ryhmä);;;
-/* Kopioitu EG testikansiosta 15.9 ;;;
-/* Nyt  näitä on 7 peruskysymystä ja 3 lisäkysymystä - tavoite on 6+3;;;
-/* 23.9.25 Nyt  näitä on 9 peruskysymystä ja 3 lisäkysymystä - tavoite on 6+3;;;
-;;;
-;;;
-;;;
-;;;
-;;;
-;;;
-/* Tässä nelosväittämät,mutta niitä laajennettu hieman jotta osuisi 4-7-9 ryhmään (9.10.26);;;
-/* Huom! A11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;;
-A1;1;Minusta tuntuu usein, etten aivan kuulu joukkoon, vaikka olisin osa ryhmää.;
-A1;2;Minulle on tyypillistä ilmaista tunteitani ja persoonallisuuttani luovalla ja omaperäisellä tavalla;
-A1;3;Palaan mielessäni usein menneisiin kokemuksiin ja niiden herättämiin tunteisiin.;
-A1;4;Minulle aitous on jopa tärkeämpää kuin se, että kaikki hyväksyisivät minut.;
-A1;5;Olen erityisen herkkä estetiikalle, kauneudelle tai ympäristöni tunnelmille.;
-A1;6;Luulen, että tunteeni ovat syvempiä tai monimutkaisempia  kuin ihmisillä keskimäärin.;
-A1;7;Minulle on tyypillistä ryhmässä  aistia, missä tunnetilassa muut ovat, ja nämä tunnetilat vaikuttavat voimakkaasti omaan olotilaani.;
-/* 9.10.26;8;"Ajatellaan, että olet onnistunut liittymään johonkin ryhmään tai  työyhteisöön, jossa voit hyvin. Kun sinulta kysyttäisiin, miksi olet tyytyväinen kuulumisestasi tähän ryhmään, vastauksesi voisi luontevasti olla esimerkiksi:"" Vaikka ryhmässä on välillä voimakkaitakin erilaisia mielipiteitä, se tuntuu aidosti erilaiselta. Ihmiset ovat luovia ja syviä ja arvostavat yksilöllisyyttä.""";
-A1 ;8;Saatan pysähtyä ihastelemaan maisemaa, valoa tai jotakin muuta kaunista, vaikka minulla olisi muuta tekemistä.;
-/* 9.10.26;9;Minun on vaikea teeskennellä olevani hyväntuulinen, jos oikeasti en ole.;
-A1;9;Jos jokin tekeminen alkaa tuntua ikävältä, jätän sen joskus kesken ja teen jotain muuta.;
-A11;10;Minulle on tyypillistä ryhmässä  aistia, missä tunnetilassa muut ovat, ja nämä tunnetilat vaikuttavat voimakkaasti omaan olotilaani.;
-A11;11;Olen erityisen herkkä estetiikalle, kauneudelle tai ympäristöni tunnelmille.;
-A11;12;Minulle on tyypillistä ilmaista tunteitani ja persoonallisuuttani luovalla ja omaperäisellä tavalla;
-;;;
-/* ; Tässä on 3-7-8 väittämät;;
-/* Huom! B11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;;
-B1;14;Minulla on usein tapana ottaa ohjat, kun ryhmän johtoasema on epäselvä.;
-B1;15;Minulle on luontevaa esitellä aikaansaannoksiani, tai ideoitani muille tuntematta siitä epämukavuutta.;
-B1;16;Minulle on luontevaa lähteä liikkeelle jonkin asian suhteen, vaikka tilanteessa olisikin vielä epäselvyyttä.;
-/* 9.10.26;17;Minulla on taipumus lisätä vauhtia ja etsiä mahdollisuuksia ennemmin kuin hidastaa, kun kohtaan vastoinkäymisiä.;
-B1;17;Jos jokin asia ei onnistu, en jää sitä pitkäksi aikaa harmittelemaan vaan kokeilen jotain muuta;
-B1;18;Minulle on tyypillistä tarttua uuteen mahdollisuuteen heti, vaikka en olisi ehtinyt analysoida kaikkia riskejä.;
-/* 9.10.26;19;Paine ja kilpailu sytyttävät minut parhaaseen suoritukseeni.;
-B1;19;Minua alkaa helposti ärsyttää, jos asioista vain puhutaan eikä mitään tapahdu.;
-B1;20;Minulle on luontevaa ottaa tilaa keskustelussa ja viedä sitä johonkin suuntaan, varsinkin jos alkuperäinen suunta ei minua miellytä.;
-B1;21;Jos jotakin asiaa pitäisi edistää,  ja se edellyttäisi tuntemattomalle ihmiselle soittamista, minä kuulun niihin, jotka eivät koe asiassa mitään epämukavaa. ;
-B1;22;Minulle on luontevaa tarttua tilaisuuteen heti, vaikka en olisi täysin valmistautunut. Luotan siihen, että onnistun viemään asian loppuun.;
-B11;23;Jos jotakin asiaa pitäisi edistää,  ja se edellyttäisi tuntemattomalle ihmiselle soittamista, minä kuulun niihin, jotka eivät koe asiassa mitään epämukavaa. ;
-B11;24;Minulle on luontevaa tarttua tilaisuuteen heti, vaikka en olisi täysin valmistautunut. Luotan siihen, että onnistun viemään asian loppuun.;
-B11;25;Minulle on tyypillistä tarttua uuteen mahdollisuuteen heti, vaikka en olisi ehtinyt analysoida kaikkia riskejä.;
-;;;
-/* ; Tässä on 1-5-6 väittämät;;
-/* Huom! C11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;;
-C1;27;Vietän usein aikaa yksin pohdiskellen.;
-C1;28;Koen, että minun on kerättävä paljon tietoa ennen kuin voin tehdä päätöksen tai aloittaa toiminnan.;
-/* 9.10.26;29;Huomaan usein virheet, riskit ja puutteet jo varhaisessa vaiheessa, koska koen vastuukseni varmistaa, että asiat tehdään oikein ja turvallisesti.;
-C1;29;Huomaan usein asioissa virheitä, puutteita tai riskejä, joita muut eivät ole huomanneet.;
-C1;30;Minusta tuntuu erittäin epämukavalta improvisoida tärkeässä tilanteessa ilman etukäteisvalmistautumista.;
-C1;31;Haluan yleensä tarkistaa faktojen paikkansapitävyyden itse ennen kuin voin luottaa niihin.;
-C1;32;Pysähdyn usein miettimään seurauksia ennen kuin sanon jotakin tärkeää, koska pelkään, että väärin muotoiltu viesti voisi johtaa virheisiin tai väärinkäsityksiin.;
-/* 9.10.26;33;Haluan mieluummin varmistaa asian oikeellisuuden useasta lähteestä kuin luottaa kuulemaani tietoon.;
-C1;33;Minua häiritsee, jos jokin asia päätetään ennen kuin sitä on kunnolla selvitetty.;
-/* 9.10.26;34;Minusta on tärkeää valmistautua kunnolla etukäteen, jotta voin olla varma onnistumisesta.;
-C1;34;En mielelläni lupaa hoitaa tehtävää ennen kuin tiedän, mitä sen tekeminen vaatii.;
-C1;35;Pysähdyn usein miettimään seurauksia ennen kuin toimin, koska en halua tehdä virheitä.;
-C11;36;Minusta tuntuu erittäin epämukavalta, jos joudun improvisoimaan tärkeässä tilanteessa ilman etukäteisvalmistautumista;
-C11;37;Pysähdyn usein miettimään seurauksia ennen kuin toimin, koska en halua tehdä virheitä.;
-C11;38;Vietän usein aikaa yksin pohdiskellen.;
-;;;
-/* ; Tässä on 2-6-9 väittämät;;
-/* Huom! D11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;;
-D1;40;Minulle on tärkeämpää säilyttää hyvä ilmapiiri ja välttää ristiriitoja kuin ajaa mielipiteitäni ihmissuhteiden kustannuksella.;
-D1;41;Minulle on tyypillistä mukautua muiden odotuksiin tai tarpeisiin, vaikka se olisi ristiriidassa oman alkuperäisen ajatukseni kanssa.;
-D1;42;"Minun on vaikeaa sanoa ""ei"", jos pelkään sen loukkaavan toista, vaikka tietäisin, että pyyntö ei sovi minulle.";
-D1;43;Minulle on tyypilllistä asettaa ihmissuhteiden säilyminen edelle, vaikka se tarkoittaisi omien toiveideni lykkäämistä.;
-/* 9.10.26;44;Huomaan joskus muuttavani omaa mielipidettäni kesken keskustelun, jotta välttäsin suuremman erimielisyyden.;
-D1;44;Suostun usein muiden ehdotukseen, vaikka itse haluaisin tehdä jotain muuta.;
-D1;45;Huomioin usein muiden tunteet tai reaktiot jo ennen kuin pysähdyn miettimään, mitä itse haluan tai tarvitsen.;
-/* 9.10.26;46;Minulle on silloin tällöin tyypillistä olla ulkoisesti myötämielinen asiaan, vaikka sisäisesti kokisinkin asian toisin. Toimin näin, koska en halua rikkoa ryhmän harmoniaa.;
-D1;46;Jos joku vaikuttaa tyytymättömältä minuun, alan helposti miettiä, olenko tehnyt jotain väärin.;
-D1;47;Pidän usein mielipiteeni itselläni, jos sen ilmaiseminen voisi horjuttaa hyvää ilmapiiriä.;
-D1;48;Minusta on helpompi mukautua ryhmän päätökseen kuin yrittää saada muut näkemään asiat minun tavallani.;
-D11;49;Minulle on tyypilllistä asettaa ihmissuhteiden säilyminen edelle, vaikka se tarkoittaisi omien toiveideni lykkäämistä.;
-D11;50;Huomioin usein muiden tunteet tai reaktiot jo ennen kuin pysähdyn miettimään, mitä itse haluan tai tarvitsen.;
-D11;51;Pidän usein mielipiteeni itselläni, jos sen ilmaiseminen voisi horjuttaa hyvää ilmapiiriä.;
+﻿/* tämä on kommenttirivin aloitusmerkki;;
+;;
+/* Tässä tiedosssa on väittämiä testausta varten;;
+;;
+;;
+"/* A1 -tagilla merkityt rivit on 4-tyyppiväittämiä,johon mahdollinen 4-tyyppi reagoi myönteisesti, ""kyllä"" vastauksella";;
+/* A11 -tagilla merkityt rivit on samanlaisia 4-tyyppiväittämiä,ja nämä ovat lisäkysymyksiä, jos ensimmäisilleä kysymyksillä ei saada selkeää tulosta ja joudutaantasapeliin toisen ryhmän kanssa;;
+/* 9.10.2026, A-ryhmän kysymyksiä muokattu kattamaan myös 7 ja9 tyyppejä;;
+/* B, C ja D tagit ovat vastaavasti koodattuja. B tarkoittaa 3,7,8 väittämiä, D tarkoittaa 2,6,9 väittämiä ja C tarkoittaa 1,5,6 väittämiä;;
+;;
+/* Huom! Tyyppi 6 on tarkoituksella mukna C ja D väittämissä;;
+;;
+/* Huom! Perusväittämiä voi olla maksimissaan 40 kpl (eli 8 per ryhmä) ja lisäkysymyksiä10 (eli 5 per ryhmä);;
+/* Kopioitu EG testikansiosta 15.9 ;;
+/* Nyt  näitä on 7 peruskysymystä ja 3 lisäkysymystä - tavoite on 6+3;;
+/* 23.9.25 Nyt  näitä on 9 peruskysymystä ja 3 lisäkysymystä - tavoite on 6+3;;
+;;
+;;
+;;
+;;
+;;
+;;
+/* Tässä nelosväittämät,mutta niitä laajennettu hieman jotta osuisi 4-7-9 ryhmään (9.10.26);;
+/* Huom! A11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+A1;1;Minusta tuntuu usein, etten aivan kuulu joukkoon, vaikka olisin osa ryhmää.
+A1;2;Minulle on tyypillistä ilmaista tunteitani ja persoonallisuuttani luovalla ja omaperäisellä tavalla.
+A1;3;Palaan mielessäni usein menneisiin kokemuksiin ja niiden herättämiin tunteisiin.
+A1;4;Minulle aitous on jopa tärkeämpää kuin se, että kaikki hyväksyisivät minut.
+A1;5;Olen erityisen herkkä estetiikalle, kauneudelle tai ympäristöni tunnelmille.
+A1;6;Kun koen jotain ikävää, en yleensä yritä heti päästä siihen liittyvästä tunteesta eroon.
+/* 11.10.26;6;Luulen, että tunteeni ovat syvempiä tai monimutkaisempia kuin ihmisillä keskimäärin.
+/* 11.10.26;7;Minulle on tyypillistä ryhmässä aistia, missä tunnetilassa muut ovat, ja nämä tunnetilat vaikuttavat voimakkaasti omaan olotilaani.
+A1;7;Koen joskus, että olen erilainen kuin muut, vaikka kukaan ei sitä minulle sanoisi.
+/* 9.10.26;8;"Ajatellaan, että olet onnistunut liittymään johonkin ryhmään tai  työyhteisöön, jossa voit hyvin. Kun sinulta kysyttäisiin, miksi olet tyytyväinen kuulumisestasi tähän ryhmään, vastauksesi voisi luontevasti olla esimerkiksi:"" Vaikka ryhmässä on välillä voimakkaitakin erilaisia mielipiteitä, se tuntuu aidosti erilaiselta. Ihmiset ovat luovia ja syviä ja arvostavat yksilöllisyyttä."""
+A1 ;8;Saatan pysähtyä ihastelemaan maisemaa, valoa tai jotakin muuta kaunista, vaikka minulla olisi muuta tekemistä.
+/* 9.10.26;9;Minun on vaikea teeskennellä olevani hyväntuulinen, jos oikeasti en ole.
+A1;9;Jos jokin tekeminen alkaa tuntua ikävältä, jätän sen joskus kesken ja teen jotain muuta.
+A11;10;Palaan mielessäni usein menneisiin kokemuksiin ja niiden herättämiin tunteisiin.
+A11;11;Olen erityisen herkkä estetiikalle, kauneudelle tai ympäristöni tunnelmille.
+A11;12;Minulle on tyypillistä ilmaista tunteitani ja persoonallisuuttani luovalla ja omaperäisellä tavalla.
+;;
+/* ; Tässä on 3-7-8 väittämät;
+/* Huom! B11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+B1;14;Minulla on usein tapana ottaa ohjat, kun ryhmän johtoasema on epäselvä.
+B1;15;Minulle on luontevaa esitellä aikaansaannoksiani tai ideoitani muille tuntematta siitä epämukavuutta.
+B1;16;Minulle on luontevaa lähteä liikkeelle jonkin asian suhteen, vaikka tilanteessa olisikin vielä epäselvyyttä.
+/* 9.10.26;17;Minulla on taipumus lisätä vauhtia ja etsiä mahdollisuuksia ennemmin kuin hidastaa, kun kohtaan vastoinkäymisiä.
+B1;17;Jos jokin asia ei onnistu, en jää sitä pitkäksi aikaa harmittelemaan vaan kokeilen jotain muuta.
+B1;18;Minulle on tyypillistä tarttua uuteen mahdollisuuteen heti, vaikka en olisi ehtinyt analysoida kaikkia riskejä.
+/* 9.10.26;19;Paine ja kilpailu sytyttävät minut parhaaseen suoritukseeni.
+B1;19;Minua alkaa helposti ärsyttää, jos asioista vain puhutaan eikä mitään tapahdu.
+B1;20;Minulle on luontevaa ottaa tilaa keskustelussa ja viedä sitä johonkin suuntaan, varsinkin jos alkuperäinen suunta ei minua miellytä.
+B1;21;Jos jotakin asiaa pitäisi edistää, ja se edellyttäisi tuntemattomalle ihmiselle soittamista, minä kuulun niihin, jotka eivät koe asiassa mitään epämukavaa. 
+B1;22;Minulle on luontevaa tarttua tilaisuuteen heti, vaikka en olisi täysin valmistautunut. Luotan siihen, että onnistun viemään asian loppuun.
+B11;23;Jos jotakin asiaa pitäisi edistää,  ja se edellyttäisi tuntemattomalle ihmiselle soittamista, minä kuulun niihin, jotka eivät koe asiassa mitään epämukavaa. 
+B11;24;Minulle on luontevaa tarttua tilaisuuteen heti, vaikka en olisi täysin valmistautunut. Luotan siihen, että onnistun viemään asian loppuun.
+B11;25;Minulle on tyypillistä tarttua uuteen mahdollisuuteen heti, vaikka en olisi ehtinyt analysoida kaikkia riskejä.
+;;
+/* ; Tässä on 1-5-6 väittämät;
+/* Huom! C11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+C1;27;Vietän usein aikaa yksin pohdiskellen.
+C1;28;Koen, että minun on kerättävä paljon tietoa ennen kuin voin tehdä päätöksen tai aloittaa toiminnan.
+/* 9.10.26;29;Huomaan usein virheet, riskit ja puutteet jo varhaisessa vaiheessa, koska koen vastuukseni varmistaa, että asiat tehdään oikein ja turvallisesti.
+C1;29;Huomaan usein asioissa virheitä, puutteita tai riskejä, joita muut eivät ole huomanneet.
+C1;30;Minusta tuntuu erittäin epämukavalta improvisoida tärkeässä tilanteessa ilman etukäteisvalmistautumista.
+C1;31;Haluan yleensä tarkistaa faktojen paikkansapitävyyden itse ennen kuin voin luottaa niihin.
+C1;32;Pysähdyn usein miettimään seurauksia ennen kuin sanon jotakin tärkeää, koska pelkään, että väärin muotoiltu viesti voisi johtaa virheisiin tai väärinkäsityksiin.
+/* 9.10.26;33;Haluan mieluummin varmistaa asian oikeellisuuden useasta lähteestä kuin luottaa kuulemaani tietoon.
+C1;33;Minua häiritsee, jos jokin asia päätetään ennen kuin sitä on kunnolla selvitetty.
+/* 9.10.26;34;Minusta on tärkeää valmistautua kunnolla etukäteen, jotta voin olla varma onnistumisesta.
+C1;34;En mielelläni lupaa hoitaa tehtävää ennen kuin tiedän, mitä sen tekeminen vaatii.
+C1;35;Pysähdyn usein miettimään seurauksia ennen kuin toimin, koska en halua tehdä virheitä.
+C11;36;Minusta tuntuu erittäin epämukavalta, jos joudun improvisoimaan tärkeässä tilanteessa ilman etukäteisvalmistautumista.
+C11;37;Pysähdyn usein miettimään seurauksia ennen kuin toimin, koska en halua tehdä virheitä.
+C11;38;Vietän usein aikaa yksin pohdiskellen.
+;;
+/* ; Tässä on 2-6-9 väittämät;
+/* Huom! D11 - kysymykset ovat  samoja kuin peruskysymykset, tarkoituksella;;
+D1;40;Minulle on tärkeämpää säilyttää hyvä ilmapiiri ja välttää ristiriitoja kuin ajaa mielipiteitäni ihmissuhteiden kustannuksella.
+D1;41;Minulle on tyypillistä mukautua muiden odotuksiin tai tarpeisiin, vaikka se olisi ristiriidassa oman alkuperäisen ajatukseni kanssa.
+D1;42;"Minun on vaikeaa sanoa ""ei"", jos pelkään sen loukkaavan toista, vaikka tietäisin, että pyyntö ei sovi minulle."
+D1;43;Minulle on tyypillistä asettaa ihmissuhteiden säilyminen edelle, vaikka se tarkoittaisi omien toiveideni lykkäämistä.
+/* 9.10.26;44;Huomaan joskus muuttavani omaa mielipidettäni kesken keskustelun, jotta välttäsin suuremman erimielisyyden.
+D1;44;Suostun usein muiden ehdotukseen, vaikka itse haluaisin tehdä jotain muuta.
+D1;45;Huomioin usein muiden tunteet tai reaktiot jo ennen kuin pysähdyn miettimään, mitä itse haluan tai tarvitsen.
+/* 9.10.26;46;Minulle on silloin tällöin tyypillistä olla ulkoisesti myötämielinen asiaan, vaikka sisäisesti kokisinkin asian toisin. Toimin näin, koska en halua rikkoa ryhmän harmoniaa.
+D1;46;Jos joku vaikuttaa tyytymättömältä minuun, alan helposti miettiä, olenko tehnyt jotain väärin.
+D1;47;Pidän usein mielipiteeni itselläni, jos sen ilmaiseminen voisi horjuttaa hyvää ilmapiiriä.
+D1;48;Minusta on helpompi mukautua ryhmän päätökseen kuin yrittää saada muut näkemään asiat minun tavallani.
+D11;49;Minulle on tyypillistä asettaa ihmissuhteiden säilyminen edelle, vaikka se tarkoittaisi omien toiveideni lykkäämistä.
+D11;50;Huomioin usein muiden tunteet tai reaktiot jo ennen kuin pysähdyn miettimään, mitä itse haluan tai tarvitsen.
+D11;51;Pidän usein mielipiteeni itselläni, jos sen ilmaiseminen voisi horjuttaa hyvää ilmapiiriä.

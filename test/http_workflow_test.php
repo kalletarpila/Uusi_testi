@@ -7,6 +7,7 @@ $sandbox = create_isolated_app($root, true);
 $checks = $passed = $failed = $requests = $skipped = 0;
 $match = null; foreach ($argv as $arg) if (str_starts_with($arg,'--match=')) $match=substr($arg,8);
 $failures = [];
+$navigationOnly = in_array('--navigation-only', $argv, true);
 function verify(bool $ok, string $message): void {
     global $checks;
     $checks++;
@@ -37,7 +38,7 @@ class Participant {
             $status = (int)($m[1] ?? 0); $this->statuses[] = $status;
             $location = '';
             foreach ($http_response_header as $h) {
-                if (preg_match('/^Set-Cookie: PHPSESSID=([^;]*)/i', $h, $m)) $this->cookie = $m[1];
+                if (preg_match('/^Set-Cookie: PHPSESSID=([^;]*)/i', $h, $m)) $this->cookie = stripos($h,'Max-Age=0') !== false ? '' : $m[1];
                 if (stripos($h, 'Location:') === 0) $location = trim(substr($h, 9));
             }
             if ($location && in_array($status,[302,303],true)) {
@@ -176,6 +177,10 @@ foreach (['InsideBlockQuestions.csv','SeparateBlocksQuestions.csv','SeparateBloc
 $groups=['A2'=>['4','7','9'],'B2'=>['3','7','8'],'C2'=>['1','5','6'],'D2'=>['2','6','9']];
 $originals=[]; foreach (['InsideBlockQuestions.csv','SeparateBlocksQuestions.csv','SeparateBlocksQuestionsTiebreak.csv'] as $file) $originals[$file]=file_get_contents($sandbox.'/'.$file);
 try {
+    if ($navigationOnly) {
+        require __DIR__.'/http_workflow_cases.php'; // Shared fixtures only in this mode.
+        require __DIR__.'/phase1_navigation_cases.php';
+    } else {
     foreach ($groups as $track=>$types) foreach ($types as $target) scenario("normal $track -> $target",function()use($base,$sandbox,$track,$target){$p=new Participant($base,$sandbox);$p->reach($track);$p->phase2(favor($target));$p->finish($target);});
 
     scenario('CSV Unicode and semicolon nickname',function()use($base,$sandbox){$p=new Participant($base,$sandbox);$p->begin('Ääkköset; tutkija');$p->phase1(['A1'=>6,'B1'=>1,'C1'=>1,'D1'=>1]);$p->phase2(favor('4'));$r=$p->finish('4');verify($r['nick']==='Ääkköset; tutkija'&&mb_check_encoding($r['nick'],'UTF-8'),'Unicode nickname intact');});
@@ -192,6 +197,7 @@ try {
 
     if (!in_array('--probe',$argv,true)) {
         require __DIR__.'/http_workflow_cases.php';
+    }
     }
 } finally {
     proc_terminate($process); proc_close($process);

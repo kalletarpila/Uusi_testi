@@ -10,7 +10,7 @@
 9;BvsD;3–7–8 vs 2–6–9;Saat uuden idean, joka voisi edistää projektia.;Tuon idean esiin heti ja ehdotan konkreettisia askeleita, joilla se saadaan nopeasti kokeiluun.;Pohdin ensin, miten idea vaikuttaisi muihin ja miten sen voisi esitellä lempeästi, jotta kaikki kokevat sen turvalliseksi.
 10;BvsD;3–7–8 vs 2–6–9;Joku antaa sinulle epäreilua kritiikkiä.;Otan asian suoraan esiin ja selvitän tilanteen nopeasti, koska en halua epäselvyyksien jäävän ilmaan.;Pyrin ensin rauhoittamaan tilanteen ja ymmärtämään toisen näkökulman, jotta ristiriita ei kasva.
 11;BvsD;3–7–8 vs 2–6–9;Liityt uuteen ryhmään, jossa et tunne ketään.;Otan aktiivisesti ohjat ja esittelen itseni rohkeasti, jotta saan nopeasti luotua kontaktit ja rytmin tekemiseen.;Tarkkailen ensin ryhmän ilmapiiriä ja dynamiikkaa ja liityn joukkoon rauhallisesti, jotta luon hyvän yhteyden muihin.
-12;BvsD;3–7–8 vs 2–6–9;Tiimissä joku tarvitsee apua ja hän on selvästi kuormittunut;Kysyn nopeasti, miten voin auttaa, ja voin otan häneltä tehtävän haltuuni tehokkaasti.;Tarjoan apuani empaattisesti ja pyrin varmistamaan, että toinen tuntee olonsa tuetuksi ja rauhalliseksi.
+12;BvsD;8 vs 2;Huomaat, että ystäväsi tarvitsee apua hankalan tehtävän kanssa.;Tartun asiaan ja alan selvittää, miten tehtävä saadaan hoidettua.;Kysyn ystävältäni, miten voisin parhaiten auttaa häntä.
 13;BvsD;3–7–8 vs 2–6–9;Et saa heti haluamaasi päätöstä.;Painan asiaa eteenpäin ja esitän perustelut suoraan.;Otan tilanteen maltillisesti ja pyrin ymmärtämään, mikä muita mietityttää, jotta voimme löytää yhteisen ratkaisun.
 14;BvsD;3–7–8 vs 2–6–9;Työpaikalla tarvitaan nopea ratkaisu.;Teen ehdotuksen ja vien päätöksen ripeästi loppuun.;Koetan silti varmistaa lyhyesti, että ratkaisu tuntuu muista hyväksyttävältä.
 15;DvsC;2–6–9 vs 1–5–6;Olet uudessa työryhmässä.;Pyrin luomaan lämpimän ja turvallisen ilmapiirin ja tunnustelemaan ryhmän tapaa toimia.;Haluan nopeasti selkeän käsityksen tavoitteista ja työnjaosta.
@@ -27,17 +27,17 @@
 26;AvsB;9 vs 8;Olet mukana porukassa, jossa syntyy erimielisyyttä siitä, miten jokin asia pitäisi tehdä.;Haluan ensin kuulla muiden näkemyksiä ja ymmärtää, miksi he ajattelevat eri tavalla.;Kerron suoraan oman näkemykseni ja pyrin saamaan asian etenemään.
 27;AvsB;4 vs 3;Kukaan ei tunnu ymmärtävän sinua.;Yritän selittää, miltä tämä minusta tuntuu, jotta toinen ymmärtäisi paremmin.;Siirryn eteenpäin ja keskityn tuloksiin, jotka puhuvat puolestaan.
 28;AvsB;4 vs 8;Olet saanut aikaan jotain tärkeää, mutta muut eivät ole tyytyväisiä tapaasi toimia.;Minua jää vaivaamaan, etteivät muut ymmärtäneet tapaani tehdä asiaa.;Minulle riittää, että sain asian hoidettua, vaikka muut eivät pitäisi tavastani toimia.
-29;AvsC;4 vs 1–5–6;Edessäsi on tärkeä päätös, mutta et ole vielä varma, mikä vaihtoehto olisi paras.;Mietin, mikä vaihtoehto tuntuisi minulle itselleni sopivimmalta.;Haluan selvittää vaihtoehtojen hyvät ja huonot puolet ennen päätöstä.
-30;AvsC;4 vs 1–5–6;Sinua ohjataan noudattamaan uusia sääntöjä.;Mietin hetken, sopiiko tämä tapa minulle ja tuntuuko se luontevalta.;Noudatan ohjeita tarkasti, sillä ne tuovat selkeyttä.
-31;AvsC;4 vs 1–5–6;Saat palautetta, joka ei tunnu mukavalta.;Tämä herättää minussa tunteita, ja pohdin, miksi se tuntuu tältä.;Erotan faktat tunteista ja etsin käytännön kehityskohtia.
-32;AvsC;4 vs 1–5–6;Olet uudessa sosiaalisessa tilanteessa.;Hakeudun mieluummin tilanteisiin, joissa voin olla oma itseni.;Tarkkailen tilannetta ja etsin rakenteita, joiden kautta toimia.
-33;AvsC;4 vs 1–5–6;Tulet erimielisyyteen jonkun kanssa.;Haluan ymmärtää paremmin, miksi tämä herättää minussa tunteita.;Selvitän konkreettisen erimielisyyden ja etsin rationaalisen ratkaisun.
-34;AvsC;4 vs 1–5–6;Suunnittelet tulevaa.;Mietin, millainen suunta tuntuisi minulle hyvältä ja omalta.;Laadin realistisen suunnitelman resurssien ja riskien mukaan.
-35;AvsC;4 vs 1–5–6;Koet vaikeuksia arjessa.;Pysähdyn miettimään, miksi tämä painaa minua ja mitä tarvitsisin voidakseni paremmin.;Etsin syyn ja teen ratkaisusuunnitelman.
-36;AvsD;4 vs 2–6–9;Teet päätöksen, joka vaikuttaa myös muihin.;Valitsen sen, mikä tuntuu minulle oikealta.;Valitsen vaihtoehdon, joka tukee yhteistä hyvää ja pitää ilmapiirin tasapainoisena.
-37;AvsD;4 vs 2–6–9;Ystäväsi kertoo sinulle asiasta, joka on ollut hänelle vaikea;Haluan kuulla tarkemmin, miltä asia on hänestä tuntunut.;Kysyn, voisinko jotenkin auttaa häntä.
-38;AvsD;4 vs 2–6–9;Sinulla on ristiriita läheisen kanssa.;Tämä herättää minussa paljon tunteita, ja haluan ymmärtää, mistä ne tulevat.;Pyrin kuuntelemaan toista ja löytämään sovittelevan tavan edetä ilman vastakkainasettelua.
-39;AvsD;4 vs 2–6–9;Joku ei ymmärrä sinua.;Yritän kertoa selkeämmin, miltä asia minusta tuntuu.;Yritän selittää asian lempeästi ja huomioida toisen tunteet, jotta yhteys säilyy.
-40;AvsD;4 vs 2–6–9;Et saa tarvitsemaasi huomiota.;Tämä tuntuu minusta pahalta ja mietin, miksi se koskettaa minua näin.;Pidän tilanteen rauhallisena ja etsin tapaa olla yhteydessä toisiin ilman, että syntyy kitkaa.
-41;AvsD;4 vs 2–6–9;Ajattelet tulevaisuutta.;Mietin, millainen elämä tuntuisi minulle hyvältä ja sopivalta.;Ajattelen, mikä tuo minulle ja läheisilleni turvaa ja tasapainoa.
-42;AvsD;4 vs 2–6–9;Olet stressaantunut.;Tämä tuntuu minussa voimakkaasti ja mietin, mikä elämässäni kuormittaa.;Pyrin rauhoittumaan, keventämään tilannetta ja hakemaan tukea tai lohtua läheisiltä.
+29;AvsC;4 vs 5;Löydät uuden harrastuksen, joka kiinnostaa sinua.;Haluan tehdä sitä omalla tavallani.;Haluan ymmärtää, miten siinä kaikki toimii.
+30;AvsC;7 vs 1;Yhteiseen tekemiseen sovitaan uudet säännöt, jotka rajoittavat sitä, miten voit toimia.;Minua harmittaa, jos en voi enää tehdä asioita yhtä vapaasti kuin ennen.;Minusta on hyvä, että kaikilla on selkeät säännöt, joita noudattaa.
+31;AvsC;4 vs 5;Saat palautetta tekemästäsi asiasta, johon olet nähnyt paljon vaivaa.;Palaute jää helposti vaivaamaan minua.;Haluan selvittää, mihin palaute perustuu.
+32;AvsC;4 vs 1;Teet jotain omalla tavallasi, mutta joku huomauttaa, ettei se ole oikea tapa toimia.;Minulle on tärkeää tehdä asia omalla tavallani.;Haluan varmistaa, että teen asian oikein.
+33;AvsC;9 vs 6;Yhteiseen tekemiseen tulee yllättävä muutos, eikä vielä tiedetä, miten asiat järjestyvät.;Suhtaudun muutokseen rauhallisesti ja annan asioiden selvitä aikanaan.;Alan selvittää, mitä muutos tarkoittaa ja mihin pitäisi varautua.
+34;AvsC;7 vs 5;Saat mahdollisuuden kokeilla jotain, mitä et ole aikaisemmin tehnyt.;Lähden mielelläni kokeilemaan.;Haluan ensin perehtyä asiaan.
+35;AvsC;9 vs 5;Ystäväsi kertoo sinulle ongelmasta, johon hän ei tiedä ratkaisua.;Kuuntelen rauhassa ja annan hänen kertoa asiasta.;Alan miettiä, mistä ongelma johtuu ja miten sen voisi ratkaista.
+36;AvsD;7 vs 6;Ystäväsi ehdottaa, että lähtisitte yhdessä kokeilemaan jotain uutta, mutta ette vielä tiedä tarkasti, mitä se pitää sisällään.;Innostun ajatuksesta ja lähden mielelläni mukaan.;Haluan ensin selvittää tarkemmin, mihin olemme ryhtymässä.
+37;AvsD;4 vs 2;Ystäväsi kertoo sinulle asiasta, joka on ollut hänelle vaikea.;Haluan kuulla tarkemmin, miltä asia on hänestä tuntunut.;Kysyn, voisinko jotenkin auttaa häntä.
+38;AvsD;7 vs 2;Ystäväsi kertoo sinulle uudesta asiasta, josta hän on innostunut.;Innostun itsekin ja alan keksiä, mitä kaikkea siihen voisi liittyä.;Haluan kuulla lisää siitä, miksi asia on hänelle tärkeä.
+39;AvsD;4 vs 6;Joku kyseenalaistaa sinulle tärkeän valinnan.;Haluan kertoa, miksi valinta tuntuu minulle oikealta.;Alan miettiä, onko valinnassani jotain, mitä en ole huomannut.
+40;AvsD;7 vs 6;Ystäväsi ehdottaa, että lähtisitte matkalle paikkaan, jossa kumpikaan ei ole aikaisemmin käynyt.;Alan innostuneena miettiä, mitä kaikkea matkalla voisi kokea.;Alan selvittää, mitä matkalla pitäisi ottaa huomioon.
+41;AvsD;4 vs 2;Sinulta odotetaan jotain, mikä ei tunnu sinulle itsellesi luontevalta.;Haluan toimia omalla tavallani.;Yritän vastata muiden odotuksiin.
+42;AvsD;4 vs 6;Olet tehnyt itsellesi tärkeän päätöksen. Läheisesi kertoo, miksi päätös saattaa olla huono.;Luotan omaan tunteeseeni siitä, että päätös on oikea.;Alan pohtia, ovatko läheiseni esittämät epäilyt aiheellisia.
