@@ -1,0 +1,284 @@
+RINNAKKAISET KAYTTAJAT / TUTKIMUSAINEISTON EHEYS — 2026-10-12
+
+LAHTOTILANNE JA TOIMITUS
+Alku-HEAD: 03d4447d640eeb2e339ae1a34d8ae4ff136e5640, haara dev.
+Loppu-HEAD: taman raportin sisaltava kohdennettu commit; tarkka SHA toimitus-
+viestissa ja git rev-parse HEAD -tuloksessa toimituksen jalkeen. Raportti ei voi
+sisaltaa oman commitinsa SHA:ta muuttamatta kyseista SHA:ta.
+Ei pushia, julkaisua, oikeita sahkoposteja tai tuotantoaineiston muutoksia.
+
+Kriittinen arvio kattoi index.php:n, invite.php:n, session alustuksen/sulkemisen,
+CSV-kirjoituksen, kutsu-JSONin, sovelluslokit, mail-kutsujen jarjestyksen,
+POST-tokenit, eristetyn HTTP-kehyksen ja aiemmat integraatioraportit.
+Pisteytys, kysymystekstit, tulosluokittelu ja tutkimus-CSV:n 136 saraketta sailyvat.
+
+MUUTETUT TIEDOSTOT
+index.php: atominen kutsuvaraus/paivitys, CSV-idempotenssi ja tallennusvirheet.
+invite.php: uuden kutsun lisays saman JSON-transaktion sisalla.
+storage.php (uusi): vakaat sivutiedostolukot ja atominen tiedoston julkaisu.
+test/isolated_app.php: storage mukaan kopioon, lukittu mail-stub, PHP-tokenien
+  kasittely myos interpoloiduissa merkkijonoissa eristysfunktioita korvattaessa.
+test/http_workflow_test.php: nykyiset HTTP-apurit kaytettavissa kirjastona.
+test/a2_regression_test.php: fixturekohtainen sessionId pysyvaa deduplikointia varten.
+test/concurrent_support.php: workerit, HTTP-generaattori ja mittaus.
+test/concurrent_workflow_test.php: kuormaprofiilit ja kilpailutilanteiden toistot.
+test/concurrent_failure_test.php: 21 hallittua virheskenaariota.
+test/FULL_WORKFLOW_REPORT.txt: paivatty viittaus tahan laajennukseen.
+Tama raportti ja test/CONCURRENCY_*.json-nayttoaineistot: BEFORE, SHARING_BEFORE,
+OWNERSHIP_BEFORE, INITIAL_LOAD, GENERATOR_LIMIT, PROBES, FAILURES, RESULTS_FINAL
+ja NAVIGATION_MATRIX. Kysymys-CSV:t ja historialliset tulosaineistot eivat muutu.
+
+TOISTETUT ONGELMAT JA RAJATUT KORJAUKSET
+1. Append haki loppukohdan ennen lukitusta. Kymmenesta deterministisesti
+   samanaikaisesta kirjoituksesta sailyi yksi. Seek tapahtuu nyt lukon sisalla;
+   lyhyet kirjoitukset kirjoitetaan loppuun ja havaittu virhe palauttaa pituuden.
+2. Kutsun read-modify-write oli eri luku/kirjoituslukoissa: vain 1/10 eri kutsun
+   completed-paivityksesta sailyi. Luku, tarkistus, muutos ja julkaisu ovat nyt
+   saman sivutiedostolukon sisalla, myos invite.php:n todellisessa lisaysreitissa.
+3. Otsikon olemassaolotarkistus ja kirjoitus olivat erillaan: otsikot monistuivat.
+   Otsikko, rivien tarkistus, sessionId-deduplikointi ja uusi rivi jakavat nyt lukon.
+4. Saman accepted-kutsun varasi kymmenen eri istuntoa. Nyt expiry/omistaja
+   tarkistetaan JSON-transaktiossa; accepted_session_id sitoo varauksen yhteen
+   istuntoon. Sama istunto jatkaa, completed ei palaudu acceptediksi.
+   Nama nelja toistettiin alku-HEADilla: CONCURRENCY_BEFORE.json.
+5. Windows-lukijan tilapainen jakamiskielto esti valmiin valitiedoston renamea.
+   Oikea 600 ms lukijaprosessi toisti ongelman. Julkaisua yritetaan nyt uudelleen
+   enintaan noin 4 s. Pitka kielto antaa teknisen virheen, vanhat tavut sailyvat.
+   SHARING_BEFORE kuvaa valivaihetta ennen tata korjausta, ei alku-HEADin ajoa.
+6. Valivaiheen completed-no-op ohitti omistajan tarkistuksen. Vieraan istunnon
+   statuskutsu toisti taman; omistaja tarkistetaan nyt ennen no-op-palautusta.
+   OWNERSHIP_BEFORE kuvaa tata rajattua valivaiheen toistoa.
+
+Session start/write -virhe ei saa nayttaa onnistunutta tilasiirtymaa.
+session_write_close voi palauttaa true myos handlerin write-virheessa; sulkemisen
+varoitukset otetaan talteen ja puskuroitu vastaus vaihdetaan HTTP 503:ksi.
+Kutsupaivityksen virhe ilmoitetaan teknisena virheena myos CSV:n jo tallennuttua.
+Identtinen viimeisen POSTin uusinta ei lisaa toista rivia, RESULT-tietuetta tai
+mail-stubia. Ristiriitainen checkpoint-uusinta hylataan; alkuperainen rivi sailyy.
+
+Vakaata path.lock-tiedostoa lukitaan datafilen korvaamisesta riippumatta.
+CSV/JSONia ei tyhjenneta ensin: satunnainen saman hakemiston temp-tiedosto
+kirjoitetaan loppuun, fflush/fsync suoritetaan ja rename julkaisee sen.
+CSV-lukukahva suljetaan ennen renamea Windowsia varten. Vioittunutta JSONia ei
+korvata tyhjalla. LOCK_NB-uusintavali on 10 ms, lukon odotus noin 4 s.
+Tallennusoperaation aikaraja ei ole osallistujamaaraan perustuva kayttajaraja.
+
+ERISTYS, TOPOLOGIA JA TODISTE TODELLISESTA RINNAKKAISUUDESTA
+Windows, PHP CLI 8.4.13 (D:\php\php.exe). Vain 127.0.0.1 ja jokaiselle profiilille
+oma valiaikainen sovelluskopio/data/session.save_path. Kysymystiedostot kopioidaan
+lukemalla. Oikeita kutsuja, lokitiedostoja, istuntoja tai mail-palvelimia ei kayteta.
+Kopiossa eristetaan vain datahakemistot, mail-IO ja testin havainnointi.
+Normaalikuormassa ei ole testin lisaamia viiveita tai pisteytysohituksia.
+
+Yksi PHP-kehityspalvelin on yksisaikeinen. Testi kayttaa min(osallistujat,30)
+ERILLISTA PHP-palvelinprosessia, joilla on sama data- JA session.save_path.
+Osallistujan perakkaiset pyynnot kiertavat eri workerien kautta.
+1/10/30-profiileissa on 1/10/30 workeria, 50/100/200:ssa 30.
+Generaattorin 40 socketin katto ja aikarajat suojaavat kehityskonetta.
+200 tarkoittaa 200 aktiivista osallistujaa 30 PHP-workerin palvelussa,
+ei 200 samanaikaisesti suorittavaa PHP-prosessia. Tuotannon asetuksia ei muutettu.
+Sovelluksessa ei ole aktiivisten kayttajien laskuria, kiinteaa osallistujajonoa,
+30/200 kayttajan kattoa tai kayttajasemaforia. Kirjoituslukko sarjallistaa yhden
+tiedoston muutokset; fyysista rajatonta palvelinkapasiteettia ei vaiteta.
+
+Ramp: uusi osallistuja 20 ms valein. Burst: aloitus yhdessa ja kaikki odottavat
+oikealla viimeisella Phase2/TB2-kysymyksella ennen vastaus-POSTien vapauttamista
+yhdessa. Myos valmistumisruuhka ja ensimmaisen CSV:n luonti testataan HTTP:ssa.
+Korkeampi profiili suoritetaan vain edellisen onnistuttua.
+
+Jokaisesta pyynnosta tallennetaan PHP:n alku/loppu, PID ja sessionId.
+RESULTS_FINAL.json: max overlap seka overlap_witness todellisine aikavaleineen.
+Todistajat tarkistetaan: eri PIDit, yhteinen aikavali, maara vastaa maksimia
+ja traced_intervals vastaa HTTP-pyyntojen maaraa. Palvelimen jonossa odottava
+socket ei ole todiste samanaikaisesta PHP-suorituksesta.
+
+TYONKULUT JA AINEISTON EHEYS
+Oikeat cookie-istunnot, UTF-8-nimimerkit ja lomakkeista luetut workflow_tokenit.
+36 tavallista Phase1- ja 18 Phase2-kysymysta vastataan renderoityihin lomakkeisiin
+oikean POST/redirect/GET-polun kautta. Jokaisen askeleen pisteita verrataan oman
+osallistujan odotusarvoihin. Polut A1->A2/B1->B2/C1->C2/D1->D2, suora,
+nykyinen TB1, legacy-TB1, ratkaiseva TB2, RATKAISEMATON, kutsutut ja muut.
+30+ profiilit kattavat kaikki kuusi Phase1-paria ja nelja Phase2-rataa.
+1/10 profiilit kattavat pienemman fixturejoukon.
+Tarkistukset: yksi CSV-rivi/istunto, yksi otsikko, 136 saraketta, UTF-8,
+uniikki sessionId, oikea nimimerkki/tulos/kutsu, kaikkien vastausten kohdistukset
+ja TB1-laskurit. Kutsutun oma kutsu completed, muiden tila erillinen, validi JSON.
+RATKAISEMATON sailyy normaalisti suoritus- ja tutkimusaineistossa.
+Sovelluslokin rivit kokonaisia; yksi RESULT/valmistuminen oikeilla loppupisteilla.
+Yksi mail-stub/tulos. Worker-lokien Warning/Fatal/Parse/Notice tarkistetaan.
+
+LOPULLISET KUORMATULOKSET
+users pattern workers completed failed HTTP_ok HTTP_bad p50_ms p95_ms p99_ms req/s tests/min PHP_overlap
+1 ramp 1 1 0 113 0 7.6 9.7 17.2 94.0 49.9 1
+1 burst 1 1 0 113 0 7.4 9.9 18.5 94.4 50.1 1
+10 ramp 10 10 0 1250 0 21.0 38.1 44.4 329.9 158.4 8
+10 burst 10 10 0 1250 0 22.4 39.9 52.7 300.2 144.1 10
+30 ramp 30 30 0 3786 0 64.7 123.5 146.8 314.8 149.7 19
+30 burst 30 30 0 3786 0 70.9 133.6 166.3 311.6 148.1 28
+50 ramp 30 50 0 6378 0 105.3 174.5 201.5 302.6 142.3 24
+50 burst 30 50 0 6378 0 94.4 177.7 224.1 307.5 144.7 29
+100 ramp 30 100 0 12756 0 102.4 195.8 227.8 299.7 141.0 30
+100 burst 30 100 0 12756 0 103.5 194.0 238.6 301.0 141.6 30
+200 ramp 30 200 0 25576 0 99.0 194.1 226.3 294.1 138.0 30
+200 burst 30 200 0 25576 0 98.5 209.2 250.0 296.9 139.3 30
+PASS: 12/12 profiilia, 782/782 valmistui, 99 718 HTTP onnistui, 0 HTTP-virhetta,
+0 tyonkulkuvirhetta, 0 PHP-diagnostiikkaa. CSV 782 rivia, kutsuttuja 500,
+RATKAISEMATON 244, kaikki kutsutut completed; kaikki paallekkaisyystodisteet validoitu.
+
+Latenssi socketin avaamisesta vastauksen loppuun; taulukossa millisekunteja.
+Generaattorin odottava sisainen jono ei sisally latenssiin. Redirect on oma
+HTTP-pyyntonsa. req/s ja testia/min kattavat koko tyonkulun tarkistuksineen,
+ilman workerien kaynnistysta. Mittauslokin ja tilannekuvien IO sisaltyy lukuihin. Nopeat automaattivastaukset, ei ihmisen 10-15 min
+miettimisaikaa. Muita eristettyja regressioajoja oli samalla koneella: luvut
+eivat ole yksinomaisen palvelinkoneen kapasiteettivertailu.
+Mitattu memory_get_peak_usage(true) oli enintaan 4 MiB/PHP-pyynto. Tama ei ole
+OS:n RSS tai koko palvelimen muisti. CPU/IO-kyllastymista tai tuotannon resursseja
+ei mitattu luotettavasti; niista ei anneta keksittyja lukuja.
+
+AIEMMAT EPÄONNISTUMISET — HAVAINNOT SAILYTETAAN
+INITIAL_LOAD.json: valivaiheen ensimmaisessa sarjassa 1/10/30/50 molemmat
+kuviot onnistuivat. 100 ramp pysahtyi tekniseen phase2_unresolved-tilaan:
+53 valmistui, 12 392 HTTP-pyyntoa, kaikki statukset 200/302/303, ei PHP-varoituksia.
+Vanha workflow_failures=47 tarkoitti kaikkia kesken jaaneita, ei 47 todistettua
+virhetta: yksi havaittu tekninen tila ja 46 keskeytettya muuta tyonkulkua.
+Seuraavia profiileja ei silloin suoritettu. Tarkkaa IO-syyta ei saatu talteen
+ennen testihakemiston siivousta. Windows-jakamiskielto toistettiin erikseen;
+syy-yhteytta tahan 100 ramp -havaintoon EI ole todistettu. Uusi virheraportointi
+erottaa tekniset/keskeytetyt tyonkulut ja HTTP-virheet seka tallentaa tekniset syyt.
+
+GENERATOR_LIMIT.json: kahdessa myohemmassa 200-osallistujan yrityksessa CLI-
+tyokalun 128 MiB raja ylittyi mittauslokia taulukoitaessa. CSV:ssa oli 200 rivia
+ja eheystarkistus oli ehtinyt valmistua, mutta koko profiilia ei hyvaksytty,
+koska mittaus/siivous ei valmistunut normaalisti. Tama oli testigeneraattorin
+raja, ei app-workerien raportoima virhe. Mittaus lukee nyt lokin virtana ja
+kayttaa kahta numeerista aikaleimataulukkoa. Vanhojen yritysten vain omat
+30+30 workeria tunnistettiin loki-PIDeista, exe-polusta ja kaynnistysaikaikkunasta
+ennen pysaytysta/siivousta. Uusi fatal-shutdown vapauttaa 2 MiB varamuistin ja
+siivoaa vain omat workerit. Erillinen 32 MiB CLI-rajan ylitys kahdella workerilla
+vahvisti pysaytyksen ja testihakemiston poistumisen. Lopullinen taulukko on
+kokonaan uusi ajo virtalukukorjauksen jalkeen.
+
+KATKOS- JA VIRHEINJEKTIOT
+FAILURES.json: 21 eristettya skenaariota, kaikki omat paikalliset prosessit.
+1. 10 saman istunnon vastaus-POSTia: yksi eteneminen; toinen istunto ja sen
+   pisteet sailyvat. Reset vaikuttaa vain omaan istuntoon.
+2. 10 valmistumis-POSTia ja kadonneen session-checkpointin palautus: yksi CSV
+   ja mail-stub; saman viimeisen POSTin uusinta palautuu ilman duplikaattia.
+3. Muutetun viimeisen vastauksen ristiriitainen checkpoint-uusinta hylataan;
+   alkuperaisen CSV:n hash sailyy.
+4. Oikea 600 ms sivutiedostolukko: mitattu lukko-odotus, tulos onnistuu.
+5. 5,5 s lukko: rajattu odotus, tekninen virhe, ei rivia tai completedia.
+6. Oikea Windows-lukijaprosessi 600 ms: julkaisu onnistuu uusinnan jalkeen.
+7. Pitka Windows-jakamiskielto: vanha CSV sama, ei uutta rivia/ilmoitusta.
+8. Todellisen invite.php:n 10 append_invite-kutsua ja 10 index.php-tilapaivitysta
+   rinnakkain: kaikki 40 tietuetta sailyvat, 10 uutta ja 10 completed-paivitysta.
+   HTTP-apureitti ei ole kutsun koko luontilomakkeen E2E-testi.
+9-10. CSV/JSON fwrite enintaan 3 tavua: silmukka kirjoittaa kaiken loppuun.
+11. Simuloitu disk-write failure 5 tavun jalkeen: vajaa temp poistuu,
+   ei julkista vajaata rivia tai mail-stubia.
+12. JSON-paivitys epaonnistuu CSV:n jalkeen: tekninen virhe, tutkimusrivi sailyy,
+   kutsu accepted. Vian poistamisen jalkeen testin huoltokutsu todelliseen
+   complete_quiz_result-funktioon tasmayttaa completedin ilman duplikaattia.
+   Kayttajalle ei toteutettu automaattista korjauspolkua.
+13. Viallinen JSON: tekninen virhe, alkuperaiset tavut sailyvat.
+14. 10 vanhentunutta tokenyritysta hylataan; rinnakkainen accepted/completed
+   ei palauta completed-kutsua acceptediksi.
+15. 10 istuntoa/sama token: yksi omistaja, omistajan jatkaminen toimii.
+16. Completed-kutsun vieras statuskutsu ei ohita omistajan tarkistusta.
+17-18. Session start/write epaonnistuu: HTTP 503, ei virheellista valmistumista.
+19. Session write epaonnistuu tulosrivin jalkeen: HTTP 503, rivi sailyy;
+   vanhan POST-tokenin uusinta palauttaa tuloksen ilman duplikaattia.
+20-21. Testin OMA PHP-worker pysaytetaan 5 temp-tavun jalkeen CSV/JSONissa:
+   vanha tiedosto ehja, uusinta tuottaa yhden tuloksen. Kummassakin yksi orpo
+   temp ennen siivousta; ei julkista tutkimusdataa. Lopuksi kaikki poistetaan.
+PASS 21/21. Mitattu 600 ms lukon odotus: 0.594 s; viimeisen POSTin roundtrip 0.630 s. Pitkan lukon tekninen virhe noin 4.028 s.
+
+REGRESSIOT JA KATTAVUUDEN ERITTELY
+PASS 110/110 vanhaa HTTP-skenaariota, 69 727 assertiota, 12 061 oikeaa pyyntoa.
+PASS 318/318 navigointia, 520 675 assertiota, 71 516 oikeaa pyyntoa;
+  jokainen tapaus CONCURRENCY_NAVIGATION_MATRIX.json:ssa, HTTP/executed/passed=true.
+PASS 3857 A2-regressiotarkistusta; PASS 2343 TB2-osajoukon uusintatarkistusta.
+PASS 4/4 deterministista kilpailutilanteen probea, 21/21 virheskenaariota.
+PASS kaikki 9 muokattua/uusia PHP-tiedostoja koskevaa syntaksitarkistusta.
+PASS git diff --check; neljan kysymys-/kuvaus-CSV:n SHA-256 ennallaan.
+Kaikki lopulliset tuotantokoodin muutokset olivat mukana naissa uusinta-ajoissa.
+Kaikki eristetyt testihakemistot ja omat workerit on siivottu; ei testidatasaastetta.
+HTTP E2E: kuormaprofiilien kokonaiset tyonkulut ja olemassa olevat 110+318
+HTTP-skenaariota. Nelja storage-probea ja osa 21 virhetestista kutsuvat
+todellisia funktioita testin HTTP-apureitilta; eivat uusia kokonaisia osallistujapolkuja.
+3857 A2-tarkistusta sisaltaa loader-/funktio-/tilakone-/renderointitesteja.
+2343 TB2-tarkistusta on tuon sarjan erikseen uudelleen ajettu osajoukko;
+lukumaaret eivat ole toisistaan riippumattomia skenaarioita.
+318 navigointia: nykyinen/legacy TB1, kaikki kuusi paria ja 30 suunnattua
+parinvaihtoa, aiemmat valinnat, pisteiden korvaus, palautus, virheet ja lopputulos.
+
+RAJAT JA PALAUTUMINEN
+CSV ja JSON ovat erikseen atomisia julkaisuja paikallisella testatulla Windows-
+tiedostojarjestelmalla. Ne, sessio, sovellusloki, debug-kopio ja mail EIVAT ole
+yhteinen transaktio. CSV ensin: sen jalkeinen katkos voi jattaa kutsun accepted-
+tilaan vaikka tutkimusrivi on tallessa. Operaattorin tasmaytys voi olla tarpeen.
+Done2 vasta kutsupaivityksen onnistuttua. Mail-kutsu on CSV:n jalkeen mutta ennen
+kutsupaivitysta: ilmoitus voi olla jo lahetetty myohemmassa kutsuvirheessa tai
+jaada puuttumaan kaatumisessa CSV:n ja mail-kutsun valissa. Ei exactly-once-
+mail-lupausta tai outboxia. Identtinen CSV-uusinta ohittaa RESULT-lokin/mailin;
+ne voivat jaada puuttumaan katkoksessa, vaikka tutkimusrivi sailyy.
+
+SessionId-deduplikointi koskee kyseista kuukausi-CSV:ta. Kuukauden vaihteen yli
+tapahtuva checkpoint-uusinta / globaali deduplikointi ei ole testattu tai taattu.
+CSV:n tarkistus/kopiointi on O(tiedoston koko) per tulos. Suurin tuore tiedosto
+oli 200 rivia; suuren historiallisen kuukausi-CSV:n viivetta ei mitattu.
+Pitka ulkoinen lukko voi aiheuttaa teknisen virheen myos alle 30 osallistujalla.
+Luotettavuus priorisoitiin lapimenoon; tietokantaa/ulkopuolista jonoa ei lisatty.
+
+Vanha accepted-kutsu ilman owneria sidotaan ensimmaisella uudella varauksella.
+Jo kaynnissa olleita legacy-istuntoja ei migroitu. Cookien katoaminen voi vaatia
+operaattorin hallitun vapautuksen. Aloita mahdollinen pilotti uusilla istunnoilla.
+Kaikkien aktiivisten kirjoittajien on kaytettava uutta lukitusmallia; backup-/kopio-
+PHP-entrypointteja ei validoitu. Koko JSONin korvaavat yhteensopivuuswrapperit
+eivat tee ulkoisesta stale-snapshotista turvallista transaktiota; varsinaiset
+app-reitit kayttavat muutos-/lisaystransaktioita.
+
+TESTAAMATTOMAT ASIAT
+Kutsun koko luontilomakkeen captcha/DNS/mail-polku; sen oikea append-funktio
+testattiin rinnakkain. Oikea mail-toimitus, selain/mobiiliulkoasu, tuotannon
+PHP-FPM/Apache/IIS-asetukset, verkkojaot, monipalvelinymparisto, pitka soak,
+virrankatkaisu ja hakemiston fsync-kestavyys. Natiivia ACL-oikeudenpoistoa ei
+tehty; oikea Windows-output sharing denial testattiin. Levya ei taytetty:
+diskfull/short write ovat kopion IO-injektioita. Tuotannon hakemiston luonti/
+rename-oikeudet, ACL-periytyminen, levytila, varmistukset ja crash-temp-tiedostojen
+yllapitosiivous on tarkistettava erikseen. OS-resurssi-/CPU-mittaus ei kattava.
+
+30 OSALLISTUJAN VALMIUSARVIO
+KYLLA: lopullinen paikallinen testi osoittaa oikean toiminnan 30 rinnakkaisella
+osallistujalla seka ramp- etta burst-kuormassa: 30/30 valmistui kummassakin,
+yksi tutkimusrivi/osallistuja, kutsut oikein completed, ei havaittua aineisto-,
+HTTP- tai PHP-virhetta. Todellinen PHP-paallekkaisyys 19/28 pyyntoa kyseisissa
+profiileissa; korkeammassa kuormassa 30 eri workeria todistetusti paallekkain.
+30:n p95 oli 123,5/133,6 ms; 200:n 194,1/209,2 ms. Lapimeno oli noin
+312-315 req/s 30:lla ja 294-297 req/s 200:lla tassa automaattitestissa.
+Korkein onnistuneesti varmennettu osallistujamaara oli 200 (molemmat kuviot),
+30 PHP-workerilla. Tama on paikallinen oikeellisuusnaytto, ei tuotannon
+kapasiteettilupaus. Kuormageneraattorin jonotus ei sisally latenssijakaumaan.
+Ei ekstrapolointia rajattomaan kapasiteettiin tai automaattista julkaisua.
+Palvelinasetukset, oikeudet, varmistukset ja katkos-/tasmaytysrajat kuuluvat
+mahdollisen pilotin kaytannon valmisteluun.
+
+UUSINTAKOMENNOT (repojuuresta; php = D:\php\php.exe)
+php test/concurrent_workflow_test.php --probes --report=test/CONCURRENCY_PROBES.json
+php test/concurrent_workflow_test.php --report=test/CONCURRENCY_RESULTS_FINAL.json
+php test/concurrent_failure_test.php --report=test/CONCURRENCY_FAILURES.json
+php test/http_workflow_test.php
+php test/http_workflow_test.php --navigation-only --matrix=test/CONCURRENCY_NAVIGATION_MATRIX.json
+php test/a2_regression_test.php
+php test/a2_regression_test.php --tiebreak-only
+php -l jokaiselle muutetulle/uudelle PHP-tiedostolle; git diff --check.
+
+MUUTTUMATTOMAT SYOTTEET (SHA-256)
+InsideBlockQuestions.csv
+  a06bbc0d3bc58b6f35a8be33326d7d2e217cb298647582313ab71a2ebe0b8c60
+SeparateBlocksQuestions.csv
+  fad1038e97f0889c62025c9b24f77e3f8f4e82c8e766e77a3f6b6b4773ebf4f7
+SeparateBlocksQuestionsTiebreak.csv
+  1f021ae3c2a018cd52243822f1c76f48f4ac931208f3bbab03ccfdafb7097483
+TypeDescriptions.csv
+  cf177422eac1e8621288168b19e3295e6c81ae99023327c1d6353c6974d97ed2

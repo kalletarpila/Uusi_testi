@@ -3,7 +3,7 @@
 // php test/http_workflow_test.php [--probe] [--keep]
 require_once __DIR__ . '/isolated_app.php';
 $root = dirname(__DIR__);
-$sandbox = create_isolated_app($root, true);
+$sandbox = defined('HTTP_WORKFLOW_LIBRARY') ? '' : create_isolated_app($root, true);
 $checks = $passed = $failed = $requests = $skipped = 0;
 $match = null; foreach ($argv as $arg) if (str_starts_with($arg,'--match=')) $match=substr($arg,8);
 $failures = [];
@@ -159,6 +159,8 @@ function research_rows(string $dir): array {
 function favor(string $target): Closure { return fn($b)=>$b['left_var']===$target?['left',2]:($b['right_var']===$target?['right',2]:['neutral',0]); }
 function neutral(): Closure { return fn($b)=>['neutral',0]; }
 function configure(string $dir,string $name,?string $contents): void { $path=$dir.'/'.$name; if ($contents===null) unlink($path); else file_put_contents($path,$contents); }
+
+if (defined('HTTP_WORKFLOW_LIBRARY')) return;
 
 $socket=stream_socket_server('tcp://127.0.0.1:0',$errno,$error); if (!$socket) throw new RuntimeException($error);
 $address=stream_socket_get_name($socket,false); fclose($socket); $base='http://'.$address;

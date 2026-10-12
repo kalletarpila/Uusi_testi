@@ -1,0 +1,24 @@
+{
+  "earlier_incomplete_measurements": [
+    {
+      "temporary_directory": "enneagram-test-1663cd3c4812a5b5",
+      "error": "CLI load-generator 128 MiB memory limit in old concurrent_overlap trace aggregation (line 164), after workflow integrity validation",
+      "csv_rows": 200,
+      "owned_workers_stopped": 30,
+      "profile": "200 burst"
+    },
+    {
+      "temporary_directory": "enneagram-test-4b4fee87901a7367",
+      "error": "CLI load-generator 128 MiB memory limit in old concurrent_overlap trace aggregation (line 164), after workflow integrity validation",
+      "csv_rows": 200,
+      "owned_workers_stopped": 30,
+      "profile": "200 ramp"
+    }
+  ],
+  "fatal_generator_cleanup_check": {
+    "passed": true,
+    "simulated_cli_memory_limit_bytes": 33554432,
+    "owned_workers_stopped": 2,
+    "temporary_directory_removed": true
+  }
+}

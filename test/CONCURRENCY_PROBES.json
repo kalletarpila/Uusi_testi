@@ -1,0 +1,105 @@
+{
+    "initial_head": "03d4447d640eeb2e339ae1a34d8ae4ff136e5640",
+    "profiles": [],
+    "probes": {
+        "append-position-under-lock": {
+            "passed": true,
+            "detail": {
+                "executed_php_workers": 10,
+                "maximum_overlapping_php_requests": 10,
+                "traced_intervals": 10,
+                "overlap_witness": [
+                    {
+                        "id": "append-4",
+                        "pid": 26852,
+                        "start": 1791825232.933262,
+                        "end": 1791825232.938714,
+                        "sid": "6f6dc7be0e711e480796fe28095ded9f"
+                    },
+                    {
+                        "id": "append-0",
+                        "pid": 29800,
+                        "start": 1791825232.932421,
+                        "end": 1791825232.938711,
+                        "sid": "348b10c5e2e50acf63bd5be0b0b1937f"
+                    },
+                    {
+                        "id": "append-8",
+                        "pid": 19836,
+                        "start": 1791825232.933468,
+                        "end": 1791825232.938862,
+                        "sid": "6099c46309d00a1c07d0fe20b8f1298d"
+                    },
+                    {
+                        "id": "append-7",
+                        "pid": 37252,
+                        "start": 1791825232.936203,
+                        "end": 1791825232.939863,
+                        "sid": "bc7c0c884c677719dbabe39207c7fa29"
+                    },
+                    {
+                        "id": "append-5",
+                        "pid": 42684,
+                        "start": 1791825232.934202,
+                        "end": 1791825232.938957,
+                        "sid": "38cc7e18377c24e4bb06b35a0213c681"
+                    },
+                    {
+                        "id": "append-2",
+                        "pid": 42564,
+                        "start": 1791825232.933402,
+                        "end": 1791825232.938754,
+                        "sid": "7c8a9a447de2087919ce29d0aaefbc69"
+                    },
+                    {
+                        "id": "append-3",
+                        "pid": 37260,
+                        "start": 1791825232.934656,
+                        "end": 1791825232.939099,
+                        "sid": "20423aadc5412a5f11e43d64ba27c70c"
+                    },
+                    {
+                        "id": "append-9",
+                        "pid": 20664,
+                        "start": 1791825232.935377,
+                        "end": 1791825232.939641,
+                        "sid": "2ac89bb7501b2fdf572ba32e15cb55c7"
+                    },
+                    {
+                        "id": "append-1",
+                        "pid": 8364,
+                        "start": 1791825232.932605,
+                        "end": 1791825232.959782,
+                        "sid": "c6eb0572530ed811037e17152f3fdb3b"
+                    },
+                    {
+                        "id": "append-6",
+                        "pid": 6868,
+                        "start": 1791825232.931936,
+                        "end": 1791825232.975172,
+                        "sid": "cf1900c51f3274de7aeb58491c216c3e"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            }
+        },
+        "invitation-transaction-no-lost-update": {
+            "passed": true,
+            "detail": {
+                "completed": 10
+            }
+        },
+        "single-first-writer-header": {
+            "passed": true,
+            "detail": {
+                "header_count": 1
+            }
+        },
+        "same-invitation-single-session-owner": {
+            "passed": true,
+            "detail": {
+                "owners": 1
+            }
+        }
+    }
+}

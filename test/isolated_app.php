@@ -21,13 +21,13 @@ function create_isolated_app(string $root, bool $http = false): string {
                 for ($k = $i; $k < count($tokens); $k++) {
                     $part = $tokens[$k];
                     $end += strlen(is_array($part) ? $part[1] : $part);
-                    if ($part === '{') $depth++;
+                    if ($part === '{' || (is_array($part) && in_array($part[0], [T_CURLY_OPEN, T_DOLLAR_OPEN_CURLY_BRACES], true))) $depth++;
                     if ($part === '}' && --$depth === 0) break;
                 }
                 $replacement = match ($name) {
                     'data_dir' => 'function data_dir(): string { return __DIR__ . "/data"; }',
                     'send_mail' => 'function send_mail(string $to, string $subject, string $body): bool { return true; }',
-                    default => 'function send_result_email(array $row): void { $GLOBALS["test_result_emails"][] = $row; file_put_contents(__DIR__ . "/data/emails.jsonl", json_encode($row).PHP_EOL, FILE_APPEND); }',
+                    default => 'function send_result_email(array $row): void { $GLOBALS["test_result_emails"][] = $row; file_put_contents(__DIR__ . "/data/emails.jsonl", json_encode($row).PHP_EOL, FILE_APPEND | LOCK_EX); }',
                 };
                 $replacements[] = [$offset, $end - $offset, $replacement];
             }
@@ -48,6 +48,7 @@ PHP;
         $source = str_replace('<?php declare(strict_types=1);', '<?php declare(strict_types=1);' . "\n" . $instrumentation, $source);
     }
     file_put_contents($sandbox . '/index.php', $source);
+    if (is_file($root.'/storage.php')) copy($root.'/storage.php',$sandbox.'/storage.php');
     foreach (['InsideBlockQuestions.csv','SeparateBlocksQuestions.csv','SeparateBlocksQuestionsTiebreak.csv','TypeDescriptions.csv'] as $csv) copy($root.'/'.$csv, $sandbox.'/'.$csv);
     return $sandbox;
 }

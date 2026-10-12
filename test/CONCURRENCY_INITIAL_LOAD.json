@@ -1,0 +1,378 @@
+{
+    "initial_head": "03d4447d640eeb2e339ae1a34d8ae4ff136e5640",
+    "profiles": [
+        {
+            "participants": 1,
+            "pattern": "ramp",
+            "workers": 1,
+            "completed": 1,
+            "workflow_failures": 0,
+            "assertions": 760,
+            "integrity": {
+                "csv_rows": 1,
+                "unique_sessions": 1,
+                "invited_completed": 0,
+                "unresolved_completed": 0,
+                "stub_notifications": 1,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 1,
+                "maximum_overlapping_php_requests": 1,
+                "traced_intervals": 113,
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 45.95116900949395,
+            "http": {
+                "requests": 113,
+                "http_success": 113,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 57,
+                    "303": 55,
+                    "302": 1
+                },
+                "latency_seconds": {
+                    "p50": 0.008023977279663086,
+                    "p95": 0.011368989944458008,
+                    "p99": 0.019190073013305664
+                },
+                "elapsed_seconds": 1.3057339191436768,
+                "requests_per_second": 86.54136830121361
+            },
+            "passed": true
+        },
+        {
+            "participants": 1,
+            "pattern": "burst",
+            "workers": 1,
+            "completed": 1,
+            "workflow_failures": 0,
+            "assertions": 760,
+            "integrity": {
+                "csv_rows": 1,
+                "unique_sessions": 1,
+                "invited_completed": 0,
+                "unresolved_completed": 0,
+                "stub_notifications": 1,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 1,
+                "maximum_overlapping_php_requests": 1,
+                "traced_intervals": 113,
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 46.9511466600199,
+            "http": {
+                "requests": 113,
+                "http_success": 113,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 57,
+                    "303": 55,
+                    "302": 1
+                },
+                "latency_seconds": {
+                    "p50": 0.007889986038208008,
+                    "p95": 0.010526895523071289,
+                    "p99": 0.02153801918029785
+                },
+                "elapsed_seconds": 1.2779240608215332,
+                "requests_per_second": 88.42465954303748
+            },
+            "passed": true
+        },
+        {
+            "participants": 10,
+            "pattern": "ramp",
+            "workers": 10,
+            "completed": 10,
+            "workflow_failures": 0,
+            "assertions": 8283,
+            "integrity": {
+                "csv_rows": 10,
+                "unique_sessions": 10,
+                "invited_completed": 4,
+                "unresolved_completed": 2,
+                "stub_notifications": 10,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 10,
+                "maximum_overlapping_php_requests": 7,
+                "traced_intervals": 1250,
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 160.09998716824555,
+            "http": {
+                "requests": 1250,
+                "http_success": 1250,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 630,
+                    "303": 568,
+                    "302": 52
+                },
+                "latency_seconds": {
+                    "p50": 0.021091938018798828,
+                    "p95": 0.03699684143066406,
+                    "p99": 0.04460501670837402
+                },
+                "elapsed_seconds": 3.7476580142974854,
+                "requests_per_second": 333.5416399338449
+            },
+            "passed": true
+        },
+        {
+            "participants": 10,
+            "pattern": "burst",
+            "workers": 10,
+            "completed": 10,
+            "workflow_failures": 0,
+            "assertions": 8283,
+            "integrity": {
+                "csv_rows": 10,
+                "unique_sessions": 10,
+                "invited_completed": 4,
+                "unresolved_completed": 2,
+                "stub_notifications": 10,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 10,
+                "maximum_overlapping_php_requests": 9,
+                "traced_intervals": 1250,
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 153.89430030622526,
+            "http": {
+                "requests": 1250,
+                "http_success": 1250,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 630,
+                    "303": 568,
+                    "302": 52
+                },
+                "latency_seconds": {
+                    "p50": 0.021756887435913086,
+                    "p95": 0.03853583335876465,
+                    "p99": 0.0490880012512207
+                },
+                "elapsed_seconds": 3.89877986907959,
+                "requests_per_second": 320.6131256379693
+            },
+            "passed": true
+        },
+        {
+            "participants": 30,
+            "pattern": "ramp",
+            "workers": 30,
+            "completed": 30,
+            "workflow_failures": 0,
+            "assertions": 25115,
+            "integrity": {
+                "csv_rows": 30,
+                "unique_sessions": 30,
+                "invited_completed": 18,
+                "unresolved_completed": 8,
+                "stub_notifications": 30,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 23,
+                "traced_intervals": 3786,
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 149.18727756271915,
+            "http": {
+                "requests": 3786,
+                "http_success": 3786,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 1908,
+                    "303": 1774,
+                    "302": 104
+                },
+                "latency_seconds": {
+                    "p50": 0.06798601150512695,
+                    "p95": 0.12879109382629395,
+                    "p99": 0.14799714088439941
+                },
+                "elapsed_seconds": 12.065371990203857,
+                "requests_per_second": 313.79057380691927
+            },
+            "passed": true
+        },
+        {
+            "participants": 30,
+            "pattern": "burst",
+            "workers": 30,
+            "completed": 30,
+            "workflow_failures": 0,
+            "assertions": 25115,
+            "integrity": {
+                "csv_rows": 30,
+                "unique_sessions": 30,
+                "invited_completed": 18,
+                "unresolved_completed": 8,
+                "stub_notifications": 30,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 23,
+                "traced_intervals": 3786,
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 146.41162188046988,
+            "http": {
+                "requests": 3786,
+                "http_success": 3786,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 1908,
+                    "303": 1774,
+                    "302": 104
+                },
+                "latency_seconds": {
+                    "p50": 0.0712590217590332,
+                    "p95": 0.12850713729858398,
+                    "p99": 0.16479110717773438
+                },
+                "elapsed_seconds": 12.294106006622314,
+                "requests_per_second": 307.95244468858834
+            },
+            "passed": true
+        },
+        {
+            "participants": 50,
+            "pattern": "ramp",
+            "workers": 30,
+            "completed": 50,
+            "workflow_failures": 0,
+            "assertions": 42295,
+            "integrity": {
+                "csv_rows": 50,
+                "unique_sessions": 50,
+                "invited_completed": 32,
+                "unresolved_completed": 16,
+                "stub_notifications": 50,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 24,
+                "traced_intervals": 6378,
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 143.0627849685815,
+            "http": {
+                "requests": 6378,
+                "http_success": 6378,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 3214,
+                    "303": 2994,
+                    "302": 170
+                },
+                "latency_seconds": {
+                    "p50": 0.09846806526184082,
+                    "p95": 0.17732596397399902,
+                    "p99": 0.2095189094543457
+                },
+                "elapsed_seconds": 20.96981406211853,
+                "requests_per_second": 304.1514808432043
+            },
+            "passed": true
+        },
+        {
+            "participants": 50,
+            "pattern": "burst",
+            "workers": 30,
+            "completed": 50,
+            "workflow_failures": 0,
+            "assertions": 42295,
+            "integrity": {
+                "csv_rows": 50,
+                "unique_sessions": 50,
+                "invited_completed": 32,
+                "unresolved_completed": 16,
+                "stub_notifications": 50,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 30,
+                "traced_intervals": 6378,
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 144.59645929139356,
+            "http": {
+                "requests": 6378,
+                "http_success": 6378,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 3214,
+                    "303": 2994,
+                    "302": 170
+                },
+                "latency_seconds": {
+                    "p50": 0.0970759391784668,
+                    "p95": 0.18521618843078613,
+                    "p99": 0.2295379638671875
+                },
+                "elapsed_seconds": 20.747395992279053,
+                "requests_per_second": 307.41207245350273
+            },
+            "passed": true
+        },
+        {
+            "participants": 100,
+            "pattern": "ramp",
+            "completed": 53,
+            "workflow_failures": 47,
+            "http": {
+                "requests": 12392,
+                "http_success": 12392,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 6233,
+                    "303": 5819,
+                    "302": 340
+                },
+                "latency_seconds": {
+                    "p50": 0.10341095924377441,
+                    "p95": 0.1914050579071045,
+                    "p99": 0.2268049716949463
+                },
+                "elapsed_seconds": 41.27944207191467,
+                "requests_per_second": 300.19785583369486
+            },
+            "passed": false,
+            "error": "Unexpected load workflow state: phase2_unresolved",
+            "diagnostics": []
+        },
+        {
+            "participants": 100,
+            "pattern": "burst",
+            "executed": false,
+            "reason": "Previous level unstable"
+        },
+        {
+            "participants": 200,
+            "pattern": "ramp",
+            "executed": false,
+            "reason": "Previous level unstable"
+        },
+        {
+            "participants": 200,
+            "pattern": "burst",
+            "executed": false,
+            "reason": "Previous level unstable"
+        }
+    ],
+    "probes": []
+}

@@ -258,3 +258,24 @@ Uusi eristetty ajo repojuuresta:
   php test/http_workflow_test.php --navigation-only --matrix=test/PHASE1_NAVIGATION_MATRIX.json
 Vanha 110-skenaarion HTTP-sarja ja molemmat regressioajot ajetaan myos uudelleen.
 Pisteytyspolitiikka ja tutkimus-CSV:n sarakkeet sailyvat. Ei pushia/julkaisua.
+
+LAAJENNUS 2026-10-12: RINNAKKAISET KAYTTAJAT JA AINEISTON EHEYS
+Aiempi rinnakkaisen ajon testaamattomuusraja taydentyy paikallisella aidosti
+rinnakkaisella testilla: erilliset PHP-prosessit jakavat saman data- ja session-
+hakemiston. 1/10/30/50/100/200 osallistujaa, ramp ja burst; 12/12 profiilia,
+782 valmistunutta tyonkulkua, 99 718 onnistunutta HTTP-pyyntoa, ei HTTP-,
+tyonkulku- tai PHP-virheita lopullisessa sarjassa. Enintaan 30 PHP-workeria;
+200 osallistujan tulos ei tarkoita 200 samanaikaisesti suorittavaa PHP-prosessia.
+
+Kriittinen arvio, toistetut kilpailutilanteet, kohdennetut tallennuskorjaukset,
+21 katkostestia, 110/318 HTTP-regressiot, mittarit, aiemmat epaonnistuneet ajot,
+atomisuuden rajat ja 30 osallistujan paikallinen valmiusarvio:
+  test/CONCURRENCY_REPORT.txt
+  test/CONCURRENCY_RESULTS_FINAL.json
+  test/CONCURRENCY_FAILURES.json
+  test/CONCURRENCY_NAVIGATION_MATRIX.json
+CSV ja kutsu-JSON eivat muodosta yhteista transaktiota: tallennettu tutkimusrivi
+sailyy kutsupaivityksen virheessa, mutta operaattorin tasmaytys voi olla tarpeen.
+Tuotantopalvelimen kapasiteettia tai rajatonta kayttajamaaraa ei osoitettu.
+Kysymyksia, pisteytysta, tutkimus-CSV:n rakennetta tai historiallista dataa ei
+muutettu. Kaikki testit eristettiin, mailit stubattiin. Ei pushia tai julkaisua.

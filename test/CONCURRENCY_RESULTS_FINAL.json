@@ -1,0 +1,2202 @@
+{
+    "initial_head": "03d4447d640eeb2e339ae1a34d8ae4ff136e5640",
+    "profiles": [
+        {
+            "participants": 1,
+            "pattern": "ramp",
+            "workers": 1,
+            "completed": 1,
+            "workflow_failures": 0,
+            "assertions": 760,
+            "integrity": {
+                "csv_rows": 1,
+                "unique_sessions": 1,
+                "invited_completed": 0,
+                "unresolved_completed": 0,
+                "stub_notifications": 1,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 1,
+                "maximum_overlapping_php_requests": 1,
+                "traced_intervals": 113,
+                "overlap_witness": [
+                    {
+                        "id": "user-0-0",
+                        "pid": 17064,
+                        "start": 1791824547.005545,
+                        "end": 1791824547.008731,
+                        "sid": "10dfb640d689f7d2e8d05dcf62607422"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 49.932794821524624,
+            "http": {
+                "requests": 113,
+                "http_success": 113,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 57,
+                    "303": 55,
+                    "302": 1
+                },
+                "latency_seconds": {
+                    "p50": 0.007551908493041992,
+                    "p95": 0.009677886962890625,
+                    "p99": 0.017214059829711914
+                },
+                "elapsed_seconds": 1.2016150951385498,
+                "requests_per_second": 94.04009691387138
+            },
+            "passed": true
+        },
+        {
+            "participants": 1,
+            "pattern": "burst",
+            "workers": 1,
+            "completed": 1,
+            "workflow_failures": 0,
+            "assertions": 760,
+            "integrity": {
+                "csv_rows": 1,
+                "unique_sessions": 1,
+                "invited_completed": 0,
+                "unresolved_completed": 0,
+                "stub_notifications": 1,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 1,
+                "maximum_overlapping_php_requests": 1,
+                "traced_intervals": 113,
+                "overlap_witness": [
+                    {
+                        "id": "user-0-0",
+                        "pid": 30404,
+                        "start": 1791824548.908312,
+                        "end": 1791824548.911314,
+                        "sid": "84ce52598d1faa292c2e4a9203710d82"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 50.13222202080125,
+            "http": {
+                "requests": 113,
+                "http_success": 113,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 57,
+                    "303": 55,
+                    "302": 1
+                },
+                "latency_seconds": {
+                    "p50": 0.007359027862548828,
+                    "p95": 0.009918928146362305,
+                    "p99": 0.01845717430114746
+                },
+                "elapsed_seconds": 1.1968350410461426,
+                "requests_per_second": 94.41568480584236
+            },
+            "passed": true
+        },
+        {
+            "participants": 10,
+            "pattern": "ramp",
+            "workers": 10,
+            "completed": 10,
+            "workflow_failures": 0,
+            "assertions": 8283,
+            "integrity": {
+                "csv_rows": 10,
+                "unique_sessions": 10,
+                "invited_completed": 4,
+                "unresolved_completed": 2,
+                "stub_notifications": 10,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 10,
+                "maximum_overlapping_php_requests": 8,
+                "traced_intervals": 1250,
+                "overlap_witness": [
+                    {
+                        "id": "user-0-51",
+                        "pid": 27180,
+                        "start": 1791824559.622506,
+                        "end": 1791824559.62469,
+                        "sid": "3cd28e630be25d5961d745389919bbcc"
+                    },
+                    {
+                        "id": "user-4-51",
+                        "pid": 43240,
+                        "start": 1791824559.621618,
+                        "end": 1791824559.624575,
+                        "sid": "221ee950f31c6a054f8d14f0ad8f220f"
+                    },
+                    {
+                        "id": "user-3-51",
+                        "pid": 43372,
+                        "start": 1791824559.621229,
+                        "end": 1791824559.623918,
+                        "sid": "96630eec3250cc8508d5545b2f1cd845"
+                    },
+                    {
+                        "id": "user-5-51",
+                        "pid": 3516,
+                        "start": 1791824559.622571,
+                        "end": 1791824559.624759,
+                        "sid": "5e2941f54367178cd9eece6be1343157"
+                    },
+                    {
+                        "id": "user-1-51",
+                        "pid": 42200,
+                        "start": 1791824559.621113,
+                        "end": 1791824559.623838,
+                        "sid": "e0f963088b0002586849f844dd56e155"
+                    },
+                    {
+                        "id": "user-8-52",
+                        "pid": 17216,
+                        "start": 1791824559.622608,
+                        "end": 1791824559.624789,
+                        "sid": "cfc268b460eb195c28a67e98b8acf225"
+                    },
+                    {
+                        "id": "user-7-51",
+                        "pid": 41536,
+                        "start": 1791824559.622603,
+                        "end": 1791824559.624839,
+                        "sid": "bd38cfe4bf131a7f7ec9b06de5b08b05"
+                    },
+                    {
+                        "id": "user-2-51",
+                        "pid": 42456,
+                        "start": 1791824559.621274,
+                        "end": 1791824559.623892,
+                        "sid": "10ab2cab84668b3882244074b489f6a2"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 158.37461175418952,
+            "http": {
+                "requests": 1250,
+                "http_success": 1250,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 630,
+                    "303": 568,
+                    "302": 52
+                },
+                "latency_seconds": {
+                    "p50": 0.021036148071289062,
+                    "p95": 0.03808116912841797,
+                    "p99": 0.04443097114562988
+                },
+                "elapsed_seconds": 3.7884860038757324,
+                "requests_per_second": 329.94710782122814
+            },
+            "passed": true
+        },
+        {
+            "participants": 10,
+            "pattern": "burst",
+            "workers": 10,
+            "completed": 10,
+            "workflow_failures": 0,
+            "assertions": 8283,
+            "integrity": {
+                "csv_rows": 10,
+                "unique_sessions": 10,
+                "invited_completed": 4,
+                "unresolved_completed": 2,
+                "stub_notifications": 10,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 10,
+                "maximum_overlapping_php_requests": 10,
+                "traced_intervals": 1250,
+                "overlap_witness": [
+                    {
+                        "id": "user-8-1",
+                        "pid": 34192,
+                        "start": 1791824567.252406,
+                        "end": 1791824567.261591,
+                        "sid": "8838220e0ede8149b67ccfd9a19571d2"
+                    },
+                    {
+                        "id": "user-1-1",
+                        "pid": 44780,
+                        "start": 1791824567.250135,
+                        "end": 1791824567.261687,
+                        "sid": "696aa490b5330672be930a623d8f6a65"
+                    },
+                    {
+                        "id": "user-2-1",
+                        "pid": 35504,
+                        "start": 1791824567.256103,
+                        "end": 1791824567.265669,
+                        "sid": "fdfae78c604994ebea92eee64e126c03"
+                    },
+                    {
+                        "id": "user-5-1",
+                        "pid": 40900,
+                        "start": 1791824567.255827,
+                        "end": 1791824567.266401,
+                        "sid": "1f0c7b4118dd9a1c3d7107e765eeb162"
+                    },
+                    {
+                        "id": "user-3-1",
+                        "pid": 40000,
+                        "start": 1791824567.255704,
+                        "end": 1791824567.265584,
+                        "sid": "922e595d3a6792e0e6b6a2a335d1d6e9"
+                    },
+                    {
+                        "id": "user-0-1",
+                        "pid": 4724,
+                        "start": 1791824567.26149,
+                        "end": 1791824567.270487,
+                        "sid": "31218e134d64d019311fe0bfa1a86be8"
+                    },
+                    {
+                        "id": "user-9-1",
+                        "pid": 33152,
+                        "start": 1791824567.26155,
+                        "end": 1791824567.270792,
+                        "sid": "752fbbf06c2b4fff5ef16bfeff5469a2"
+                    },
+                    {
+                        "id": "user-7-1",
+                        "pid": 36200,
+                        "start": 1791824567.26147,
+                        "end": 1791824567.273005,
+                        "sid": "83b8937ae3aaed1a8f8c6acec5ffb42e"
+                    },
+                    {
+                        "id": "user-4-1",
+                        "pid": 8764,
+                        "start": 1791824567.255924,
+                        "end": 1791824567.278511,
+                        "sid": "6f74deb968d73f4246540992ed3d4987"
+                    },
+                    {
+                        "id": "user-6-1",
+                        "pid": 21260,
+                        "start": 1791824567.261475,
+                        "end": 1791824567.294632,
+                        "sid": "887610961ad696d050d59e0115d0cce7"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 144.11503353191904,
+            "http": {
+                "requests": 1250,
+                "http_success": 1250,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 630,
+                    "303": 568,
+                    "302": 52
+                },
+                "latency_seconds": {
+                    "p50": 0.02243494987487793,
+                    "p95": 0.03994607925415039,
+                    "p99": 0.052670955657958984
+                },
+                "elapsed_seconds": 4.16334080696106,
+                "requests_per_second": 300.239653191498
+            },
+            "passed": true
+        },
+        {
+            "participants": 30,
+            "pattern": "ramp",
+            "workers": 30,
+            "completed": 30,
+            "workflow_failures": 0,
+            "assertions": 25115,
+            "integrity": {
+                "csv_rows": 30,
+                "unique_sessions": 30,
+                "invited_completed": 18,
+                "unresolved_completed": 8,
+                "stub_notifications": 30,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 19,
+                "traced_intervals": 3786,
+                "overlap_witness": [
+                    {
+                        "id": "user-2-53",
+                        "pid": 34716,
+                        "start": 1791824601.111204,
+                        "end": 1791824601.118521,
+                        "sid": "bd68db3368febf61a338a27ed79aafa8"
+                    },
+                    {
+                        "id": "user-4-53",
+                        "pid": 42284,
+                        "start": 1791824601.111082,
+                        "end": 1791824601.118234,
+                        "sid": "9c699fb43a2958fdbdc7eba11f5778a7"
+                    },
+                    {
+                        "id": "user-15-52",
+                        "pid": 6472,
+                        "start": 1791824601.111275,
+                        "end": 1791824601.118126,
+                        "sid": "3ead66c8a4cef66ac1135b024fe81854"
+                    },
+                    {
+                        "id": "user-14-52",
+                        "pid": 17452,
+                        "start": 1791824601.115018,
+                        "end": 1791824601.121168,
+                        "sid": "392ffdafe999efd02d68c0f5410804c4"
+                    },
+                    {
+                        "id": "user-3-53",
+                        "pid": 44168,
+                        "start": 1791824601.114619,
+                        "end": 1791824601.120772,
+                        "sid": "6b0ef5bc30287fdf24b0add88b69214a"
+                    },
+                    {
+                        "id": "user-16-52",
+                        "pid": 40304,
+                        "start": 1791824601.116847,
+                        "end": 1791824601.122664,
+                        "sid": "d03ff66db5e058443d594946a10316b9"
+                    },
+                    {
+                        "id": "user-19-51",
+                        "pid": 15432,
+                        "start": 1791824601.11126,
+                        "end": 1791824601.121448,
+                        "sid": "c6111c622bda877f420ba05f09fb362c"
+                    },
+                    {
+                        "id": "user-13-52",
+                        "pid": 41896,
+                        "start": 1791824601.11563,
+                        "end": 1791824601.121592,
+                        "sid": "951d49c0a60390eb7110b9057990f1d4"
+                    },
+                    {
+                        "id": "user-17-52",
+                        "pid": 40448,
+                        "start": 1791824601.112044,
+                        "end": 1791824601.122504,
+                        "sid": "951e2878c38b1109f9565259c17b89b2"
+                    },
+                    {
+                        "id": "user-24-51",
+                        "pid": 2148,
+                        "start": 1791824601.114804,
+                        "end": 1791824601.120971,
+                        "sid": "890b02398af5b9d497b03015cc7ddec1"
+                    },
+                    {
+                        "id": "user-27-50",
+                        "pid": 40308,
+                        "start": 1791824601.113769,
+                        "end": 1791824601.124293,
+                        "sid": "63e857536f85256abb10f65a6934112c"
+                    },
+                    {
+                        "id": "user-23-50",
+                        "pid": 34616,
+                        "start": 1791824601.112062,
+                        "end": 1791824601.122854,
+                        "sid": "b8a98f784b94614b5c53bae20c61c181"
+                    },
+                    {
+                        "id": "user-8-54",
+                        "pid": 19616,
+                        "start": 1791824601.113307,
+                        "end": 1791824601.124216,
+                        "sid": "66bd4c2282c3dcb454db46d2e45c7ae0"
+                    },
+                    {
+                        "id": "user-5-54",
+                        "pid": 41820,
+                        "start": 1791824601.115911,
+                        "end": 1791824601.125078,
+                        "sid": "0b994cd63df3e8533bebd74361a0508b"
+                    },
+                    {
+                        "id": "user-6-54",
+                        "pid": 980,
+                        "start": 1791824601.116764,
+                        "end": 1791824601.124954,
+                        "sid": "b6d0135f6ac1b5f8d792b71c38598d4a"
+                    },
+                    {
+                        "id": "user-29-51",
+                        "pid": 23812,
+                        "start": 1791824601.114795,
+                        "end": 1791824601.120892,
+                        "sid": "471be31976659b181f54a9a980ad3d56"
+                    },
+                    {
+                        "id": "user-28-51",
+                        "pid": 35024,
+                        "start": 1791824601.115203,
+                        "end": 1791824601.122138,
+                        "sid": "9fd1679976914e79b611ef2ac447d72b"
+                    },
+                    {
+                        "id": "user-21-51",
+                        "pid": 40760,
+                        "start": 1791824601.112233,
+                        "end": 1791824601.122905,
+                        "sid": "a1b487f66e1138481a5f78546d97a804"
+                    },
+                    {
+                        "id": "user-25-51",
+                        "pid": 26484,
+                        "start": 1791824601.111393,
+                        "end": 1791824601.122474,
+                        "sid": "ce9ee7e121707cd332335e0ca13c4658"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 149.66858400194644,
+            "http": {
+                "requests": 3786,
+                "http_success": 3786,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 1908,
+                    "303": 1774,
+                    "302": 104
+                },
+                "latency_seconds": {
+                    "p50": 0.06465387344360352,
+                    "p95": 0.12348198890686035,
+                    "p99": 0.1467900276184082
+                },
+                "elapsed_seconds": 12.026571989059448,
+                "requests_per_second": 314.802921684094
+            },
+            "passed": true
+        },
+        {
+            "participants": 30,
+            "pattern": "burst",
+            "workers": 30,
+            "completed": 30,
+            "workflow_failures": 0,
+            "assertions": 25115,
+            "integrity": {
+                "csv_rows": 30,
+                "unique_sessions": 30,
+                "invited_completed": 18,
+                "unresolved_completed": 8,
+                "stub_notifications": 30,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 28,
+                "traced_intervals": 3786,
+                "overlap_witness": [
+                    {
+                        "id": "user-1-0",
+                        "pid": 20292,
+                        "start": 1791824623.757193,
+                        "end": 1791824623.776933,
+                        "sid": "4f5403235318a537c85295ed2a451444"
+                    },
+                    {
+                        "id": "user-10-0",
+                        "pid": 37664,
+                        "start": 1791824623.757873,
+                        "end": 1791824623.777372,
+                        "sid": "4ade46059ff58f812719f0eb6c1d3869"
+                    },
+                    {
+                        "id": "user-25-0",
+                        "pid": 12644,
+                        "start": 1791824623.758648,
+                        "end": 1791824623.778596,
+                        "sid": "3e96998af2556c1fc7d35f846b9d830b"
+                    },
+                    {
+                        "id": "user-0-0",
+                        "pid": 2976,
+                        "start": 1791824623.757952,
+                        "end": 1791824623.778357,
+                        "sid": "82e7826364a5412ab924868ca63d6a8d"
+                    },
+                    {
+                        "id": "user-5-0",
+                        "pid": 37624,
+                        "start": 1791824623.761473,
+                        "end": 1791824623.778974,
+                        "sid": "24aa1ff0a3afdeb5c2a207de37c0c19a"
+                    },
+                    {
+                        "id": "user-20-0",
+                        "pid": 40232,
+                        "start": 1791824623.761551,
+                        "end": 1791824623.778994,
+                        "sid": "09f50150f980af26d4a6e318f8621310"
+                    },
+                    {
+                        "id": "user-2-0",
+                        "pid": 43904,
+                        "start": 1791824623.763203,
+                        "end": 1791824623.778795,
+                        "sid": "f9315b592a6fb9459da45590229d6dbf"
+                    },
+                    {
+                        "id": "user-3-0",
+                        "pid": 14776,
+                        "start": 1791824623.759481,
+                        "end": 1791824623.77893,
+                        "sid": "e8a9f7e73910173acc556c04d662a96f"
+                    },
+                    {
+                        "id": "user-8-0",
+                        "pid": 41008,
+                        "start": 1791824623.76067,
+                        "end": 1791824623.77946,
+                        "sid": "3958271f7d4bb461e0fe75933f77dfc4"
+                    },
+                    {
+                        "id": "user-22-0",
+                        "pid": 29388,
+                        "start": 1791824623.760208,
+                        "end": 1791824623.779705,
+                        "sid": "345f5c66e265e87a4c5fc4c01224b4bc"
+                    },
+                    {
+                        "id": "user-6-0",
+                        "pid": 41248,
+                        "start": 1791824623.760166,
+                        "end": 1791824623.77967,
+                        "sid": "2c42a716063e7341da02c50c3efbbbd0"
+                    },
+                    {
+                        "id": "user-11-0",
+                        "pid": 40876,
+                        "start": 1791824623.76177,
+                        "end": 1791824623.780103,
+                        "sid": "73bf0a92158f19ba4230753f99385489"
+                    },
+                    {
+                        "id": "user-9-0",
+                        "pid": 44940,
+                        "start": 1791824623.762044,
+                        "end": 1791824623.780432,
+                        "sid": "a3a5d799c901b24f29fa8813b85625ce"
+                    },
+                    {
+                        "id": "user-7-0",
+                        "pid": 41672,
+                        "start": 1791824623.758149,
+                        "end": 1791824623.780563,
+                        "sid": "4e0669bf67e52683db7096a6ee04e426"
+                    },
+                    {
+                        "id": "user-12-0",
+                        "pid": 31572,
+                        "start": 1791824623.762193,
+                        "end": 1791824623.782459,
+                        "sid": "b0a4b3852aa2a22295f44cfa6ee5a969"
+                    },
+                    {
+                        "id": "user-13-0",
+                        "pid": 44260,
+                        "start": 1791824623.761716,
+                        "end": 1791824623.783414,
+                        "sid": "5388eff17772310b184a50b596417494"
+                    },
+                    {
+                        "id": "user-15-0",
+                        "pid": 40864,
+                        "start": 1791824623.762111,
+                        "end": 1791824623.783273,
+                        "sid": "96f6fe45984f8d997d95b36e6aebc726"
+                    },
+                    {
+                        "id": "user-18-0",
+                        "pid": 29488,
+                        "start": 1791824623.770883,
+                        "end": 1791824623.783889,
+                        "sid": "ac0392c560de40c125513bdecdcaa81f"
+                    },
+                    {
+                        "id": "user-27-0",
+                        "pid": 12364,
+                        "start": 1791824623.771475,
+                        "end": 1791824623.78483,
+                        "sid": "e28bd1ace42f21aa93c23511a4cbdbdf"
+                    },
+                    {
+                        "id": "user-21-0",
+                        "pid": 13356,
+                        "start": 1791824623.771839,
+                        "end": 1791824623.785568,
+                        "sid": "21c89795ae18056b3d6c9f20a089d6b1"
+                    },
+                    {
+                        "id": "user-26-0",
+                        "pid": 42544,
+                        "start": 1791824623.771908,
+                        "end": 1791824623.78536,
+                        "sid": "3bdb40e5051d12fb8ed6e80f7eecaf63"
+                    },
+                    {
+                        "id": "user-29-0",
+                        "pid": 27016,
+                        "start": 1791824623.771453,
+                        "end": 1791824623.785056,
+                        "sid": "b2880636b07ef2682ece7a5e335ad3d8"
+                    },
+                    {
+                        "id": "user-23-0",
+                        "pid": 26944,
+                        "start": 1791824623.772147,
+                        "end": 1791824623.785437,
+                        "sid": "becac8827627b31202234458543e01aa"
+                    },
+                    {
+                        "id": "user-28-0",
+                        "pid": 42076,
+                        "start": 1791824623.77148,
+                        "end": 1791824623.785048,
+                        "sid": "7462dad9d4653b0065b2197c70f874fd"
+                    },
+                    {
+                        "id": "user-19-0",
+                        "pid": 8428,
+                        "start": 1791824623.771796,
+                        "end": 1791824623.785445,
+                        "sid": "d1239fdf85db6a597e199b63d01a92da"
+                    },
+                    {
+                        "id": "user-24-0",
+                        "pid": 44468,
+                        "start": 1791824623.772076,
+                        "end": 1791824623.785276,
+                        "sid": "2b8c721882a33bc6100e76f0c549f58b"
+                    },
+                    {
+                        "id": "user-16-0",
+                        "pid": 44384,
+                        "start": 1791824623.771404,
+                        "end": 1791824623.785179,
+                        "sid": "7fc6ad3ce65dfe92b0c9320e2bca4614"
+                    },
+                    {
+                        "id": "user-14-0",
+                        "pid": 43648,
+                        "start": 1791824623.771846,
+                        "end": 1791824623.789395,
+                        "sid": "2275ad29949b167a0c9e8ae7beacf6b7"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 148.14647542141185,
+            "http": {
+                "requests": 3786,
+                "http_success": 3786,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 1908,
+                    "303": 1774,
+                    "302": 104
+                },
+                "latency_seconds": {
+                    "p50": 0.07085919380187988,
+                    "p95": 0.13362383842468262,
+                    "p99": 0.16630816459655762
+                },
+                "elapsed_seconds": 12.150137186050415,
+                "requests_per_second": 311.60141996970293
+            },
+            "passed": true
+        },
+        {
+            "participants": 50,
+            "pattern": "ramp",
+            "workers": 30,
+            "completed": 50,
+            "workflow_failures": 0,
+            "assertions": 42295,
+            "integrity": {
+                "csv_rows": 50,
+                "unique_sessions": 50,
+                "invited_completed": 32,
+                "unresolved_completed": 16,
+                "stub_notifications": 50,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 24,
+                "traced_intervals": 6378,
+                "overlap_witness": [
+                    {
+                        "id": "user-10-0",
+                        "pid": 44832,
+                        "start": 1791824656.538873,
+                        "end": 1791824656.545783,
+                        "sid": "ce24b4fda03675a4deb580caed4ce027"
+                    },
+                    {
+                        "id": "user-11-0",
+                        "pid": 40580,
+                        "start": 1791824656.540233,
+                        "end": 1791824656.546073,
+                        "sid": "e51d1f8acbbffb6096ab0a5d9f4380eb"
+                    },
+                    {
+                        "id": "user-17-0",
+                        "pid": 39748,
+                        "start": 1791824656.539914,
+                        "end": 1791824656.546578,
+                        "sid": "69c389583b2a9793a8616a4b2f84c2de"
+                    },
+                    {
+                        "id": "user-2-0",
+                        "pid": 28700,
+                        "start": 1791824656.539498,
+                        "end": 1791824656.547032,
+                        "sid": "56f3396d20749781ea89fc2a3331121a"
+                    },
+                    {
+                        "id": "user-22-0",
+                        "pid": 1352,
+                        "start": 1791824656.540988,
+                        "end": 1791824656.547452,
+                        "sid": "a8b77d820154bbd05e898825f724052d"
+                    },
+                    {
+                        "id": "user-12-0",
+                        "pid": 36904,
+                        "start": 1791824656.540135,
+                        "end": 1791824656.550166,
+                        "sid": "42c33dc100229b9ede72ed81f5cb7ed5"
+                    },
+                    {
+                        "id": "user-6-0",
+                        "pid": 10092,
+                        "start": 1791824656.541583,
+                        "end": 1791824656.550666,
+                        "sid": "bb7e64ac71454300841b162a2ba2c8c7"
+                    },
+                    {
+                        "id": "user-4-0",
+                        "pid": 42200,
+                        "start": 1791824656.541647,
+                        "end": 1791824656.550932,
+                        "sid": "06c5abd58b342c8ff74504f8f983247f"
+                    },
+                    {
+                        "id": "user-5-0",
+                        "pid": 43620,
+                        "start": 1791824656.54197,
+                        "end": 1791824656.551087,
+                        "sid": "e84eaa165c424838cfa9de17bfe5909c"
+                    },
+                    {
+                        "id": "user-15-0",
+                        "pid": 44704,
+                        "start": 1791824656.540445,
+                        "end": 1791824656.551523,
+                        "sid": "eb4203d837877ffac2b9af35219782c5"
+                    },
+                    {
+                        "id": "user-16-0",
+                        "pid": 10696,
+                        "start": 1791824656.542224,
+                        "end": 1791824656.551583,
+                        "sid": "2f10486f4785ad52ab2c1bab259eb326"
+                    },
+                    {
+                        "id": "user-18-0",
+                        "pid": 25540,
+                        "start": 1791824656.542483,
+                        "end": 1791824656.551923,
+                        "sid": "a23eaefef2c7700d6c429854a2f478ac"
+                    },
+                    {
+                        "id": "user-8-0",
+                        "pid": 43124,
+                        "start": 1791824656.542612,
+                        "end": 1791824656.552197,
+                        "sid": "52836f7e8d279805afbe150e8e65bd8d"
+                    },
+                    {
+                        "id": "user-9-0",
+                        "pid": 32492,
+                        "start": 1791824656.542926,
+                        "end": 1791824656.552499,
+                        "sid": "b2375bfc9403cdcfdf9f385e05f10807"
+                    },
+                    {
+                        "id": "user-20-0",
+                        "pid": 23584,
+                        "start": 1791824656.543075,
+                        "end": 1791824656.553107,
+                        "sid": "b7a0ba6e07eb0e543b95946c89a8888a"
+                    },
+                    {
+                        "id": "user-3-0",
+                        "pid": 39220,
+                        "start": 1791824656.542766,
+                        "end": 1791824656.552546,
+                        "sid": "285e694d19326c653dc6949e5965fb9a"
+                    },
+                    {
+                        "id": "user-19-0",
+                        "pid": 21076,
+                        "start": 1791824656.543651,
+                        "end": 1791824656.553152,
+                        "sid": "9765aaf71e030aadfb815f45cfab05e0"
+                    },
+                    {
+                        "id": "user-24-0",
+                        "pid": 22788,
+                        "start": 1791824656.544109,
+                        "end": 1791824656.553404,
+                        "sid": "0030d73896f6836917b8f04d732d57b1"
+                    },
+                    {
+                        "id": "user-21-0",
+                        "pid": 28656,
+                        "start": 1791824656.544395,
+                        "end": 1791824656.553549,
+                        "sid": "3ec68af0719a8d3757c0f3dad4abba4d"
+                    },
+                    {
+                        "id": "user-23-0",
+                        "pid": 44896,
+                        "start": 1791824656.544338,
+                        "end": 1791824656.553724,
+                        "sid": "90f6dabceb489b76527130815e3adede"
+                    },
+                    {
+                        "id": "user-25-0",
+                        "pid": 44980,
+                        "start": 1791824656.544662,
+                        "end": 1791824656.553815,
+                        "sid": "ecbf8637c7b89fe806a37cf9b8baa1e1"
+                    },
+                    {
+                        "id": "user-26-0",
+                        "pid": 35452,
+                        "start": 1791824656.545466,
+                        "end": 1791824656.554196,
+                        "sid": "6c7a86435dec30796ebb9f3b05a877cd"
+                    },
+                    {
+                        "id": "user-14-0",
+                        "pid": 27140,
+                        "start": 1791824656.542552,
+                        "end": 1791824656.555085,
+                        "sid": "d88df686fdb21cf925d0b0d75cd0e0af"
+                    },
+                    {
+                        "id": "user-13-0",
+                        "pid": 10444,
+                        "start": 1791824656.543103,
+                        "end": 1791824656.555659,
+                        "sid": "f5564b0e7ffe3f111a5370a91bbf6258"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 142.32372690660355,
+            "http": {
+                "requests": 6378,
+                "http_success": 6378,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 3214,
+                    "303": 2994,
+                    "302": 170
+                },
+                "latency_seconds": {
+                    "p50": 0.10533308982849121,
+                    "p95": 0.17451906204223633,
+                    "p99": 0.2015368938446045
+                },
+                "elapsed_seconds": 21.07870602607727,
+                "requests_per_second": 302.58024340343917
+            },
+            "passed": true
+        },
+        {
+            "participants": 50,
+            "pattern": "burst",
+            "workers": 30,
+            "completed": 50,
+            "workflow_failures": 0,
+            "assertions": 42295,
+            "integrity": {
+                "csv_rows": 50,
+                "unique_sessions": 50,
+                "invited_completed": 32,
+                "unresolved_completed": 16,
+                "stub_notifications": 50,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 29,
+                "traced_intervals": 6378,
+                "overlap_witness": [
+                    {
+                        "id": "user-27-1",
+                        "pid": 28008,
+                        "start": 1791824697.373025,
+                        "end": 1791824697.387666,
+                        "sid": "0d981fff1e0562d29af02038bd6d79da"
+                    },
+                    {
+                        "id": "user-25-1",
+                        "pid": 12796,
+                        "start": 1791824697.373072,
+                        "end": 1791824697.38918,
+                        "sid": "e48aad945495dba505744d815ef23dc2"
+                    },
+                    {
+                        "id": "user-24-1",
+                        "pid": 39052,
+                        "start": 1791824697.373604,
+                        "end": 1791824697.39111,
+                        "sid": "438259a31c2ee20bd9ecbc893e520bd7"
+                    },
+                    {
+                        "id": "user-11-1",
+                        "pid": 42084,
+                        "start": 1791824697.373609,
+                        "end": 1791824697.392353,
+                        "sid": "c8ce7cda89203dda7a20b20648497ccd"
+                    },
+                    {
+                        "id": "user-33-1",
+                        "pid": 41276,
+                        "start": 1791824697.373729,
+                        "end": 1791824697.392691,
+                        "sid": "a4b0c947329cd3c9a07134c33b05a31f"
+                    },
+                    {
+                        "id": "user-32-1",
+                        "pid": 17708,
+                        "start": 1791824697.373416,
+                        "end": 1791824697.393061,
+                        "sid": "d4b1273057a994c62dfe0ecaf6f9fa3e"
+                    },
+                    {
+                        "id": "user-13-1",
+                        "pid": 43176,
+                        "start": 1791824697.372997,
+                        "end": 1791824697.395933,
+                        "sid": "b6d3dc0ff715a9c62bdb2b6c1f3afa0a"
+                    },
+                    {
+                        "id": "user-35-1",
+                        "pid": 10604,
+                        "start": 1791824697.387484,
+                        "end": 1791824697.396914,
+                        "sid": "90bb0d7474fc4b12ab71538046e9275d"
+                    },
+                    {
+                        "id": "user-38-1",
+                        "pid": 33388,
+                        "start": 1791824697.379278,
+                        "end": 1791824697.399621,
+                        "sid": "67482bfe4275fa9ff5e882e85a6e47cf"
+                    },
+                    {
+                        "id": "user-19-1",
+                        "pid": 44956,
+                        "start": 1791824697.375622,
+                        "end": 1791824697.406464,
+                        "sid": "002514874b300d109419100f6efcdcff"
+                    },
+                    {
+                        "id": "user-28-1",
+                        "pid": 34192,
+                        "start": 1791824697.373475,
+                        "end": 1791824697.421459,
+                        "sid": "4145c55a91b65b324943022c7761798d"
+                    },
+                    {
+                        "id": "user-14-1",
+                        "pid": 42172,
+                        "start": 1791824697.37369,
+                        "end": 1791824697.438338,
+                        "sid": "485cb5ea115f98defce72f50e3d03de9"
+                    },
+                    {
+                        "id": "user-18-1",
+                        "pid": 35724,
+                        "start": 1791824697.338595,
+                        "end": 1791824697.455628,
+                        "sid": "256861edacdc7d0bb65d59401d3a63c3"
+                    },
+                    {
+                        "id": "user-31-1",
+                        "pid": 38640,
+                        "start": 1791824697.374032,
+                        "end": 1791824697.472042,
+                        "sid": "fe5551a033672f7dd42fabdaacefadbd"
+                    },
+                    {
+                        "id": "user-17-1",
+                        "pid": 30884,
+                        "start": 1791824697.375007,
+                        "end": 1791824697.488298,
+                        "sid": "c01ec81fa627e7477c8c69c1e69c0f47"
+                    },
+                    {
+                        "id": "user-6-1",
+                        "pid": 41772,
+                        "start": 1791824697.339116,
+                        "end": 1791824697.502674,
+                        "sid": "dbb3c9e101da10871fca945bf5ef4cb9"
+                    },
+                    {
+                        "id": "user-21-1",
+                        "pid": 37392,
+                        "start": 1791824697.37369,
+                        "end": 1791824697.521093,
+                        "sid": "543ef03ee92a148845efe41a01c7cec3"
+                    },
+                    {
+                        "id": "user-29-1",
+                        "pid": 41092,
+                        "start": 1791824697.373964,
+                        "end": 1791824697.555266,
+                        "sid": "0bd0b002ff77134ef89e10cd3b1308bd"
+                    },
+                    {
+                        "id": "user-22-1",
+                        "pid": 44648,
+                        "start": 1791824697.373307,
+                        "end": 1791824697.571275,
+                        "sid": "cd0355692536633f6778c73524ae88e4"
+                    },
+                    {
+                        "id": "user-20-1",
+                        "pid": 42296,
+                        "start": 1791824697.376322,
+                        "end": 1791824697.589297,
+                        "sid": "d3a619f8483b707ee92f860c3714f55b"
+                    },
+                    {
+                        "id": "user-4-1",
+                        "pid": 43564,
+                        "start": 1791824697.373481,
+                        "end": 1791824697.604732,
+                        "sid": "f555347c68c81d7da31c3abe187b8168"
+                    },
+                    {
+                        "id": "user-23-1",
+                        "pid": 41080,
+                        "start": 1791824697.338587,
+                        "end": 1791824697.619476,
+                        "sid": "68dab2b72609049bdc5a6c25c6615bfd"
+                    },
+                    {
+                        "id": "user-15-1",
+                        "pid": 43636,
+                        "start": 1791824697.373675,
+                        "end": 1791824697.635973,
+                        "sid": "d2093fcd1e4c5cddf0ee0cd610dfa9d4"
+                    },
+                    {
+                        "id": "user-30-1",
+                        "pid": 41544,
+                        "start": 1791824697.374509,
+                        "end": 1791824697.673084,
+                        "sid": "1575c17662258799786391739da6686b"
+                    },
+                    {
+                        "id": "user-16-1",
+                        "pid": 31804,
+                        "start": 1791824697.374024,
+                        "end": 1791824697.686716,
+                        "sid": "c2024f631880de50c970fca3b94121f2"
+                    },
+                    {
+                        "id": "user-39-1",
+                        "pid": 44020,
+                        "start": 1791824697.380149,
+                        "end": 1791824697.706539,
+                        "sid": "4777940c815f293267c807c128258256"
+                    },
+                    {
+                        "id": "user-40-1",
+                        "pid": 42732,
+                        "start": 1791824697.380272,
+                        "end": 1791824697.738801,
+                        "sid": "2d1532e47ec6c541ceaa2c729ff1304d"
+                    },
+                    {
+                        "id": "user-37-1",
+                        "pid": 44124,
+                        "start": 1791824697.379364,
+                        "end": 1791824697.771645,
+                        "sid": "cddf8a9b37f0d9c52070d9682753dfe9"
+                    },
+                    {
+                        "id": "user-42-1",
+                        "pid": 33628,
+                        "start": 1791824697.380365,
+                        "end": 1791824697.786815,
+                        "sid": "005231830552d868f70dd39aa02ce291"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 144.65780108832678,
+            "http": {
+                "requests": 6378,
+                "http_success": 6378,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 3214,
+                    "303": 2994,
+                    "302": 170
+                },
+                "latency_seconds": {
+                    "p50": 0.09441900253295898,
+                    "p95": 0.17774200439453125,
+                    "p99": 0.22414493560791016
+                },
+                "elapsed_seconds": 20.738598108291626,
+                "requests_per_second": 307.54248511378273
+            },
+            "passed": true
+        },
+        {
+            "participants": 100,
+            "pattern": "ramp",
+            "workers": 30,
+            "completed": 100,
+            "workflow_failures": 0,
+            "assertions": 84585,
+            "integrity": {
+                "csv_rows": 100,
+                "unique_sessions": 100,
+                "invited_completed": 64,
+                "unresolved_completed": 32,
+                "stub_notifications": 100,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 30,
+                "traced_intervals": 12756,
+                "overlap_witness": [
+                    {
+                        "id": "user-2-1",
+                        "pid": 11916,
+                        "start": 1791824739.610325,
+                        "end": 1791824739.630905,
+                        "sid": "d8688127d227e882f9741dfb6ac770e8"
+                    },
+                    {
+                        "id": "user-9-1",
+                        "pid": 38844,
+                        "start": 1791824739.610247,
+                        "end": 1791824739.630483,
+                        "sid": "4dcb035d338336f9fb38834395941395"
+                    },
+                    {
+                        "id": "user-11-1",
+                        "pid": 26792,
+                        "start": 1791824739.610803,
+                        "end": 1791824739.633805,
+                        "sid": "1b853885fb01011026b8753db6391f6b"
+                    },
+                    {
+                        "id": "user-24-1",
+                        "pid": 41396,
+                        "start": 1791824739.616187,
+                        "end": 1791824739.636797,
+                        "sid": "4647768d7535dce238693954f736e639"
+                    },
+                    {
+                        "id": "user-27-1",
+                        "pid": 8416,
+                        "start": 1791824739.615434,
+                        "end": 1791824739.63649,
+                        "sid": "e4c8eeda964364dc1e37b5526d08bc59"
+                    },
+                    {
+                        "id": "user-8-1",
+                        "pid": 38380,
+                        "start": 1791824739.61412,
+                        "end": 1791824739.634365,
+                        "sid": "0619c82e982579c4792d12a05c0f172c"
+                    },
+                    {
+                        "id": "user-1-1",
+                        "pid": 42896,
+                        "start": 1791824739.611077,
+                        "end": 1791824739.634584,
+                        "sid": "213a63530019bbaa37986b12a00e49bf"
+                    },
+                    {
+                        "id": "user-3-1",
+                        "pid": 26664,
+                        "start": 1791824739.614643,
+                        "end": 1791824739.634478,
+                        "sid": "0465c2897a8f1b6836d4129d8be12ba5"
+                    },
+                    {
+                        "id": "user-10-1",
+                        "pid": 41124,
+                        "start": 1791824739.612614,
+                        "end": 1791824739.634835,
+                        "sid": "242be1471ab5c86b704d8912831eb15e"
+                    },
+                    {
+                        "id": "user-25-1",
+                        "pid": 44328,
+                        "start": 1791824739.614611,
+                        "end": 1791824739.634978,
+                        "sid": "df33de31ab18ade9577cd7ffc2d84852"
+                    },
+                    {
+                        "id": "user-26-1",
+                        "pid": 44508,
+                        "start": 1791824739.615574,
+                        "end": 1791824739.636913,
+                        "sid": "fd35fdfe43068241e3219efc80a95f02"
+                    },
+                    {
+                        "id": "user-7-1",
+                        "pid": 27180,
+                        "start": 1791824739.610179,
+                        "end": 1791824739.637464,
+                        "sid": "6ef12de8822183da7f217220e83d6c3f"
+                    },
+                    {
+                        "id": "user-13-1",
+                        "pid": 36624,
+                        "start": 1791824739.61092,
+                        "end": 1791824739.645767,
+                        "sid": "ac2983b3259a43dfaece5f63c700b05e"
+                    },
+                    {
+                        "id": "user-19-1",
+                        "pid": 13012,
+                        "start": 1791824739.615498,
+                        "end": 1791824739.673085,
+                        "sid": "12f219fc2e69a77462377ee47a21018f"
+                    },
+                    {
+                        "id": "user-30-1",
+                        "pid": 40196,
+                        "start": 1791824739.615377,
+                        "end": 1791824739.688977,
+                        "sid": "1fed89b497913a04ebc1101186823d19"
+                    },
+                    {
+                        "id": "user-6-1",
+                        "pid": 43532,
+                        "start": 1791824739.614692,
+                        "end": 1791824739.740717,
+                        "sid": "adf00ff2658f9c7fedc86328e6a8ef27"
+                    },
+                    {
+                        "id": "user-14-1",
+                        "pid": 32144,
+                        "start": 1791824739.614949,
+                        "end": 1791824739.757006,
+                        "sid": "9acab36db36d0c406e22991d5f3bc2af"
+                    },
+                    {
+                        "id": "user-20-1",
+                        "pid": 43024,
+                        "start": 1791824739.614057,
+                        "end": 1791824739.788321,
+                        "sid": "3fb05092ca06755b564c8c99e9a2e145"
+                    },
+                    {
+                        "id": "user-15-1",
+                        "pid": 5560,
+                        "start": 1791824739.61497,
+                        "end": 1791824739.805555,
+                        "sid": "a9bfcd492cfd006522f8895b1edeb8e9"
+                    },
+                    {
+                        "id": "user-29-1",
+                        "pid": 43908,
+                        "start": 1791824739.615098,
+                        "end": 1791824739.872881,
+                        "sid": "409f05cfabd33def39d6956391c6f6f4"
+                    },
+                    {
+                        "id": "user-4-1",
+                        "pid": 29500,
+                        "start": 1791824739.614378,
+                        "end": 1791824739.88938,
+                        "sid": "610927066fdb14061e01b81979015d7c"
+                    },
+                    {
+                        "id": "user-17-1",
+                        "pid": 28384,
+                        "start": 1791824739.613179,
+                        "end": 1791824739.907922,
+                        "sid": "cf2f7ca98d2c17e6bb833b38ff37dde5"
+                    },
+                    {
+                        "id": "user-22-1",
+                        "pid": 28484,
+                        "start": 1791824739.616772,
+                        "end": 1791824739.922349,
+                        "sid": "42ea1611847598f026853db26aa3c73d"
+                    },
+                    {
+                        "id": "user-16-1",
+                        "pid": 42792,
+                        "start": 1791824739.61447,
+                        "end": 1791824739.990564,
+                        "sid": "ddb2ab6871f7a684cede5144df2ec35b"
+                    },
+                    {
+                        "id": "user-12-1",
+                        "pid": 30680,
+                        "start": 1791824739.610997,
+                        "end": 1791824740.021827,
+                        "sid": "ef820fea6888f7a1026a81c87088835a"
+                    },
+                    {
+                        "id": "user-23-1",
+                        "pid": 41688,
+                        "start": 1791824739.615133,
+                        "end": 1791824740.121198,
+                        "sid": "62011b06328232bbe3745ddba604eccf"
+                    },
+                    {
+                        "id": "user-28-1",
+                        "pid": 42936,
+                        "start": 1791824739.612165,
+                        "end": 1791824740.171439,
+                        "sid": "212533a4838fb91bd6b5c3437330b96a"
+                    },
+                    {
+                        "id": "user-18-1",
+                        "pid": 41928,
+                        "start": 1791824739.614908,
+                        "end": 1791824740.206191,
+                        "sid": "ccdf989008130e89544a6f3b41a61c75"
+                    },
+                    {
+                        "id": "user-21-1",
+                        "pid": 29420,
+                        "start": 1791824739.61715,
+                        "end": 1791824740.223598,
+                        "sid": "c420e618ddfcc32da70a69b08ef110f7"
+                    },
+                    {
+                        "id": "user-5-1",
+                        "pid": 5428,
+                        "start": 1791824739.611743,
+                        "end": 1791824740.291826,
+                        "sid": "a5b26914c8d800c90ad15cd4c636a5a6"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 140.99066777666454,
+            "http": {
+                "requests": 12756,
+                "http_success": 12756,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 6428,
+                    "303": 5988,
+                    "302": 340
+                },
+                "latency_seconds": {
+                    "p50": 0.1023550033569336,
+                    "p95": 0.19582891464233398,
+                    "p99": 0.22777199745178223
+                },
+                "elapsed_seconds": 42.556008100509644,
+                "requests_per_second": 299.7461596931888
+            },
+            "passed": true
+        },
+        {
+            "participants": 100,
+            "pattern": "burst",
+            "workers": 30,
+            "completed": 100,
+            "workflow_failures": 0,
+            "assertions": 84585,
+            "integrity": {
+                "csv_rows": 100,
+                "unique_sessions": 100,
+                "invited_completed": 64,
+                "unresolved_completed": 32,
+                "stub_notifications": 100,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 30,
+                "traced_intervals": 12756,
+                "overlap_witness": [
+                    {
+                        "id": "user-10-0",
+                        "pid": 37028,
+                        "start": 1791824800.886148,
+                        "end": 1791824800.899159,
+                        "sid": "dc91f830212c29ccee27e265c26cdeeb"
+                    },
+                    {
+                        "id": "user-3-0",
+                        "pid": 44828,
+                        "start": 1791824800.885276,
+                        "end": 1791824800.900253,
+                        "sid": "c060093dd7f5426f20fe2e7993f16020"
+                    },
+                    {
+                        "id": "user-2-0",
+                        "pid": 37296,
+                        "start": 1791824800.885782,
+                        "end": 1791824800.904904,
+                        "sid": "d964226ceee3ea0c56b37561e0b542a9"
+                    },
+                    {
+                        "id": "user-12-0",
+                        "pid": 26692,
+                        "start": 1791824800.885747,
+                        "end": 1791824800.905656,
+                        "sid": "f0e4d5f16ea70ec73180f511a5d8768a"
+                    },
+                    {
+                        "id": "user-4-0",
+                        "pid": 28828,
+                        "start": 1791824800.887045,
+                        "end": 1791824800.906091,
+                        "sid": "b86e8cb1d9bbaa3ba5515cd615be582e"
+                    },
+                    {
+                        "id": "user-6-0",
+                        "pid": 15556,
+                        "start": 1791824800.886157,
+                        "end": 1791824800.907454,
+                        "sid": "a1b3e12b17be5623b1eccb78a29b8aed"
+                    },
+                    {
+                        "id": "user-20-0",
+                        "pid": 38400,
+                        "start": 1791824800.890181,
+                        "end": 1791824800.908409,
+                        "sid": "84d9814f1d27dd0aa8f3ba180db09cfe"
+                    },
+                    {
+                        "id": "user-7-0",
+                        "pid": 38680,
+                        "start": 1791824800.8904,
+                        "end": 1791824800.908462,
+                        "sid": "eff52021b8838df9722dce82c3c3625b"
+                    },
+                    {
+                        "id": "user-16-0",
+                        "pid": 20964,
+                        "start": 1791824800.889433,
+                        "end": 1791824800.909135,
+                        "sid": "10e46f13ad9c9085d97986dab56e553d"
+                    },
+                    {
+                        "id": "user-11-0",
+                        "pid": 30528,
+                        "start": 1791824800.890401,
+                        "end": 1791824800.909007,
+                        "sid": "a7a5123d286a09cadfd14cea85ae0620"
+                    },
+                    {
+                        "id": "user-17-0",
+                        "pid": 2400,
+                        "start": 1791824800.890241,
+                        "end": 1791824800.909291,
+                        "sid": "c217a93ca40d136d11ab9951fa26d272"
+                    },
+                    {
+                        "id": "user-8-0",
+                        "pid": 6632,
+                        "start": 1791824800.889831,
+                        "end": 1791824800.909457,
+                        "sid": "47e84e4d29ba4c5c5edbf7b6cbb6f2cc"
+                    },
+                    {
+                        "id": "user-0-0",
+                        "pid": 16096,
+                        "start": 1791824800.889722,
+                        "end": 1791824800.909614,
+                        "sid": "764d3294d7ee585ef01505acf429d53d"
+                    },
+                    {
+                        "id": "user-5-0",
+                        "pid": 20824,
+                        "start": 1791824800.89013,
+                        "end": 1791824800.909466,
+                        "sid": "8317ca1fd8b0ec13cfc0aa6ce827d1d3"
+                    },
+                    {
+                        "id": "user-9-0",
+                        "pid": 35976,
+                        "start": 1791824800.88999,
+                        "end": 1791824800.909664,
+                        "sid": "440ecff1f28700b2b2b9a316e9a4ddd9"
+                    },
+                    {
+                        "id": "user-1-0",
+                        "pid": 27068,
+                        "start": 1791824800.888363,
+                        "end": 1791824800.90955,
+                        "sid": "38ae9ce00be354879df346a7950079ce"
+                    },
+                    {
+                        "id": "user-27-0",
+                        "pid": 34160,
+                        "start": 1791824800.897965,
+                        "end": 1791824800.911727,
+                        "sid": "7ccd420c2096bc639d8713182eb05ecf"
+                    },
+                    {
+                        "id": "user-19-0",
+                        "pid": 42344,
+                        "start": 1791824800.898483,
+                        "end": 1791824800.912774,
+                        "sid": "ad1b7a5165d23e98f9fa130b012af031"
+                    },
+                    {
+                        "id": "user-24-0",
+                        "pid": 43932,
+                        "start": 1791824800.89838,
+                        "end": 1791824800.912636,
+                        "sid": "784fe5cecb6333dc2533f034653f25d2"
+                    },
+                    {
+                        "id": "user-26-0",
+                        "pid": 44500,
+                        "start": 1791824800.898215,
+                        "end": 1791824800.911945,
+                        "sid": "c784062dbb230546bc674ae4659ab38f"
+                    },
+                    {
+                        "id": "user-25-0",
+                        "pid": 42484,
+                        "start": 1791824800.898385,
+                        "end": 1791824800.912202,
+                        "sid": "19834b3d707f9bd7d83313c22af30eee"
+                    },
+                    {
+                        "id": "user-22-0",
+                        "pid": 26868,
+                        "start": 1791824800.898203,
+                        "end": 1791824800.912342,
+                        "sid": "df57232b2f11d240b9a6bc0ddd6b1766"
+                    },
+                    {
+                        "id": "user-29-0",
+                        "pid": 7652,
+                        "start": 1791824800.898287,
+                        "end": 1791824800.912466,
+                        "sid": "20cd537c923d6e8a6468b43e0dbc85b3"
+                    },
+                    {
+                        "id": "user-21-0",
+                        "pid": 41960,
+                        "start": 1791824800.898627,
+                        "end": 1791824800.912922,
+                        "sid": "9a44fc60486f9aae63f890e450f18f88"
+                    },
+                    {
+                        "id": "user-13-0",
+                        "pid": 41532,
+                        "start": 1791824800.889792,
+                        "end": 1791824800.912965,
+                        "sid": "fefabe90bf8f7a4998402ab876e1b80f"
+                    },
+                    {
+                        "id": "user-14-0",
+                        "pid": 41412,
+                        "start": 1791824800.888808,
+                        "end": 1791824800.913278,
+                        "sid": "dbe60fcd57a27fa1326f12eac4a4d5bf"
+                    },
+                    {
+                        "id": "user-18-0",
+                        "pid": 35396,
+                        "start": 1791824800.898847,
+                        "end": 1791824800.913053,
+                        "sid": "9620868573f718e1bfec2cea8fd3993d"
+                    },
+                    {
+                        "id": "user-23-0",
+                        "pid": 43412,
+                        "start": 1791824800.898989,
+                        "end": 1791824800.913326,
+                        "sid": "01d9528fb39be0d0283e3963a3073cb3"
+                    },
+                    {
+                        "id": "user-28-0",
+                        "pid": 36972,
+                        "start": 1791824800.898954,
+                        "end": 1791824800.913058,
+                        "sid": "e61f696ce2bc71cc130e7bb3da5f83e7"
+                    },
+                    {
+                        "id": "user-15-0",
+                        "pid": 5368,
+                        "start": 1791824800.889344,
+                        "end": 1791824800.913865,
+                        "sid": "5ec26669fc785117926ae378d5fc6d9e"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 141.58537242178397,
+            "http": {
+                "requests": 12756,
+                "http_success": 12756,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 6428,
+                    "303": 5988,
+                    "302": 340
+                },
+                "latency_seconds": {
+                    "p50": 0.10354399681091309,
+                    "p95": 0.1939678192138672,
+                    "p99": 0.23861908912658691
+                },
+                "elapsed_seconds": 42.37725901603699,
+                "requests_per_second": 301.01050176871274
+            },
+            "passed": true
+        },
+        {
+            "participants": 200,
+            "pattern": "ramp",
+            "workers": 30,
+            "completed": 200,
+            "workflow_failures": 0,
+            "assertions": 169545,
+            "integrity": {
+                "csv_rows": 200,
+                "unique_sessions": 200,
+                "invited_completed": 132,
+                "unresolved_completed": 64,
+                "stub_notifications": 200,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 30,
+                "traced_intervals": 25576,
+                "overlap_witness": [
+                    {
+                        "id": "user-1-1",
+                        "pid": 42196,
+                        "start": 1791824867.219925,
+                        "end": 1791824867.240685,
+                        "sid": "a4c120b0ce827fc6954029d201234fec"
+                    },
+                    {
+                        "id": "user-2-1",
+                        "pid": 43472,
+                        "start": 1791824867.224575,
+                        "end": 1791824867.245346,
+                        "sid": "fb321f30d8f69b250f07015025aef7d0"
+                    },
+                    {
+                        "id": "user-10-1",
+                        "pid": 27796,
+                        "start": 1791824867.224287,
+                        "end": 1791824867.24504,
+                        "sid": "e81c32509f4294cc79cae94d14b69363"
+                    },
+                    {
+                        "id": "user-24-1",
+                        "pid": 43356,
+                        "start": 1791824867.226525,
+                        "end": 1791824867.245136,
+                        "sid": "19690206f391715b8f4e647f510d4c60"
+                    },
+                    {
+                        "id": "user-3-1",
+                        "pid": 34764,
+                        "start": 1791824867.22422,
+                        "end": 1791824867.243284,
+                        "sid": "2235ee97d3941fd080ad3d83c569abec"
+                    },
+                    {
+                        "id": "user-9-1",
+                        "pid": 34944,
+                        "start": 1791824867.221793,
+                        "end": 1791824867.242747,
+                        "sid": "9c2bbcd4d68347febeef55b277a18e71"
+                    },
+                    {
+                        "id": "user-11-1",
+                        "pid": 34000,
+                        "start": 1791824867.22541,
+                        "end": 1791824867.244206,
+                        "sid": "c6ffb7ee3b7c016abf12cbde424267ec"
+                    },
+                    {
+                        "id": "user-8-1",
+                        "pid": 35908,
+                        "start": 1791824867.223837,
+                        "end": 1791824867.244055,
+                        "sid": "857d36c3e955fd964261f7cead27cd51"
+                    },
+                    {
+                        "id": "user-26-1",
+                        "pid": 31980,
+                        "start": 1791824867.229953,
+                        "end": 1791824867.248506,
+                        "sid": "0be1c5e71c531b759e6dd46d2e51477e"
+                    },
+                    {
+                        "id": "user-4-1",
+                        "pid": 21092,
+                        "start": 1791824867.220214,
+                        "end": 1791824867.251992,
+                        "sid": "32394a99b71e89eeb329cbb5804f5cfd"
+                    },
+                    {
+                        "id": "user-25-1",
+                        "pid": 44888,
+                        "start": 1791824867.230535,
+                        "end": 1791824867.249543,
+                        "sid": "ca5029b30f3b73072133f218d8f9ed9c"
+                    },
+                    {
+                        "id": "user-27-1",
+                        "pid": 24564,
+                        "start": 1791824867.230605,
+                        "end": 1791824867.250062,
+                        "sid": "4604666e5af7c0c8d5f3dfc2d783ed5c"
+                    },
+                    {
+                        "id": "user-15-1",
+                        "pid": 9396,
+                        "start": 1791824867.231366,
+                        "end": 1791824867.268676,
+                        "sid": "91372c8366b9cd274e07752487852b3e"
+                    },
+                    {
+                        "id": "user-23-1",
+                        "pid": 44704,
+                        "start": 1791824867.224556,
+                        "end": 1791824867.28364,
+                        "sid": "732365679518eea5055a3c5fb800ded6"
+                    },
+                    {
+                        "id": "user-5-1",
+                        "pid": 7116,
+                        "start": 1791824867.220552,
+                        "end": 1791824867.300315,
+                        "sid": "02cc2226ca7ae70f32f5655057e7ed6e"
+                    },
+                    {
+                        "id": "user-19-1",
+                        "pid": 43616,
+                        "start": 1791824867.226045,
+                        "end": 1791824867.313907,
+                        "sid": "0040642c4cc490bad2af0554317875fd"
+                    },
+                    {
+                        "id": "user-7-1",
+                        "pid": 26644,
+                        "start": 1791824867.220836,
+                        "end": 1791824867.330063,
+                        "sid": "0ef24c39f54ec793ff00dbbd11f62017"
+                    },
+                    {
+                        "id": "user-17-1",
+                        "pid": 43376,
+                        "start": 1791824867.222955,
+                        "end": 1791824867.348286,
+                        "sid": "288f9b24f5a7de6649a8a548e244e3d0"
+                    },
+                    {
+                        "id": "user-21-1",
+                        "pid": 41456,
+                        "start": 1791824867.22549,
+                        "end": 1791824867.364472,
+                        "sid": "5b58486bb05aea682a658f4ac3815276"
+                    },
+                    {
+                        "id": "user-13-1",
+                        "pid": 40528,
+                        "start": 1791824867.231395,
+                        "end": 1791824867.390415,
+                        "sid": "92c2adf05ab269c63d53ae387d30c775"
+                    },
+                    {
+                        "id": "user-22-1",
+                        "pid": 19956,
+                        "start": 1791824867.221442,
+                        "end": 1791824867.40714,
+                        "sid": "a6ec74f2364f69ac00685b8f5db2543f"
+                    },
+                    {
+                        "id": "user-30-1",
+                        "pid": 864,
+                        "start": 1791824867.220922,
+                        "end": 1791824867.43921,
+                        "sid": "18a5fa04b7a8b7a4fb98274f65b73468"
+                    },
+                    {
+                        "id": "user-6-1",
+                        "pid": 43788,
+                        "start": 1791824867.227866,
+                        "end": 1791824867.457211,
+                        "sid": "ceecf6a0825d3586eeafa56b310f9c03"
+                    },
+                    {
+                        "id": "user-28-1",
+                        "pid": 34616,
+                        "start": 1791824867.231365,
+                        "end": 1791824867.472761,
+                        "sid": "9a0c4e9d93f072d75e9f0a26e27ce152"
+                    },
+                    {
+                        "id": "user-29-1",
+                        "pid": 37664,
+                        "start": 1791824867.231587,
+                        "end": 1791824867.502684,
+                        "sid": "55cffb55ff5bb781b771b9b118d2ba9f"
+                    },
+                    {
+                        "id": "user-18-1",
+                        "pid": 43100,
+                        "start": 1791824867.224455,
+                        "end": 1791824867.598643,
+                        "sid": "8d40c1f5ce435c75ed5c12fb0debc900"
+                    },
+                    {
+                        "id": "user-12-1",
+                        "pid": 40364,
+                        "start": 1791824867.223352,
+                        "end": 1791824867.610464,
+                        "sid": "710de1b665ad6a63e469cea5c9c8d981"
+                    },
+                    {
+                        "id": "user-16-1",
+                        "pid": 42612,
+                        "start": 1791824867.224383,
+                        "end": 1791824867.688333,
+                        "sid": "d3f0d34dc26439c8a389167ef9857985"
+                    },
+                    {
+                        "id": "user-20-1",
+                        "pid": 39944,
+                        "start": 1791824867.227417,
+                        "end": 1791824867.75075,
+                        "sid": "86a95a29f08e5e0e78e3b2b2e700996c"
+                    },
+                    {
+                        "id": "user-14-1",
+                        "pid": 44696,
+                        "start": 1791824867.231587,
+                        "end": 1791824868.38176,
+                        "sid": "6b07d63c4efbb7e1e0f2defea32f5a6d"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 138.00175450886707,
+            "http": {
+                "requests": 25576,
+                "http_success": 25576,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 12888,
+                    "303": 11980,
+                    "302": 708
+                },
+                "latency_seconds": {
+                    "p50": 0.09901285171508789,
+                    "p95": 0.1941390037536621,
+                    "p99": 0.2263021469116211
+                },
+                "elapsed_seconds": 86.95541620254517,
+                "requests_per_second": 294.12773944323203
+            },
+            "passed": true
+        },
+        {
+            "participants": 200,
+            "pattern": "burst",
+            "workers": 30,
+            "completed": 200,
+            "workflow_failures": 0,
+            "assertions": 169545,
+            "integrity": {
+                "csv_rows": 200,
+                "unique_sessions": 200,
+                "invited_completed": 132,
+                "unresolved_completed": 64,
+                "stub_notifications": 200,
+                "php_diagnostics": 0
+            },
+            "overlap": {
+                "executed_php_workers": 30,
+                "maximum_overlapping_php_requests": 30,
+                "traced_intervals": 25576,
+                "overlap_witness": [
+                    {
+                        "id": "user-25-1",
+                        "pid": 40308,
+                        "start": 1791824971.674455,
+                        "end": 1791824971.689437,
+                        "sid": "805f1cdde8e60cdb43e923e18e49e26c"
+                    },
+                    {
+                        "id": "user-24-1",
+                        "pid": 42112,
+                        "start": 1791824971.6759,
+                        "end": 1791824971.692519,
+                        "sid": "6cd3443a7cbae30d2510f3c848ee5918"
+                    },
+                    {
+                        "id": "user-26-1",
+                        "pid": 42968,
+                        "start": 1791824971.675173,
+                        "end": 1791824971.691157,
+                        "sid": "b6f0c82349695fec8549c8ea46d0df52"
+                    },
+                    {
+                        "id": "user-27-1",
+                        "pid": 33880,
+                        "start": 1791824971.674825,
+                        "end": 1791824971.691175,
+                        "sid": "3b314580dba27dfbae3e44e1b0ed81e6"
+                    },
+                    {
+                        "id": "user-34-1",
+                        "pid": 33176,
+                        "start": 1791824971.674897,
+                        "end": 1791824971.691389,
+                        "sid": "85713a6946801faeb3b509ee2c8b1eb9"
+                    },
+                    {
+                        "id": "user-5-1",
+                        "pid": 10340,
+                        "start": 1791824971.632183,
+                        "end": 1791824971.693142,
+                        "sid": "7901c51a0ed254c48f571e648f30be20"
+                    },
+                    {
+                        "id": "user-33-1",
+                        "pid": 37496,
+                        "start": 1791824971.678536,
+                        "end": 1791824971.693478,
+                        "sid": "6bded38bf67675d0023a8babd1e384b6"
+                    },
+                    {
+                        "id": "user-32-1",
+                        "pid": 42436,
+                        "start": 1791824971.679094,
+                        "end": 1791824971.693646,
+                        "sid": "2d7ba0847068c816a7e0bc37276d45c5"
+                    },
+                    {
+                        "id": "user-23-1",
+                        "pid": 20752,
+                        "start": 1791824971.674385,
+                        "end": 1791824971.696642,
+                        "sid": "1bf9e2f2ddaed3d56b26b0f5309c58e4"
+                    },
+                    {
+                        "id": "user-43-1",
+                        "pid": 15564,
+                        "start": 1791824971.682581,
+                        "end": 1791824971.70101,
+                        "sid": "a2adda91d83cdce207a526f27b4804b6"
+                    },
+                    {
+                        "id": "user-20-1",
+                        "pid": 42732,
+                        "start": 1791824971.67511,
+                        "end": 1791824971.760848,
+                        "sid": "4cb3d9c5bfac12edb17e8a8093b0f759"
+                    },
+                    {
+                        "id": "user-30-1",
+                        "pid": 32520,
+                        "start": 1791824971.675615,
+                        "end": 1791824971.776345,
+                        "sid": "60e37d610069faa62e3ac1f5c2df1c21"
+                    },
+                    {
+                        "id": "user-38-1",
+                        "pid": 43676,
+                        "start": 1791824971.678674,
+                        "end": 1791824971.791491,
+                        "sid": "e69e241fd233b6f535daa2bc11ef0f1c"
+                    },
+                    {
+                        "id": "user-31-1",
+                        "pid": 41988,
+                        "start": 1791824971.675273,
+                        "end": 1791824971.806746,
+                        "sid": "09f06a9e36218b9bfa59b051f3813c1c"
+                    },
+                    {
+                        "id": "user-40-1",
+                        "pid": 36156,
+                        "start": 1791824971.68223,
+                        "end": 1791824971.824812,
+                        "sid": "1b3bfc2459115fde37f74bb4604ad022"
+                    },
+                    {
+                        "id": "user-39-1",
+                        "pid": 17068,
+                        "start": 1791824971.676237,
+                        "end": 1791824971.843569,
+                        "sid": "b808a4ea599e9dc7ac45dae7f79f719d"
+                    },
+                    {
+                        "id": "user-41-1",
+                        "pid": 43264,
+                        "start": 1791824971.682365,
+                        "end": 1791824971.88949,
+                        "sid": "0df18061488621a42c3445843401d3f7"
+                    },
+                    {
+                        "id": "user-29-1",
+                        "pid": 31288,
+                        "start": 1791824971.675398,
+                        "end": 1791824971.901381,
+                        "sid": "c6fc2ede4568609dca3988d6a24db9e3"
+                    },
+                    {
+                        "id": "user-47-1",
+                        "pid": 42120,
+                        "start": 1791824971.681791,
+                        "end": 1791824971.915944,
+                        "sid": "1172a9c6f5c34f6ccb49e2c8aa488423"
+                    },
+                    {
+                        "id": "user-19-1",
+                        "pid": 43296,
+                        "start": 1791824971.637445,
+                        "end": 1791824971.997617,
+                        "sid": "724f22ef0f91e54361adcb79f626a376"
+                    },
+                    {
+                        "id": "user-28-1",
+                        "pid": 40864,
+                        "start": 1791824971.674608,
+                        "end": 1791824972.074052,
+                        "sid": "a47d416a8e22f7f08f0bf3aee1cfd89a"
+                    },
+                    {
+                        "id": "user-6-1",
+                        "pid": 20148,
+                        "start": 1791824971.636579,
+                        "end": 1791824972.09153,
+                        "sid": "859fcf950680389ede36f43f0f1f96fc"
+                    },
+                    {
+                        "id": "user-7-1",
+                        "pid": 39152,
+                        "start": 1791824971.637093,
+                        "end": 1791824972.105522,
+                        "sid": "4fd2e93e66977c34d362ce6f21652bdb"
+                    },
+                    {
+                        "id": "user-18-1",
+                        "pid": 38348,
+                        "start": 1791824971.674761,
+                        "end": 1791824972.27579,
+                        "sid": "5a93d4f7f8a29595cd0e669bd7c39f71"
+                    },
+                    {
+                        "id": "user-21-1",
+                        "pid": 19480,
+                        "start": 1791824971.675023,
+                        "end": 1791824972.383599,
+                        "sid": "081f9d90d75fc2b2896ff23e8a10c90f"
+                    },
+                    {
+                        "id": "user-14-1",
+                        "pid": 39380,
+                        "start": 1791824971.674741,
+                        "end": 1791824972.599878,
+                        "sid": "c1242c8dc7dd5a708905d37a8b061338"
+                    },
+                    {
+                        "id": "user-15-1",
+                        "pid": 43396,
+                        "start": 1791824971.674702,
+                        "end": 1791824972.781799,
+                        "sid": "086a90f5aeab191738c3415fc7414b17"
+                    },
+                    {
+                        "id": "user-12-1",
+                        "pid": 42116,
+                        "start": 1791824971.637325,
+                        "end": 1791824972.803761,
+                        "sid": "6fde20678a20ea41edff41a7ca51d683"
+                    },
+                    {
+                        "id": "user-22-1",
+                        "pid": 43248,
+                        "start": 1791824971.674977,
+                        "end": 1791824972.892946,
+                        "sid": "5cdb033aaabc2c5e0f511bd5e968f3af"
+                    },
+                    {
+                        "id": "user-16-1",
+                        "pid": 44832,
+                        "start": 1791824971.637567,
+                        "end": 1791824972.971446,
+                        "sid": "d987d9e3601ee585e7789244460dc23b"
+                    }
+                ],
+                "maximum_php_memory_peak_bytes": 4194304
+            },
+            "completed_per_minute": 139.30022601683393,
+            "http": {
+                "requests": 25576,
+                "http_success": 25576,
+                "http_failed": 0,
+                "statuses": {
+                    "200": 12888,
+                    "303": 11980,
+                    "302": 708
+                },
+                "latency_seconds": {
+                    "p50": 0.09853410720825195,
+                    "p95": 0.2091670036315918,
+                    "p99": 0.25000786781311035
+                },
+                "elapsed_seconds": 86.14487099647522,
+                "requests_per_second": 296.8952150505454
+            },
+            "passed": true
+        }
+    ],
+    "probes": []
+}

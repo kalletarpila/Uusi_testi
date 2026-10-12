@@ -1,0 +1,10 @@
+{
+    "initial_head": "03d4447d640eeb2e339ae1a34d8ae4ff136e5640",
+    "profiles": [],
+    "probes": {
+        "completed-invitation-rejects-other-session-status-call": {
+            "passed": false,
+            "error": "Completed invitation still verifies session ownership"
+        }
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "initial_head": "03d4447d640eeb2e339ae1a34d8ae4ff136e5640",
+    "profiles": [],
+    "probes": {
+        "append-position-under-lock": {
+            "passed": false,
+            "error": "Concurrent append lost/overwrote records: 1"
+        },
+        "invitation-transaction-no-lost-update": {
+            "passed": false,
+            "error": "Lost invitation updates: only 1/10 completed"
+        },
+        "single-first-writer-header": {
+            "passed": false,
+            "error": "Duplicate/missing CSV header"
+        },
+        "same-invitation-single-session-owner": {
+            "passed": false,
+            "error": "Independent sessions claimed same invitation: 10"
+        }
+    }
+}

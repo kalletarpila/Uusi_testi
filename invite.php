@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+require_once __DIR__ . '/storage.php';
 
 /**
  * ENNEAGRAMMITESTI - PILOTTIKUTSU-SOVELLUS
@@ -404,15 +405,7 @@ function invites_path(): string { return data_dir() . '/' . INVITES_FILE; }
  * @return array Lista kaikista kutsuista
  */
 function load_invites(): array {
-    $p = invites_path();
-    if (!file_exists($p) || filesize($p) === 0) return [];
-    $fp = fopen($p, 'r'); if (!$fp) return [];
-    flock($fp, LOCK_SH);
-    $json = stream_get_contents($fp);
-    flock($fp, LOCK_UN);
-    fclose($fp);
-    $arr = json_decode($json, true);
-    return is_array($arr) ? $arr : [];
+    return storage_json_read(invites_path()) ?? [];
 }
 /**
  * Tallentaa kutsut JSON-tiedostoon
@@ -424,15 +417,10 @@ function load_invites(): array {
  * @return bool True jos tallennus onnistui
  */
 function save_invites(array $inv): bool {
-    $p = invites_path();
-    $fp = fopen($p, 'c+'); if (!$fp) return false;
-    flock($fp, LOCK_EX);
-    ftruncate($fp, 0); rewind($fp);
-    $ok = fwrite($fp, json_encode($inv, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT)) !== false;
-    fflush($fp);
-    flock($fp, LOCK_UN);
-    fclose($fp);
-    return $ok;
+    return storage_json_update(invites_path(),function(&$current)use($inv){$current=$inv;return true;});
+}
+function append_invite(array $invite): bool {
+    return storage_json_update(invites_path(),function(&$items)use($invite){$items[]=$invite;return true;});
 }
 
 /* --- Generointi --- */
@@ -589,7 +577,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_invite'])) {
     }
     
     // 5. Käsittele jokainen kutsuttava erikseen
-    $all_invites = load_invites();
     $ref_name = trim($old['ref_name']);
     $note_clean = trim(strip_tags($old['ref_note']));
     
@@ -608,8 +595,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_invite'])) {
         $invite = create_invite_record($ref_name, $nominee);
         
         // Tallenna tiedot
-        $all_invites[] = $invite;
-        if (!save_invites($all_invites)) {
+        if (!append_invite($invite)) {
             $errors[] = $nom_name . ': Kutsun tallennus epäonnistui';
             invite_log('Save invites FAILED for nominee: '.$nom_name);
             continue;

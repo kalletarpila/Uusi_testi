@@ -1,4 +1,5 @@
 <?php declare(strict_types=1);
+require_once __DIR__ . '/storage.php';
 /**
  * Yksinkertainen sähköpostin lähetys palautteelle
  *
@@ -184,16 +185,7 @@ function index_log(string $msg): void {
  * @return array Lista kutsuista tai tyhjä array jos tiedosto puuttuu tai on virheellinen
  */
 function invites_load(): array {
-    $p = invites_path();
-    if (!file_exists($p) || filesize($p) === 0) return [];
-    $fp = fopen($p, 'r');
-    if (!$fp) return [];
-    flock($fp, LOCK_SH);
-    $json = stream_get_contents($fp);
-    flock($fp, LOCK_UN);
-    fclose($fp);
-    $data = json_decode($json, true);
-    return is_array($data) ? $data : [];
+    return storage_json_read(invites_path()) ?? [];
 }
 
 /**
@@ -203,17 +195,7 @@ function invites_load(): array {
  * @return bool True jos tallennus onnistui, false muuten
  */
 function invites_save(array $items): bool {
-    $p = invites_path();
-    $fp = fopen($p, 'c+');
-    if (!$fp) return false;
-    flock($fp, LOCK_EX);
-    ftruncate($fp, 0);
-    rewind($fp);
-    $ok = fwrite($fp, json_encode($items, JSON_UNESCAPED_UNICODE|JSON_PRETTY_PRINT)) !== false;
-    fflush($fp);
-    flock($fp, LOCK_UN);
-    fclose($fp);
-    return $ok;
+    return storage_json_update(invites_path(),function(&$current)use($items){$current=$items;return true;});
 }
 
 /**
@@ -256,20 +238,42 @@ function invite_is_usable(array $invite): bool {
  * @param string $status Uusi status (esim. 'sent', 'accepted', 'completed')
  * @return void
  */
-function invite_update_status(string $id, string $status): void {
-    $items = invites_load();
-    $ch = false;
-    foreach ($items as &$it) {
+function invite_update_status(string $id, string $status): bool {
+    return storage_json_update(invites_path(),function(&$items)use($id,$status){
+      foreach ($items as &$it) {
         if (($it['id'] ?? '') === $id) {
+            if (!in_array($status,['accepted','completed'],true) ||
+                (!empty($it['accepted_session_id']) && $it['accepted_session_id'] !== session_id())) return false;
+            if (($it['status'] ?? '') === 'completed') return $status === 'completed';
             $it['status'] = $status;
             if ($status === 'accepted') $it['accepted_at']  = (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
             if ($status === 'completed') $it['completed_at'] = (new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
-            $ch = true;
-            break;
+            return true;
         }
+      }
+      return false;
+    });
+}
+
+/** Claim and check expiry/ownership within the same transaction. */
+function invite_claim(string $value,bool $token=false):?array {
+    $claimed=null;$attempted=false;unset($_SESSION['invite_storage_error']);
+    $ok=storage_json_update(invites_path(),function(&$items)use($value,$token,&$claimed,&$attempted){
+        $attempted=true;
+        foreach($items as &$item){
+            $matches=$token ? ($item['token']??'')===$value : strtoupper($item['code']??'')===strtoupper($value);
+            if(!$matches)continue;
+            if(!invite_is_usable($item)||(!empty($item['accepted_session_id'])&&$item['accepted_session_id']!==session_id()))return false;
+            $item['status']='accepted';$item['accepted_session_id']=session_id();
+            $item['accepted_at']??=(new DateTimeImmutable('now'))->format('Y-m-d H:i:s');
+            $claimed=$item;return true;
+        }
+        return false;
+    });
+    if(!$ok&&(!$attempted||$claimed!==null)){
+        $_SESSION['invite_storage_error']=true;index_log('INVITE_STORAGE_ERROR: claim could not be persisted');
     }
-    unset($it);
-    if ($ch) invites_save($items);
+    return $ok?$claimed:null;
 }
 
 /* ====== LOKITIEDOSTOJEN HALLINTA ====== */
@@ -980,8 +984,25 @@ function generate_phase2_tiebreak_button_group(): array {
 function session_initialize(): void {
     try {
         if (session_status() === PHP_SESSION_NONE) {
-            session_start();
+            if (!@session_start()) {
+                http_response_code(503);
+                echo 'Tekninen virhe: istunnon tallennus ei ole käytettävissä. Yritä myöhemmin uudelleen.';
+                exit;
+            }
         }
+        register_shutdown_function(static function():void {
+            if(session_status()!==PHP_SESSION_ACTIVE)return;
+            $failed=false;
+            set_error_handler(static function($level,$message)use(&$failed){$failed=true;index_log('SESSION_WRITE_ERROR: '.$message);return true;});
+            $closed=session_write_close();restore_error_handler();
+            if(!$closed||$failed){
+                index_log('SESSION_WRITE_ERROR: request state was not saved; research CSV may already exist');
+                if(!headers_sent()){
+                    while(ob_get_level())ob_end_clean();header_remove('Location');http_response_code(503);
+                    echo 'Tekninen virhe: istunnon tallennus epäonnistui. Yritä myöhemmin uudelleen.';
+                }
+            }
+        });
         
         // Alusta perustilat jos puuttuu
         if (!isset($_SESSION['state'])) {
@@ -1398,9 +1419,7 @@ function send_result_email(array $row): void {
 }
 
 /* Uusi survey log: 25 kiinteää kolumnia + kysymyskohtaiset vastaukset */
-function ensure_log_header(): bool {
-    $lp = log_path();
-    if (!file_exists($lp)) {
+function survey_log_header(): string {
     // Fixed columns (expanded): original 25 plus 4 tiebreak-only columns = 29
     $cols = [
       'date', 'time', 'session_id', 'nick', 'user_guess', 'user_confidence',
@@ -1448,12 +1467,10 @@ function ensure_log_header(): bool {
     // Use robust append with flock and retries to avoid 'Resource temporarily unavailable'
   // Prefix header with UTF-8 BOM so Excel/Windows recognizes UTF-8 encoding
   $headerLine = "\xEF\xBB\xBF" . implode(';', $cols) . PHP_EOL;
-    if (!safe_file_append($lp, $headerLine)) {
-      handle_error('FILE_IO', "Failed to write log header to: $lp");
-      return false;
-    }
-    }
-    return is_file($lp);
+    return $headerLine;
+}
+function ensure_log_header(): bool {
+    return storage_csv_append(log_path(),survey_log_header()) !== 'error';
 }
 
 /**
@@ -1462,13 +1479,14 @@ function ensure_log_header(): bool {
  */
 function safe_file_append(string $path, string $data, int $retries = 20, int $wait_ms = 200): bool {
   $attempt = 0;
+  $operationDeadline = microtime(true) + ($retries * $wait_ms / 1000);
   // Ensure directory exists
   $dir = dirname($path);
   if (!is_dir($dir)) {
     @mkdir($dir, 0700, true);
   }
 
-  while ($attempt < $retries) {
+  while ($attempt < $retries && microtime(true) < $operationDeadline) {
     // Use 'c' mode: open for writing, create if not exists, do not truncate
     $fh = @fopen($path, 'c');
     if ($fh === false) {
@@ -1478,14 +1496,13 @@ function safe_file_append(string $path, string $data, int $retries = 20, int $wa
       continue;
     }
 
-    // Seek to end before locking/writing
-    if (@fseek($fh, 0, SEEK_END) === -1) {
-      // Non-fatal, but note it
-      index_log('FILE_APPEND: fseek failed for ' . $path . ' (attempt ' . $attempt . ')');
-    }
-
     // Try to acquire exclusive lock
-    $locked = @flock($fh, LOCK_EX);
+    $locked = false;
+    $lockDeadline = $operationDeadline;
+    do {
+      $locked = @flock($fh, LOCK_EX | LOCK_NB);
+      if (!$locked) usleep(10000);
+    } while (!$locked && microtime(true) < $lockDeadline);
     if (!$locked) {
       @fclose($fh);
       $attempt++;
@@ -1495,13 +1512,14 @@ function safe_file_append(string $path, string $data, int $retries = 20, int $wa
     }
 
     // Write and flush
-    $written = @fwrite($fh, $data);
-    @fflush($fh);
+    $originalSize = fstat($fh)['size'];
+    $written = @fseek($fh, 0, SEEK_END) === 0 && storage_write_all($fh, $data) && @fflush($fh);
+    if (!$written && $originalSize !== false) @ftruncate($fh, $originalSize);
     // Release lock and close
     @flock($fh, LOCK_UN);
     @fclose($fh);
 
-    if ($written === false) {
+    if (!$written) {
       $attempt++;
       index_log('FILE_APPEND: fwrite failed for ' . $path . ' (attempt ' . $attempt . ')');
       usleep($wait_ms * 1000);
@@ -1633,7 +1651,6 @@ function write_full_log_row(array $row): bool {
         index_log('DEBUG: Final parts count=' . count($parts) . ' (should be 121: 25+40+10+36+10)');
         index_log('DEBUG: TB2_1-TB2_4 samples: [' . ($parts[111] ?? 'empty') . ',' . ($parts[112] ?? 'empty') . ',' . ($parts[113] ?? 'empty') . ',' . ($parts[114] ?? 'empty') . '] (format: var-qnum-value)');
         
-        if (!ensure_log_header()) return false;
         
   // Debug: show raw and mapped confidence values right before writing
   $raw_conf = $row['confidence'] ?? null;
@@ -1654,10 +1671,12 @@ function write_full_log_row(array $row): bool {
   $csvLine = stream_get_contents($csvBuffer);
   fclose($csvBuffer);
         
-    if (!safe_file_append($logPath, $csvLine)) {
+    $appendStatus=storage_csv_append($logPath,survey_log_header(),$csvLine,(string)($_SESSION['sessionId'] ?? session_id()));
+    if ($appendStatus === 'error') {
       handle_error('FILE_IO', "Failed to write log row to: $logPath");
       return false;
     }
+    if ($appendStatus === 'existing') return true;
 
     // Also write a debug copy into repository-local logs directory for inspection during development
     $debugDir = __DIR__ . '/logs';
@@ -1696,7 +1715,10 @@ function complete_quiz_result(): bool {
         }
         $_SESSION['result_saved'] = true;
     }
-    if (!empty($_SESSION['InviteId'])) invite_update_status($_SESSION['InviteId'], 'completed');
+    if (!empty($_SESSION['InviteId']) && !invite_update_status($_SESSION['InviteId'], 'completed')) {
+        quiz_technical_error('invitation_update_failed_after_result_saved');
+        return false;
+    }
     $_SESSION['state'] = 'done2';
     return true;
 }
@@ -1796,15 +1818,14 @@ function handle_intro_form(): ?string {
 
     // Kutsukoodi validoidaan tässä, jos annettu ja ei jo token-claimia
     if (INVITES_ENABLED && $code !== '' && empty($_SESSION['InviteId'])) {
-        $items = invites_load();
-        $inv = invite_find_by_code($items, $code);
-        if ($inv && invite_is_usable($inv)) {
+        $inv = invite_claim($code);
+        if ($inv) {
             $_SESSION['RefGuessType'] = (string)($inv['guess_type'] ?? '');
             $_SESSION['RefGuessProb'] = (string)($inv['guess_prob'] ?? '');
             $_SESSION['InviteId']     = (string)($inv['id'] ?? '');
-            if (($inv['status'] ?? '') === 'sent') invite_update_status($_SESSION['InviteId'], 'accepted');
             index_log('INVITE: Claimed by code="' . $code . '" (id=' . $_SESSION['InviteId'] . ')');
         } else {
+            if(!empty($_SESSION['invite_storage_error']))return 'Tekninen virhe: kutsun tallennus epäonnistui. Yritä myöhemmin uudelleen.';
             return 'Kutsukoodi ei kelpaa tai on vanhentunut.';
         }
     }
@@ -3157,22 +3178,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'ph
 if (INVITES_ENABLED && ($_SESSION['state'] ?? '') === 'intro' && isset($_GET['invite'])) {
   $token = (string)$_GET['invite'];
   if ($token !== '') {
-    $items = invites_load();
-    $inv = invite_find_by_token($items, $token);
-    if ($inv && invite_is_usable($inv)) {
+    $inv = invite_claim($token,true);
+    if ($inv) {
       $_SESSION['RefGuessType'] = (string)($inv['guess_type'] ?? '');
       $_SESSION['RefGuessProb'] = (string)($inv['guess_prob'] ?? '');
       $_SESSION['InviteId']     = (string)($inv['id'] ?? '');
       $_SESSION['invite_claim_info'] = 'Kutsu tunnistettu.';
       // Päivitä kutsun status invites.json-tiedostoon
-      if (($inv['status'] ?? '') === 'sent') {
-        invite_update_status($_SESSION['InviteId'], 'accepted');
-      }
       // Päivitä items uudelleen, jotta status tallentuu
       $items = invites_load();
       index_log('INVITE: Token accepted (id=' . $_SESSION['InviteId'] . ')');
     } else {
-      $_SESSION['invite_claim_info'] = 'Kutsulinkki ei kelpaa tai on vanhentunut.';
+      $_SESSION['invite_claim_info'] = !empty($_SESSION['invite_storage_error'])
+        ? 'Tekninen virhe: kutsun tallennus epäonnistui. Yritä myöhemmin uudelleen.'
+        : 'Kutsulinkki ei kelpaa tai on vanhentunut.';
       index_log('INVITE: Token invalid or expired');
     }
   }

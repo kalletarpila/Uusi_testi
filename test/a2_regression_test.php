@@ -26,7 +26,7 @@ function check(bool $ok, string $message): void {
 }
 function seed(array $cache): void {
     $_SESSION = [
-        'sessionId' => 'a2-regression', 'cached_quiz_data' => $cache,
+        'sessionId' => 'a2-regression-'.bin2hex(random_bytes(8)), 'cached_quiz_data' => $cache,
         'points1' => ['A1'=>60, 'B1'=>30, 'C1'=>20, 'D1'=>10],
         'yesCounts1' => ['A1'=>10, 'B1'=>0, 'C1'=>0, 'D1'=>0],
         'log_row' => ['nick'=>'regression', 'finalVar'=>'', 'kutsuttu'=>'Ei'],

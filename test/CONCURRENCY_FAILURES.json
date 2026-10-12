@@ -1,0 +1,148 @@
+{
+    "initial_head": "03d4447d640eeb2e339ae1a34d8ae4ff136e5640",
+    "profiles": [],
+    "probes": {
+        "same-session-answer-replay-and-reset-isolation": {
+            "passed": true,
+            "detail": {
+                "simultaneous_posts": 10,
+                "http_requests": 20
+            }
+        },
+        "simultaneous-completion-and-lost-session-checkpoint": {
+            "passed": true,
+            "detail": {
+                "simultaneous_posts": 10,
+                "rows": 1,
+                "notifications": 1,
+                "http_requests": 140
+            }
+        },
+        "conflicting-checkpoint-replay-cannot-change-research": {
+            "passed": true,
+            "detail": {
+                "original_row_unchanged": true
+            }
+        },
+        "lock-wait-and-delayed-writer": {
+            "passed": true,
+            "detail": {
+                "held_seconds": 0.6,
+                "observed_storage_lock_wait_seconds": 0.5937409400939941,
+                "observed_final_roundtrip_seconds": 0.6298840045928955
+            }
+        },
+        "bounded-lock-timeout": {
+            "passed": true,
+            "detail": {
+                "observed_final_roundtrip_seconds": 4.027954816818237
+            }
+        },
+        "publish-retries-temporary-windows-reader": {
+            "passed": true,
+            "detail": {
+                "roundtrip_seconds": 0.6315839290618896
+            }
+        },
+        "persistent-output-sharing-denied": {
+            "passed": true,
+            "detail": {
+                "existing_rows": 1,
+                "new_rows": 0
+            }
+        },
+        "invitation-creation-versus-status-updates": {
+            "passed": true,
+            "detail": {
+                "new_invitations": 10,
+                "completed_existing": 10,
+                "total": 40,
+                "full_creation_form_tested": false
+            }
+        },
+        "partial-write-loop-csv-short": {
+            "passed": true,
+            "detail": {
+                "rows": 1
+            }
+        },
+        "partial-write-loop-json-short": {
+            "passed": true,
+            "detail": {
+                "rows": 1
+            }
+        },
+        "simulated-disk-write-failure": {
+            "passed": true,
+            "detail": {
+                "research_rows": 0
+            }
+        },
+        "invitation-update-failure-and-reconciliation": {
+            "passed": true,
+            "detail": {
+                "csv_saved_before_invitation_failure": true,
+                "operator_reconciliation_required": true
+            }
+        },
+        "invalid-invitation-json-does-not-overwrite": {
+            "passed": true,
+            "detail": {
+                "original_bytes_preserved": true
+            }
+        },
+        "expired-token-and-monotonic-completed-status": {
+            "passed": true,
+            "detail": {
+                "expired_attempts": 10,
+                "concurrent_status_changes": 10
+            }
+        },
+        "same-token-single-owner-and-owner-replay": {
+            "passed": true,
+            "detail": {
+                "owners": 1
+            }
+        },
+        "completed-invitation-rejects-other-session-status-call": {
+            "passed": true,
+            "detail": {
+                "foreign_status_call_rejected": true
+            }
+        },
+        "session_start_fault": {
+            "passed": true,
+            "detail": {
+                "http_status": 503
+            }
+        },
+        "session_fault": {
+            "passed": true,
+            "detail": {
+                "http_status": 503
+            }
+        },
+        "session-write-failure-after-result-is-idempotent": {
+            "passed": true,
+            "detail": {
+                "retained_rows": 1
+            }
+        },
+        "kill-owned-writer-during-csv-write": {
+            "passed": true,
+            "detail": {
+                "retained_rows_at_interrupt": 0,
+                "recovered_rows": 1,
+                "orphan_temporary_files": 1
+            }
+        },
+        "kill-owned-writer-during-json-write": {
+            "passed": true,
+            "detail": {
+                "retained_rows_at_interrupt": 1,
+                "recovered_rows": 1,
+                "orphan_temporary_files": 1
+            }
+        }
+    }
+}
