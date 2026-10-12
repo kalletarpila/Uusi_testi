@@ -1,0 +1,216 @@
+{
+  "initial_head": "b32496b3c4b342c7981e62a4d24f2f33aad3cba2",
+  "note": "Curated product defect evidence. Early harness failures and superseded font-size thresholds are excluded. Initial screenshots precede UI edits; tablet/landscape/duplicate reproductions precede their respective fixes in an intermediate run.",
+  "initial_intro_measurements": [
+    {
+      "state": "intro",
+      "kind": "control-size-clipping-or-font",
+      "detail": [
+        {
+          "text": "invite_code",
+          "x": 13.1875,
+          "y": 638.1875,
+          "w": 177,
+          "h": 21,
+          "font": 13.3333,
+          "clipped": false,
+          "tag": "INPUT"
+        },
+        {
+          "text": "nickname",
+          "x": 98.578125,
+          "y": 676.1875,
+          "w": 177,
+          "h": 21,
+          "font": 13.3333,
+          "clipped": false,
+          "tag": "INPUT"
+        },
+        {
+          "text": "-- Valitse --\n              1\n              2\n              3\n              4\n  ",
+          "x": 13.1875,
+          "y": 739.1875,
+          "w": 87,
+          "h": 19,
+          "font": 13.3333,
+          "clipped": false,
+          "tag": "SELECT"
+        },
+        {
+          "text": "Aloita kysely",
+          "x": 198.4375,
+          "y": 816.1875,
+          "w": 107.375,
+          "h": 40,
+          "font": 15,
+          "clipped": false,
+          "tag": "BUTTON"
+        }
+      ]
+    },
+    {
+      "state": "intro",
+      "kind": "video-not-keyboard-accessible",
+      "detail": {
+        "tag": "DIV"
+      }
+    }
+  ],
+  "intermediate_reproductions": [
+    {
+      "name": "chrome-desktop-normal",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false
+      },
+      "ui_issues": [
+        {
+          "state": "phase2",
+          "kind": "unexpected-submit-count",
+          "detail": {
+            "posts": 2,
+            "expected": 1
+          }
+        }
+      ]
+    },
+    {
+      "name": "chrome-landscape-normal",
+      "viewport": {
+        "name": "landscape",
+        "width": 844,
+        "height": 390,
+        "touch": true
+      },
+      "ui_issues": [
+        {
+          "state": "phase2",
+          "kind": "control-size-clipping-or-font",
+          "detail": [
+            {
+              "text": "Selvästi samaa mieltä",
+              "x": 70.265625,
+              "y": 407.6875,
+              "w": 120,
+              "h": 44,
+              "font": 11,
+              "clipped": false,
+              "tag": "BUTTON"
+            },
+            {
+              "text": "Lievästi samaa mieltä",
+              "x": 203.625,
+              "y": 407.6875,
+              "w": 120,
+              "h": 44,
+              "font": 11,
+              "clipped": false,
+              "tag": "BUTTON"
+            },
+            {
+              "text": "Lievästi samaa mieltä",
+              "x": 520.34375,
+              "y": 407.6875,
+              "w": 120,
+              "h": 44,
+              "font": 11,
+              "clipped": false,
+              "tag": "BUTTON"
+            },
+            {
+              "text": "Selvästi samaa mieltä",
+              "x": 653.703125,
+              "y": 407.6875,
+              "w": 120,
+              "h": 44,
+              "font": 11,
+              "clipped": false,
+              "tag": "BUTTON"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chrome-tablet-normal",
+      "viewport": {
+        "name": "tablet",
+        "width": 768,
+        "height": 1024,
+        "touch": true
+      },
+      "ui_issues": [
+        {
+          "state": "quiz1",
+          "kind": "control-size-clipping-or-font",
+          "detail": [
+            {
+              "text": "1",
+              "x": -38.578125,
+              "y": 322.1875,
+              "w": 120,
+              "h": 44,
+              "font": 20,
+              "clipped": false,
+              "tag": "BUTTON"
+            }
+          ]
+        },
+        {
+          "state": "phase2",
+          "kind": "control-size-clipping-or-font",
+          "detail": [
+            {
+              "text": "Selvästi samaa mieltä",
+              "x": 67.703125,
+              "y": 461.6875,
+              "w": 106.90625,
+              "h": 44,
+              "font": 11,
+              "clipped": false,
+              "tag": "BUTTON"
+            },
+            {
+              "text": "Lievästi samaa mieltä",
+              "x": 186.609375,
+              "y": 461.6875,
+              "w": 106.921875,
+              "h": 44,
+              "font": 11,
+              "clipped": false,
+              "tag": "BUTTON"
+            },
+            {
+              "text": "Lievästi samaa mieltä",
+              "x": 474.453125,
+              "y": 461.6875,
+              "w": 106.921875,
+              "h": 44,
+              "font": 11,
+              "clipped": false,
+              "tag": "BUTTON"
+            },
+            {
+              "text": "Selvästi samaa mieltä",
+              "x": 593.375,
+              "y": 461.6875,
+              "w": 106.921875,
+              "h": 44,
+              "font": 11,
+              "clipped": false,
+              "tag": "BUTTON"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    "small-introduction.png",
+    "small-pairwise-selected.png",
+    "tablet-phase1.png",
+    "landscape-phase2.png"
+  ]
+}

@@ -1,0 +1,6 @@
+{
+  "name": "enneagram-browser-acceptance",
+  "private": true,
+  "scripts": { "test": "node acceptance.cjs" },
+  "devDependencies": { "playwright": "1.57.0" }
+}

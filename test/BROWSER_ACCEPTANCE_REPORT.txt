@@ -1,0 +1,266 @@
+SELAIN- JA MOBIILIHYVÄKSYNTÄ — 2026-10-12–13
+
+TILA: PASS. Lopullinen selainajo 108/108, HTTP-sarjat 428/428.
+
+GIT JA RAJAUS
+Alku-HEAD: b32496b3c4b342c7981e62a4d24f2f33aad3cba2 (dev, aluksi puhdas).
+Loppu-HEAD: tämän raportin sisältävä kohdennettu commit. Tarkka SHA toimitetaan
+loppuviestissä; git log -1 --format=%H -- test/BROWSER_ACCEPTANCE_REPORT.txt.
+Raportti ei voi sisältää oman commitinsa SHA:ta muuttamatta kyseistä SHA:ta.
+Ei pushia eikä julkaisua. Ei tuotanto-URL:eja, oikeita kutsuja tai sähköposteja.
+Kysymystekstit, pisteytys, Phase 1:n ratkaisupolitiikka ja historialliset lokit
+säilyvät. Tutkimus-CSV:n rakenne on edelleen 136 saraketta.
+
+KRIITTINEN ALKUTARKASTUS
+Tarkastettiin nykyisen HEADin HTML/CSS, lomakkeiden JS, mobiilin piilotetut
+rinnakkaiset lomakkeet, 350 ms:n vastausanimaatio/lähetys, valittu-tila,
+ohjevideon tapahtumat, etenemispalkit ja nykyinen eristetty HTTP-testikehys.
+Alku-HEADia ajettiin aidossa Chromessa ennen UI-korjauksia. Ennen-kuvat sekä
+rajatut toistomittaukset ovat test/browser/before/-hakemistossa.
+
+Playwright arvioitiin ja lisättiin vain test/browser-hakemistoon lukittuna
+devDependencies-riippuvuutena (1.57.0 ja package-lock.json). Tuotannon PHP- tai
+Composer-riippuvuuksia ei muutettu. Tuotanto ei tarvitse Nodea tai selaimia.
+Windows, Node v24.20.0, PHP CLI 8.4.13. Selainbinäärit ovat ohitetussa
+test/browser/.browsers-hakemistossa; tuotantoon niitä ei siirretä.
+
+ERISTYS JA TESTIN EHEYS
+Jokainen selainmoottori saa oman satunnaisen localhost-portin, PHP-prosessin
+ja järjestelmän enneagram-test-*-tilapäiskopion. Nykyinen index.php, storage.php,
+neljä CSV:tä ja paikalliset kuvaresurssit kopioidaan. Olemassa oleva
+isolated_app.php korvaa vain data_dir-, send_mail- ja send_result_email-rajat.
+Tekaistut UI-kutsut ovat vain tämän kopion datahakemistossa. Oikeita kutsuja,
+historiallisia survey-lokeja tai mail-palvelimia ei käytetä.
+
+Kaikki osallistujatoiminnot suoritetaan renderöidyillä click/dblclick/tap-
+toiminnoilla ja oikeilla PHPSESSID-evästeillä. Tilaa ei siemennetä eikä PHP:n
+vastauskäsittelijöitä kutsuta selaintyönkulun oikopolkuna. Näkyvä kysymysteksti
+yhdistetään oikean PHP-lataajan CSV-katalogiin; myös vasen/oikea-ryhmämappaus
+tarkistetaan. Session lukusnapshotia ja lopullista CSV:tä käytetään havaintoina.
+Testisiemen srand(42) tulee nykyisestä HTTP-kehyksestä. Järjestystä ei oleteta
+kiinteäksi, mutta kaikkia satunnaisjärjestyksiä ei väitetä testatuiksi.
+
+Selaimen kaikki ulkoiset pyynnöt korvataan testivastauksella. Ohjevideon
+näppäimistöavaus ja iframe tarkistetaan, oikeaa YouTube-toistoa ei testata.
+Kaksi erillistä selainprosessia/moottori toimii rinnakkain; yksi PHP-worker
+moottoria kohti käsittelee pyynnöt peräkkäin. Evästeet/sessionStorage/sessionit
+ovat osallistujakohtaisia. Tämä ei ole palvelimen kapasiteettimittaus.
+PHP-palvelin ja oma tilapäiskopio poistetaan ajon lopuksi. node_modules,
+.browsers ja .runtime ovat vain paikallisia, Gitissä ohitettuja testihakemistoja.
+
+SELAINMOOTTORIT JA NÄKYMÄMATRIISI
+Google Chrome / Chromium 154.0.8037.98, asennettu oikea chrome.exe.
+Playwright Firefox / Gecko 144.0.2, build 1497.
+Playwright WebKit 26.0, build 2227 (ei fyysinen Safari).
+Firefoxin sivuprosessi ei käynnistynyt Codexin rajoitetussa shellissä. Sama
+virallinen binääri toimi sallitussa paikallisessa selainajossa; asetuksia ei
+muutettu eikä sovellusvikaa päätelty tästä ympäristövirheestä.
+
+Näkymä                 Chrome       Firefox       WebKit       Yhteensä
+Desktop 1440x900        6/6          6/6           6/6          18/18
+Laptop 1366x768         6/6          6/6           6/6          18/18
+Mobile 390x844          6/6          6/6           6/6          18/18
+Landscape 844x390       6/6          6/6           6/6          18/18
+Small 320x700           6/6          6/6           6/6          18/18
+Tablet 768x1024         6/6          6/6           6/6          18/18
+Yhteensä               36/36        36/36         36/36        108/108
+
+Jokaisen solun kuusi kokonaista polkua:
+normal: suora Phase 1 -> Phase 2 -> yksilöllinen tulos -> palaute -> reset.
+pairwise: kutsukoodi -> nykyinen TB1 -> navigointi/muutos/palautus -> tulos.
+legacy: vanha TB1 -> samat navigoinnit -> TB2 -> kolmen tyypin RATKAISEMATON.
+two-way: suora rata -> positiivinen kahden tyypin tasapeli -> TB2 -> RATKAISEMATON,
+         kutsuttu osallistuja ja completed-kutsu.
+three-way: suora rata -> kolmen tyypin tasapeli -> TB2 -> RATKAISEMATON,
+           kutsumaton osallistuja.
+decisive: suora rata -> kolmen tyypin tasapeli -> kaikki TB2-kysymykset ->
+          yksittäinen ratkaiseva tulostyyppi.
+
+Pelkkää näkymäkokoa ei käytetä kosketuskäytön todisteena. Neljä mobiili/tablet-
+näkymää käyttävät hasTouch-, tap- ja havaittuja touchstart-tapahtumia sekä
+deviceScaleFactor=2:ta. Chromium/WebKit käyttävät lisäksi isMobile-asetusta;
+Firefox ei tue sitä. TB1:n aikana vaihdetaan leveys/korkeus päittäin, tarkistetaan
+asettelu ja palataan alkuperäiseen kokoon samassa istunnossa. Tämä on emulointia,
+ei fyysisen laitteen, käyttöjärjestelmän näppäimistön tai safe area -alueen testi.
+
+TYÖNKULUT, NAVIGOINTI JA PISTEIDEN EHEYS
+Intro, aloituslomakkeen JS-validointi ja kohdistus virheelliseen valintaan;
+varmuusvalinnan näyttö/piilotus; kaikki 36 tavallista Phase 1 -kysymystä;
+A1->A2 sekä B1->B2, C1->C2, D1->D2; kaikki 18 Phase 2 -kysymystä/rata;
+Phase 2 -tasapelikysymykset; yksilöllinen ja ratkaisematon tulossivu;
+kutsukoodi; palautteen lähetys ja session reset.
+
+Nykyinen ja legacy-TB1: AB, AC, AD, BC, BD, CD kaikilla kolmella moottorilla.
+Näkymäindeksit valitsevat parit tässä järjestyksessä. Browser-pareissa voittaja
+on parin ensimmäinen ryhmä; molemmat voittajat/parien vaihtumiset testataan
+laajemmin erillisissä HTTP-sarjoissa. TB1-kysymykset esitetään kaikki: nykyinen
+7/parikierros, legacy 6/kierros. A2/B2:n kolmen tyypin TB2:ssa 6 kysymystä,
+C2/D2:ssa 9; kahden tyypin kierroksessa kyseisen parin 2 tai 3 kysymystä.
+
+TB1: kaksi vastausta -> takaisin -> tallennettu vastaus näkyvästi valittuna ->
+vaihda vastaus -> takaisin -> uusi valinta näkyy -> palauta -> eteenpäin ->
+tavalliseen Phase 1:een -> sama vastaus ja palaaminen TB1:een -> sama järjestys,
+vastaukset ja etenemä -> takaisin jo vastattuun TB-kysymykseen, valinta näkyy ->
+Phase 1:n vastauksen muutos -> uusi kierros ilman vanhoja valintoja -> loppuun.
+
+Sekä nykyisen TB1:n left/right että legacy-asteikon aria-pressed, selected-luokka
+ja laskettu tausta/tekstiväri tarkistetaan. Korvaus ei kasvata vastausmäärää;
+laskurit lasketaan riippumattomasti tallennetuista viimeisistä vastauksista.
+TB-muutos ei muuta tavallisen Phase 1:n pisteitä. Tavallisen vastauksen muutos
+tyhjentää vanhentuneen TB-tilan. Uusi kierros esittää kaikki kysymyksensä.
+
+Phase 1/2/TB2:n etenemispalkkia verrataan renderöidyn kysymyksen indeksiin.
+Kysymyksiä ei esitetä kahdesti eikä ohiteta. Jokainen suoritettu testi saavuttaa
+done2/result_saved ja yhden session_id:llä tunnistetun 136-sarakkeisen CSV-rivin.
+Kutsutun oma kutsu on completed, ratkaisematonkin testi tallentuu tutkimukseen.
+Ratkaisematon sivu näyttää selityksen ja täsmälleen korkeimmilla pisteillä olevat
+2 tai 3 tyyppiä; se ei näytä yksittäisen voittajan TYYLI-otsikkoa.
+
+VISUAALISET JA VUOROVAIKUTUSTARKISTUKSET
+Dokumentin vaakaylivuoto, näkyvien kontrollien rajat/clipping, kontrollien
+keskinäiset päällekkäisyydet, tekstikoko, vaihtoehtojen käytettävissä oleva tila,
+44 CSS-pikselin kosketuskohteet (0,1 px pyöristysvara) ja klikattavan keskipisteen elementFromPoint
+tarkistetaan jokaisessa esitetyssä Phase 1/TB1/Phase 2/TB2-kysymyksessä.
+Piilotettuja rinnakkaisia mobiili/desktop-painikkeita ei klikata.
+Kuvista tarkistetaan lisäksi edustavat intro-, kysymys-, valinta- ja tulostilat.
+44 px on tässä käytetty hyväksyntäraja; tämä ei ole WCAG-sertifiointi.
+Tavallisen Phase 1:n ja Phase 2:n ensimmäistä vastausta kaksoisklikataan tai
+tapataan kahdesti samaan DOM-elementtiin. Vain yksi POST saa lähteä.
+
+TOISTETUT VIAT JA RAJATUT KORJAUKSET
+1. 320 px:n intro: tekstikentät 21 px, select 19 px ja 13,33 px:n teksti;
+   pienet navigointi/neutral-painikkeet 40 px. Syynä selaimen oletuskontrollit ja
+   pienimpien media queryjen min-height-ohitukset. Kentille/valinnoille 16 px:n
+   fontti ja 44 px:n vähimmäiskorkeus, linkkipainikkeille yhtenäinen fontti.
+2. Nykyisen TB1:n kiinteä kaksipalstainen grid ja sisäpadding typistivät 320 px:n
+   vaihtoehdot muutaman sanan/merkin levyisiksi. Alle 600 px:n yksi palsta ja
+   maltillinen sisäpadding; värit, sisältö ja pisteytys ennallaan.
+3. 768 px:n tabletilla 120 px:n pakotettu asteikkonappien minimileveys työnsi
+   ensimmäisen painikkeen x=-38,58 px:n kohdalle. Välillä 481–768 px minimi
+   44 px ja pienemmät marginaalit; asteikko mahtuu näkyvään leveyteen.
+4. 844/768 px:n Phase 2 -painiketeksti kutistui media queryssä 11 px:iin.
+   Pidetään näiden vastauspainikkeiden fontti vähintään 14 px:n kokoisena.
+5. Videon klikattava DIV ei ollut näppäimistön kohdistettavissa. Natiivi button,
+   type=button, suomalainen aria-label ja näkyvä focus-visible-ääriviiva.
+   Poistettiin myös viittaus repossa puuttuvaan video-thumbnail.png-kuvaan;
+   sama play-symboli näkyy neutraalia taustaa vasten.
+6. Chromen nopea kaksoisklikkaus Phase 2:ssa lähetti kaksi POSTia: jokainen
+   submit ajasti oman form.submit-kutsunsa 350 ms:n päähän. Palvelimen token
+   esti pisteiden kahdentumisen. Sama JS-kuvio esiintyi tavallisessa Phase 1:ssä
+   ja legacy-TB1:ssä. Lisättiin yhteinen lähetysvaraus kunkin näkymän lomakkeille,
+   joten vain ensimmäinen submit ajastaa lähetyksen. Serveripisteytys ennallaan.
+7. Tyyliarvio 4 -> varmuus 2 -> 'en tiedä' piilotti varmuuskentän, mutta sen
+   vanha arvo 2 sisältyi edelleen FormDataan ja tutkimuksen varmuustietoon.
+   Selainregressio toisti virheen ennen korjausta (before/confidence/).
+   Piilotettu select on nyt disabled, ja näkyvä select palautetaan enablediksi.
+   Vanhentunut varmuus ei lähde POSTissa; 'en tiedä' -tuloksen user_confidence
+   tarkistetaan tyhjäksi lopullisesta CSV:stä. Pisteytys/sarakkeet eivät muutu.
+
+Kaikille näille on selainajurissa automaattinen vastinetarkistus. Ennen-aineisto
+on rajattu todellisiin UI-vikoihin. Ajurin kehitysvaiheen väärä TB2-katalogiavain,
+liian aikainen navigointiodotus, uuden sivun elementtiin osuva toinen tap sekä
+virheellinen reset-linkin POST-odotus korjattiin testikoodiin, ei tuotantovioiksi.
+15 px:n vaihtoehtoteksti ja CSS-pseudoelementin näkyvä fontti erotettiin
+mittauskriteereissä; vanhan ajurin vääriä positiivisia ei lasketa löydöksiksi.
+WebKit raportoi 44 px:n minimikorkeuden myös arvona 43,99994. Ajuriin lisättiin
+0,1 CSS-pikselin pyöristysvara ja pienen mobiilin kuusi polkua uusittiin.
+Lisäksi Node-ajurin käsittelemätön navigointilupaus ja testisnapshotin Windowsin
+tilapäinen jakamiskielto korjattiin testikehykseen. Navigointi ja klikkaus
+odotetaan Promise.all-rakenteella; observer julkaisee snapshotin atomisesti
+olemassa olevalla storage-apurilla ja lukija odottaa renderöityä workflow-tokenia.
+Nämä koskevat vain havainnointia/ajuria, eivät sovelluksen pisteytystä tai
+tutkimustallennusta. Keskeytyneiden ajojen omat PHP-prosessit tunnistettiin
+komentorivin ja tilapäispolun avulla, pysäytettiin ja testikopiot poistettiin.
+Uusi ajuri tallentaa myös oman PHP-prosessinsa siivousmanifestin.
+Samassa selainprosessissa rinnakkaisten kontekstien modaaliset alert-ikkunat
+häiritsivät validointia. Rinnakkaisilla osallistujilla on lopullisessa ajossa
+erilliset selainprosessit; dialogien protokollavirheet raportoidaan erikseen.
+
+AUTOMAATTISET TULOKSET
+Lopullinen selainmatriisi: PASS, 108/108, prosessin exit-koodi 0.
+Jokainen kuudesta työnkulusta 18/18; kosketustapahtumat havaittu 72/72
+mobiili/tablet-polussa. 7 041 asettelutarkistusta, vähintään 60/polku.
+Nopean TB1/TB2-lähetyksen erillinen uusinta: PASS, 3/3 (päällekkäinen).
+WebKit small -pyöristysuusinta: PASS, 6/6 (päällekkäinen, aiempi ajuriversio).
+110 nykyistä HTTP-skenaariota: PASS, 69 727 assertiota, 12 061 oikeaa pyyntöä.
+318 navigointi-HTTP-skenaariota: PASS, 520 675 assertiota, 71 516 oikeaa pyyntöä.
+A2/funktio-/tilakone-/renderointiregressio: PASS, 3 857 tarkistusta.
+TB2-regression erillinen uusinta: PASS, 2 343 tarkistusta; päällekkäinen osajoukko.
+PHP-syntaksi index.php/fixture.php ja JavaScript-syntaksi: PASS.
+Lopullinen git diff --check ja muuttumattomien CSV-syötteiden hashit: PASS.
+Selain- ja PHP-sarjat ajettiin samalla lopullisella index.php-sisällöllä:
+  SHA-256 8fc28d0ca9c85922188e55d0ef001717d39188084ba3d5bcd72473efe52f4e85
+Kuormasarjaa ei uusittu UI-muutoksen vuoksi; sen aiempi tulos ja rajoitukset
+ovat CONCURRENCY_REPORT.txt:ssä. Tämä selainajo ei ole kapasiteettimittaus.
+
+JavaScript/PHP-yhteenveto: 0 pageerror-, 0 console-error-, 0 paikallista
+HTTP-resurssivirhettä, 0 dialogien protokollavirhettä ja 0 PHP-diagnostiikkaa.
+Ajurivirheitä 0. Kaikki 108 polkua valmistuivat ja tallentuivat kerran CSV:hen.
+Lopullisen matriisin tapauskohtaiset pageerror-, console-error-, HTTP-resource-
+error- ja UI-havaintolistat sekä moottorien PHP-diagnostiikka ovat JSONissa.
+18 sallittua ohjevideon korvausta on listattu external_requests-kentässä.
+
+KUVAT JA MUUTETUT TIEDOSTOT
+test/browser/acceptance/matrix.json: koko 108 tapauksen koneellisesti luettava matriisi.
+test/browser/acceptance/*.png: 41 edustavaa Chrome desktop/small ja WebKit portrait
+  -tilat; poikkeamat tallentuvat lisäksi automaattisesti kaikissa näkymissä.
+Esimerkit acceptance/-hakemistossa:
+  chrome-small-normal-intro.png — 320 px:n aloituslomake
+  chrome-small-pairwise-selected.png — nykyinen TB1, aiempi valinta
+  chrome-small-legacy-selected.png — legacy-TB1, aiempi asteikkoarvo
+  chrome-small-normal-phase2.png — kosketusnäkymän Phase 2
+  chrome-desktop-two-way-result.png — vain kaksi tasapisteissä olevaa tyyppiä
+  webkit-portrait-three-way-result.png — kolmen tyypin ratkaisematon tulos
+  chrome-small-decisive-result.png — TB2:ssa ratkaistu yksilöllinen tulos
+  chrome-small-normal-feedback.png — palaute mobiilissa
+Kuvat ovat fullPage-kaappauksia; pitkät mobiilisivut vieritetään normaalisti.
+test/browser/stress.json: kolme päällekkäistä nopean lähetyksen regressiopolkua.
+test/browser/precision.json: WebKit small -uusinta pyöristyskorjatulla ajurilla.
+test/browser/regression.json: HTTP- ja funktiosarjojen tarkistetut loppusummat.
+test/browser/before/: neljä ennen-kuvaa ja toistomittaukset evidence.jsonissa;
+  confidence/ sisältää piilotetun varmuuskentän toistotestin ja kaksi kuvaa.
+index.php: yllä kuvatut rajatut CSS-, semantiikka- ja submit-suojaukset.
+test/browser/acceptance.cjs: selaintyönkulut ja automaattiset UI/regressiotarkistukset.
+test/browser/fixture.php: nykyisen eristysapurin selainfixture ja atomiset lukuhavainnot.
+test/browser/package.json, package-lock.json, .gitignore, README.txt: testityökalut.
+test/FULL_WORKFLOW_REPORT.txt: viittaus aiemmin puuttuneeseen selainkattavuuteen.
+Tämä raportti. Kysymys-CSV:t, storage.php ja tuotannon data eivät muutu.
+
+TESTAAMATTA JA PILOTTIVALMIUS
+Fyysiset iPhone/iPad/Safari sekä Android/Chrome: kosketus, virtuaalinäppäimistön
+vaikutus, näytön kääntö laitteessa, selaimen työkalupalkit, safe area, zoomaus ja
+suuret käyttöjärjestelmäfontit. Ruudunlukijat ja koko testin vain näppäimistöllä
+suorittaminen. Oikea YouTube-toisto, verkkokatkot, bfcache/back/refresh mobiilissa,
+erilaiset OS-fontit sekä Microsoft Edge eivät kuulu tähän toteutettuun matriisiin.
+Kaikkia yhdeksää yksilöllistä tulostyyppiä tai kaikkia mahdollisia vastaus-/random-
+järjestyksiä ei käyty selaimella läpi; HTTP/funktiosarjat kattavat laajemman
+algoritmiavaruuden. Kutsun luontilomake/captcha/mail ja tuotantopalvelin eivät kuulu
+tähän paikalliseen osallistujan käyttöliittymähyväksyntään.
+Kaikkia asteikon 1–6 arvoja tai molempia Phase 2:n voimakkuuksia ei klikata
+jokaisessa selainkysymyksessä. Kaikkien näkyvien kontrollien geometria tarkistetaan;
+HTTP/funktiosarjat kattavat vastausarvot ja kaikki kahden tyypin TB2-parit laajemmin.
+
+Pilotin arvio: paikallinen selainhyväksyntä läpäisty; sovellus on tämän
+testauksen osalta valmis rajattuun valvottuun pilottiin, kun fyysisten iOS- ja
+Android-laitteiden smoke-tarkistus on tehty. Selainemulointi ei korvaa sitä.
+Aiemman CONCURRENCY_REPORT.txt:n tuotannon
+oikeus-, varmistus-, tallennuksen katkos-/täsmäytys- ja palvelinrajat pätevät edelleen.
+Ei automaattista pushia, julkaisua tai tuotannon valmiuslupausta.
+
+UUSINTA
+test/browser/README.txt sisältää asennus- ja selainkomennot.
+Repojuuresta PHP-sarjat:
+  php test/http_workflow_test.php
+  php test/http_workflow_test.php --navigation-only
+  php test/a2_regression_test.php
+  php test/a2_regression_test.php --tiebreak-only
+
+MUUTTUMATTOMAT CSV-SYÖTTEET (SHA-256)
+InsideBlockQuestions.csv
+  a06bbc0d3bc58b6f35a8be33326d7d2e217cb298647582313ab71a2ebe0b8c60
+SeparateBlocksQuestions.csv
+  fad1038e97f0889c62025c9b24f77e3f8f4e82c8e766e77a3f6b6b4773ebf4f7
+SeparateBlocksQuestionsTiebreak.csv
+  1f021ae3c2a018cd52243822f1c76f48f4ac931208f3bbab03ccfdafb7097483
+TypeDescriptions.csv
+  cf177422eac1e8621288168b19e3295e6c81ae99023327c1d6353c6974d97ed2

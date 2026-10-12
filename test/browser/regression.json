@@ -1,0 +1,23 @@
+{
+  "application_source_sha256": "8fc28d0ca9c85922188e55d0ef001717d39188084ba3d5bcd72473efe52f4e85",
+  "http": {
+    "passed": 110,
+    "failed": 0,
+    "assertions": 69727,
+    "requests": 12061
+  },
+  "navigation": {
+    "passed": 318,
+    "failed": 0,
+    "assertions": 520675.0,
+    "requests": 71516.0
+  },
+  "function_state_machine": {
+    "passed_checks": 3857
+  },
+  "tiebreak_subset_recheck": {
+    "passed_checks": 2343,
+    "overlaps_full_function_suite": true
+  },
+  "research_csv_columns": 136
+}

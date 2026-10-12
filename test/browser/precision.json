@@ -1,0 +1,304 @@
+{
+  "initial_head": "b32496b3c4b342c7981e62a4d24f2f33aad3cba2",
+  "playwright": "1.57.0",
+  "baseline": false,
+  "cases": [
+    {
+      "name": "webkit-small-normal",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "normal",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "phase2-intro",
+        "phase2",
+        "result",
+        "feedback",
+        "reset"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": false,
+      "expected_final": "4",
+      "phase2_questions": 18,
+      "tb2_questions": 0,
+      "touch_events": 56,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "done2"
+      ],
+      "ui_issues": []
+    },
+    {
+      "name": "webkit-small-pairwise",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "pairwise",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "tb-selected",
+        "rotated-tb",
+        "tb-question",
+        "phase2-intro",
+        "phase2",
+        "result"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "phase1_pair": "BD",
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "3",
+      "tb1_questions": 7,
+      "phase2_questions": 18,
+      "tb2_questions": 0,
+      "touch_events": 79,
+      "states": [
+        "intro",
+        "quiz1",
+        "tb1_new_intro",
+        "tb1_new",
+        "phase2_intro",
+        "phase2",
+        "done2"
+      ],
+      "ui_issues": []
+    },
+    {
+      "name": "webkit-small-legacy",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "legacy",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "tb-selected",
+        "rotated-tb",
+        "tb-question",
+        "phase2-intro",
+        "phase2",
+        "tb2",
+        "result"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "phase1_pair": "BD",
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "RATKAISEMATON",
+      "tb1_questions": 6,
+      "phase2_questions": 18,
+      "tb2_questions": 6,
+      "touch_events": 84,
+      "states": [
+        "intro",
+        "quiz1",
+        "tiebreak_intro",
+        "tiebreak",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": []
+    },
+    {
+      "name": "webkit-small-two-way",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "two-way",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "phase2-intro",
+        "phase2",
+        "tb2",
+        "result"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "RATKAISEMATON",
+      "phase2_questions": 18,
+      "tb2_questions": 2,
+      "touch_events": 58,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": []
+    },
+    {
+      "name": "webkit-small-three-way",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "three-way",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "phase2-intro",
+        "phase2",
+        "tb2",
+        "result"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": false,
+      "expected_final": "RATKAISEMATON",
+      "phase2_questions": 18,
+      "tb2_questions": 6,
+      "touch_events": 62,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": []
+    },
+    {
+      "name": "webkit-small-decisive",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "decisive",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "phase2-intro",
+        "phase2",
+        "tb2",
+        "result"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": false,
+      "expected_final": "4",
+      "phase2_questions": 18,
+      "tb2_questions": 6,
+      "touch_events": 62,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": []
+    }
+  ],
+  "engines": [
+    {
+      "engine": "webkit",
+      "version": "26.0",
+      "php_diagnostics": []
+    }
+  ],
+  "external_requests": [],
+  "started_at": "2026-10-12T20:26:31.010Z",
+  "node": "v24.20.0",
+  "platform": "win32",
+  "modes": [
+    "normal",
+    "pairwise",
+    "legacy",
+    "two-way",
+    "three-way",
+    "decisive"
+  ],
+  "inputs": {
+    "index.php": "8fc28d0ca9c85922188e55d0ef001717d39188084ba3d5bcd72473efe52f4e85",
+    "InsideBlockQuestions.csv": "a06bbc0d3bc58b6f35a8be33326d7d2e217cb298647582313ab71a2ebe0b8c60",
+    "SeparateBlocksQuestions.csv": "fad1038e97f0889c62025c9b24f77e3f8f4e82c8e766e77a3f6b6b4773ebf4f7",
+    "SeparateBlocksQuestionsTiebreak.csv": "1f021ae3c2a018cd52243822f1c76f48f4ac931208f3bbab03ccfdafb7097483",
+    "TypeDescriptions.csv": "cf177422eac1e8621288168b19e3295e6c81ae99023327c1d6353c6974d97ed2"
+  },
+  "harness_errors": [],
+  "finished_at": "2026-10-12T20:31:51.527Z",
+  "passed": true
+}

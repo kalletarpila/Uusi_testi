@@ -3652,6 +3652,23 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
 }
 
 /* === RIPPLE-EFEKTI === */
+/* Keep controls usable at the smallest supported viewport. */
+.btn,.linkbtn{min-height:44px;min-width:44px}
+.linkbtn{font:inherit;font-size:16px}
+#startForm label{display:block}
+.card input[type="text"],.card select,.card textarea{display:block;font:inherit;font-size:16px;max-width:100%;min-height:44px;padding:8px}
+.card input[type="text"],.card textarea{width:100%}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #005b97;outline-offset:3px}
+.tiebreak-options .btn{margin:0}
+.btn-left-mild,.btn-left-strong,.btn-right-mild,.btn-right-strong{font-size:14px}
+@media(min-width:481px) and (max-width:768px){
+  .choice-btn,.tb-choice-btn{min-width:44px!important;margin:0 2px 8px!important}
+}
+@media(max-width:600px){
+  .tiebreak-options{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}
+  .tiebreak-options>div{min-width:0;min-height:0!important}
+  .tiebreak-options .opt-box>div:first-child{padding:16px!important}
+}
 </style>
 </head>
 <body>
@@ -3813,11 +3830,11 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
   </p>
   <div class="block" role="region" aria-label="Esittelyvideo">
     <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; margin: 0 auto;">
-      <div id="video-thumbnail" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: url('video-thumbnail.png'); background-size: cover; background-position: center; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+      <button id="video-thumbnail" type="button" aria-label="Katso ohjevideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; padding: 0; background: #e5e5e5; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
         <div style="width: 80px; height: 80px; background: rgba(0,0,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
           <div style="width: 0; height: 0; border-left: 25px solid #fff; border-top: 15px solid transparent; border-bottom: 15px solid transparent; margin-left: 5px;"></div>
         </div>
-      </div>
+      </button>
       <div id="video-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;">
       </div>
     </div>
@@ -3927,10 +3944,10 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
         
         if (ennea?.value && ennea.value !== 'en tiedä') {
             container?.classList.add('show');
-            if (confidence) confidence.required = true;
+            if (confidence) { confidence.required = true; confidence.disabled = false; }
         } else {
             container?.classList.remove('show');
-            if (confidence) confidence.required = false;
+            if (confidence) { confidence.required = false; confidence.disabled = true; }
         }
     }
     
@@ -4095,6 +4112,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           }, 1100);
         }
         
+        var submitting = false;
         forms.forEach(function(form) {
           // Etsitään kaikki painikkeet formista ja valitaan näkyvä
           var buttons = form.querySelectorAll('.choice-btn');
@@ -4136,6 +4154,9 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           }
           
           form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (submitting) return;
+            submitting = true;
             if (btn) {
               btn.classList.add('selected');
             }
@@ -4315,6 +4336,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           }, 1100);
         }
         
+        var submitting = false;
         forms.forEach(function(form) {
           // Etsitään kaikki painikkeet formista ja valitaan näkyvä
           var buttons = form.querySelectorAll('.tb-choice-btn');
@@ -4356,6 +4378,9 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           }
           
           form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (submitting) return;
+            submitting = true;
             if (btn) {
               btn.classList.add('selected');
             }
@@ -4518,7 +4543,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
   </div>
   
   <div class="question-layout">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; margin: 20px 0;">
+    <div class="tiebreak-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; margin: 20px 0;">
       <!-- Vasen vaihtoehto -->
       <div style="display: flex; flex-direction: column; min-height: 250px;">
         <div class="opt-box left" style="flex: 1; display: flex; flex-direction: column; margin: 0; border-radius: 8px;">
@@ -4669,6 +4694,7 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           }, 1100);
         }
         
+        var submitting = false;
         forms.forEach(function(form) {
           var btn = form.querySelector('.choice2-btn, .ripple');
           if (btn) {
@@ -4697,6 +4723,9 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
           }
           
           form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (submitting) return;
+            submitting = true;
             if (btn) {
               btn.classList.add('selected');
             }

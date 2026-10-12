@@ -279,3 +279,9 @@ sailyy kutsupaivityksen virheessa, mutta operaattorin tasmaytys voi olla tarpeen
 Tuotantopalvelimen kapasiteettia tai rajatonta kayttajamaaraa ei osoitettu.
 Kysymyksia, pisteytysta, tutkimus-CSV:n rakennetta tai historiallista dataa ei
 muutettu. Kaikki testit eristettiin, mailit stubattiin. Ei pushia tai julkaisua.
+
+SELAINLAAJENNUS 2026-10-12
+Taman raportin alkuperainen NOT EXECUTED -selainmerkinta kuvaa silloista HTTP-ajoa.
+Uusi oikean selaimen, JavaScriptin ja kosketusemuloinnin kattavuus on raportoitu
+erikseen test/BROWSER_ACCEPTANCE_REPORT.txt:ssa ja test/browser/acceptance/matrix.jsonissa.
+Testit kayttavat samaa eristettya PHP/CSV-kehysta; tuotantoa ei julkaista.
