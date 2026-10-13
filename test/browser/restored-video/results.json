@@ -1,0 +1,883 @@
+{
+  "initial_head": "1751925f410aad9026000d1c5b591b6033a61740",
+  "source_sha256": "fe620591d7d00eb25538ca41cf97a45f3e776fdfde76694bf2f713c1a4e64bc5",
+  "thumbnail_sha256": "8d9863998139544541364d1dcbc4b4a1ceb61708eba7faa99cf74480d9edc5d1",
+  "node": "v24.21.0",
+  "playwright": "1.57.0",
+  "real_youtube": true,
+  "playback_claim": "Only observed advancing currentTime with paused=false counts as playback.",
+  "started_at": "2026-10-13T14:23:57.381Z",
+  "engines": [
+    {
+      "engine": "webkit",
+      "version": "26.0",
+      "php_diagnostics": []
+    },
+    {
+      "engine": "chrome",
+      "version": "155.0.8059.40",
+      "php_diagnostics": []
+    },
+    {
+      "engine": "firefox",
+      "version": "144.0.2",
+      "php_diagnostics": []
+    }
+  ],
+  "cases": [
+    {
+      "name": "webkit-desktop",
+      "engine": "webkit",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false
+      },
+      "passed": true,
+      "screenshots": [
+        "webkit-desktop-thumbnail.png",
+        "webkit-desktop-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/watchtime",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/atr",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://jnn-pa.googleapis.com/$rpc/google.internal.waa.v1.Waa/GenerateIT",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/watchtime",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/atr",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        },
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 0,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 732,
+        "height": 411.75,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:63407/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": 0,
+        "center_dy": 0,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "hover_verified": true,
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.3302291,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [],
+      "unexpected_console_errors": [],
+      "keyboard_verified": true,
+      "start_after_video_verified": true
+    },
+    {
+      "name": "chrome-desktop",
+      "engine": "chrome",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false
+      },
+      "passed": true,
+      "screenshots": [
+        "chrome-desktop-thumbnail.png",
+        "chrome-desktop-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        },
+        {
+          "url": "https://www.youtube.com/ptracking",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/playback",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        },
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 0,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 732,
+        "height": 411.75,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:55100/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": 0,
+        "center_dy": 0,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "hover_verified": true,
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.157619,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [],
+      "unexpected_console_errors": [],
+      "keyboard_verified": true,
+      "start_after_video_verified": true
+    },
+    {
+      "name": "firefox-desktop",
+      "engine": "firefox",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false
+      },
+      "passed": true,
+      "screenshots": [
+        "firefox-desktop-thumbnail.png",
+        "firefox-desktop-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-YEC” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-YEC” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        }
+      ],
+      "failed_requests": [
+        {
+          "url": "https://www.youtube.com/youtubei/v1/player",
+          "error": "NS_BINDING_ABORTED",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/next",
+          "error": "NS_BINDING_ABORTED",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "NS_BINDING_ABORTED",
+          "during_intentional_navigation": true
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        },
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 0,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 732,
+        "height": 411.75,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:63405/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": 0,
+        "center_dy": -0.00836181640625,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "hover_verified": true,
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.257354,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-YEC” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-YEC” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        }
+      ],
+      "unexpected_console_errors": [],
+      "keyboard_verified": true,
+      "start_after_video_verified": true
+    },
+    {
+      "name": "chrome-portrait",
+      "engine": "chrome",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "passed": true,
+      "screenshots": [
+        "chrome-portrait-thumbnail.png",
+        "chrome-portrait-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        },
+        {
+          "url": "https://www.youtube.com/ptracking",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/playback",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 1,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 326.265625,
+        "height": 183.515625,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:55100/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": -0.0078125,
+        "center_dy": -0.0078125,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.307267,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [],
+      "unexpected_console_errors": [],
+      "start_after_video_verified": true
+    },
+    {
+      "name": "firefox-portrait",
+      "engine": "firefox",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "passed": true,
+      "screenshots": [
+        "firefox-portrait-thumbnail.png",
+        "firefox-portrait-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-YEC” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        }
+      ],
+      "failed_requests": [
+        {
+          "url": "https://yt3.ggpht.com/ytc/AIdro_k49nFnNX9tfAciweQ_MExVMaaZqUF8ubxZvAdlAUUw7Ts=s68-c-k-c0x00ffffff-no-rj",
+          "error": "NS_BINDING_ABORTED",
+          "during_intentional_navigation": false
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "NS_BINDING_ABORTED",
+          "during_intentional_navigation": true
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 1,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 326.26666259765625,
+        "height": 183.51666259765625,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:63405/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": 0,
+        "center_dy": -0.008331298828125,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.155166,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-YEC” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        }
+      ],
+      "unexpected_console_errors": [],
+      "start_after_video_verified": true
+    },
+    {
+      "name": "chrome-small",
+      "engine": "chrome",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true
+      },
+      "passed": true,
+      "screenshots": [
+        "chrome-small-thumbnail.png",
+        "chrome-small-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/playback",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        },
+        {
+          "url": "https://www.youtube.com/ptracking",
+          "error": "net::ERR_ABORTED",
+          "during_intentional_navigation": false
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 1,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 267.625,
+        "height": 150.53125,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:55100/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": 0,
+        "center_dy": 0,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.181372,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [],
+      "unexpected_console_errors": [],
+      "start_after_video_verified": true
+    },
+    {
+      "name": "webkit-portrait",
+      "engine": "webkit",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "passed": true,
+      "screenshots": [
+        "webkit-portrait-thumbnail.png",
+        "webkit-portrait-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/atr",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/watchtime",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 1,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 326.265625,
+        "height": 183.515625,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:63407/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": -0.0078125,
+        "center_dy": -0.0078125,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.3086458,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [],
+      "unexpected_console_errors": [],
+      "start_after_video_verified": true
+    },
+    {
+      "name": "firefox-small",
+      "engine": "firefox",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true
+      },
+      "passed": true,
+      "screenshots": [
+        "firefox-small-thumbnail.png",
+        "firefox-small-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-YEC” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        }
+      ],
+      "failed_requests": [
+        {
+          "url": "https://yt3.ggpht.com/ytc/AIdro_k49nFnNX9tfAciweQ_MExVMaaZqUF8ubxZvAdlAUUw7Ts=s68-c-k-c0x00ffffff-no-rj",
+          "error": "NS_BINDING_ABORTED",
+          "during_intentional_navigation": false
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "NS_BINDING_ABORTED",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/atr",
+          "error": "NS_BINDING_ABORTED",
+          "during_intentional_navigation": true
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 1,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 267.6333312988281,
+        "height": 150.5333251953125,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:63405/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": 0,
+        "center_dy": 0,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.351729,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-BUCKET” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "message": "[JavaScript Error: \"Cookie “__Secure-YEC” has been rejected because it is in a cross-site context and its “SameSite” is “Lax” or “Strict”.\" {file: \"https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1\" line: 0}]",
+          "location": {
+            "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        }
+      ],
+      "unexpected_console_errors": [],
+      "start_after_video_verified": true
+    },
+    {
+      "name": "webkit-small",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true
+      },
+      "passed": true,
+      "screenshots": [
+        "webkit-small-thumbnail.png",
+        "webkit-small-player.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/qoe",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/atr",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/api/stats/watchtime",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        },
+        {
+          "url": "https://www.youtube.com/youtubei/v1/log_event",
+          "error": "Load request cancelled",
+          "during_intentional_navigation": true
+        }
+      ],
+      "http_errors": [],
+      "csp_violations": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1",
+          "status": 200
+        }
+      ],
+      "touch_events": 1,
+      "playback_verified": true,
+      "thumbnail": {
+        "width": 267.625,
+        "height": 150.53125,
+        "border_radius": "8px",
+        "background": "url(\"http://127.0.0.1:63407/video-thumbnail.png\")",
+        "play_width": 80,
+        "play_height": 80,
+        "play_background": "rgba(0, 0, 0, 0.8)",
+        "play_radius": "50%",
+        "center_dx": 0,
+        "center_dy": 0,
+        "triangle_color": "rgb(255, 255, 255)",
+        "triangle_width": "25px",
+        "overflow": false
+      },
+      "autoplay_requested": true,
+      "player_visible": true,
+      "media_state": {
+        "currentTime": 0.2663125,
+        "paused": false,
+        "readyState": 4,
+        "error": null
+      },
+      "player_errors": [],
+      "expected_cookie_messages": [],
+      "unexpected_console_errors": [],
+      "start_after_video_verified": true
+    }
+  ],
+  "harness_errors": [],
+  "finished_at": "2026-10-13T14:24:11.872Z",
+  "passed": true
+}

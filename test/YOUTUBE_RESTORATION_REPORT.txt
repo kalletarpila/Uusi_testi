@@ -1,0 +1,141 @@
+ALKUPERÄISEN YOUTUBE-ESITYKSEN PALAUTUS — 13.10.2026
+
+Alku-HEAD: 1751925f410aad9026000d1c5b591b6033a61740 (dev).
+Työhakemisto oli aluksi puhdas; käyttäjä toimitti sen jälkeen video-thumbnail.png:n.
+Loppu-HEAD: tämän raportin sisältävä kohdennettu commit, tarkka SHA loppuviestissä.
+  git log -1 --format=%H -- test/YOUTUBE_RESTORATION_REPORT.txt
+Raportin omaa commit-SHA:ta ei voi sisällyttää raporttiin muuttamatta SHA:ta.
+Ei automaattista pushia tai julkaisua.
+
+HISTORIA JA RAJAUS
+Tarkistettu ac2462707616e69c70deaa47f15088d9c060e8cf ja sen vanhempi
+2a915adc860baba1a5e42ce294a1a3e8b9f8b026. Vanhemmassa oli jo harmaa painike:
+38204d4 oli korvannut puuttuvan kuvan harmaalla taustalla ja tehnyt divistä
+saavutettavan button-elementin. Alkuperäinen kuvaa käyttävä esitys löytyi
+commitista 5a3c3b6b8b9889c16b70a1bf2ffbab0059f1f60d (Initial commit).
+Sieltä palautettiin vain videon esitys:
+background-image, 80 px musta ympyrä, valkoinen kolmio, keskitys, hover ja
+klikkauksesta luotava iframe. Kokonaista historiallista tiedostoa ei palautettu.
+
+video-thumbnail.png ei ollut missään saatavilla olevan Git-historian haarassa
+eikä työhakemistossa. Muutos odotti kuvaa; käyttäjä toimitti sen nykyiseen
+Uusi_testi-hakemistoon. Kuva tarkistettiin silmämääräisesti ja selaimessa.
+Se lisätään nyt versionhallintaan muuttamattomana: 1280x720, 749609 tavua.
+SHA256: 8d9863998139544541364d1dcbc4b4a1ceb61708eba7faa99cf74480d9edc5d1.
+
+TOTEUTUS JA YHTEENSOPIVUUS
+index.php:n intro-video näyttää aluksi alkuperäisen kuvan ja toistopainikkeen.
+Iframea tai YouTube-pyyntöä ei ole ennen käyttäjän painallusta. Painallus piilottaa
+kuvan ja näyttää samaan 16:9-kehykseen luodun iframen:
+  https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1
+Alkuperäinen background-size:cover, keskitys, 8 px kulmat, hover scale(1.1),
+vaalea hover-tausta ja 0.3 s siirtymä säilyvät. Näkyvän kehyksen koko ei vaihdu.
+
+Säilytetty nykyinen type=button ja aria-label="Katso ohjevideo", jotta Enter ja
+kosketus toimivat eikä video lähetä kyselylomaketta. Skripti käyttää nykyistä
+CSP-noncea. Dynaamiselle iframelle säilytetty nykyisen suoran upotuksen title,
+allowfullscreen, mediatoiston allow sekä strict-origin-when-cross-origin-
+referrerpolicy. Säiliö näytetään display:block-arvolla kuten ac24627:n vanhemmassa;
+ensimmäisen commitin puuttuvaa säiliön näyttämistä ei palautettu.
+CSP- tai muita suojausotsikoita ei muutettu.
+
+Koko sovellusdiffi tarkistettiin: index.php:n sisältö videolohkon ulkopuolella
+on alku-HEADiin verrattuna sama rivinvaihtojen normalisoinnin jälkeen.
+Phase 1/TB1/Phase 2/TB2, vastaukset, pisteytys, sessiot, workflow-tokenit,
+storage.php, invite.php, CSV-kysymykset, tutkimusskeema ja tulostallennus säilyvät.
+Testattu index.php SHA256:
+  fe620591d7d00eb25538ca41cf97a45f3e776fdfde76694bf2f713c1a4e64bc5
+
+AIDON YOUTUBEN SELAINVALIDOINTI
+Lopullinen erillinen restore-video.cjs: PASS 9/9, 0 testikehyksen virhettä.
+Moottori                     1440x900  390x844  320x700
+Chromium/Chrome 155.0.8059.40  PASS      PASS     PASS
+Firefox 144.0.2              PASS      PASS     PASS
+WebKit 26.0                  PASS      PASS     PASS
+
+Kaikissa alkuperäisen PNG:n tarkat tavut palveltiin HTTP 200 -vastauksena,
+CSS-tausta latautui, toistopainike oli 80x80 ja keskitetty, kolmio valkoinen,
+alkutilassa iframeja 0. Desktopilla hover ja näppäimistön Enter tarkistettiin;
+mobiilissa käytettiin hasTouch-asetusta ja todellisia emuloituja tap/touchstart-
+tapahtumia. Firefoxissa ei käytetty sen tukematonta isMobile-asetusta.
+Painallus tuotti yhden näkyvän iframen, oikean videon ja autoplay=1:n, piilotti
+kuvan, säilytti 16:9:n, lomakkeen sijainnin ja workflow-tokenin, eikä tehnyt POSTia.
+Kysely käynnistyi sen jälkeen yhdellä oikealla lomakelähetyksellä kaikissa 9 tapauksessa.
+Ei vaakaylivuotoa, puuttuvia kuvia, PHP-diagnostiikkaa, JavaScript-poikkeuksia tai
+sovelluksen CSP-rikkomuksia. Kuvakaappaukset tarkistettiin myös silmämääräisesti.
+
+Todellinen toisto varmistui 9/9 tapauksessa: YouTuben videoelementin currentTime
+eteni kahden havainnon välillä paused=false-tilassa. Ulkoisia pyyntöjä EI stubattu.
+Äänen kuulumista, koko videon katsomista tai fullscreen-toimintaa ei väitetä testatuksi.
+Firefox kirjasi YouTuben __Secure-BUCKET/YEC-evästeiden SameSite-ilmoituksia.
+Ne on erotettu odottamattomista konsolivirheistä; suojausasetuksia ei löysätty.
+YouTuben pyyntöjen peruutukset soittimen käytössä/sivulta poistuttaessa on säilytetty
+JSONissa erikseen. Nämä eivät estäneet havaittua toistoa. Tarkat määrät ja kaikki
+viestit: browser/restored-video/results.json. Odottamattomat konsolivirheet: 0.
+
+REGRESSIOT
+HTTP Full Workflow: 110/110, 69 727 tarkistusta, 12 061 oikeaa HTTP-pyyntöä.
+HTTP Phase 1 -navigointi: 318/318, 520 675 tarkistusta, 71 516 HTTP-pyyntöä.
+HTTP Phase 2 -navigointi: 192/192, 236 812 tarkistusta, 29 076 HTTP-pyyntöä.
+Yhteensä HTTP: 620/620, 827 214 tarkistusta, 112 653 oikeaa HTTP-pyyntöä.
+Funktio-/tilakone-/renderointiregressio: 4 577 hyväksyttyä tarkistusta.
+
+Nykyinen koko selainregressio: PASS 108/108 = 3 moottoria x 6 näkymää x 6 polkua.
+Näkymät 1440x900, 1366x768, 390x844, 844x390, 320x700, 768x1024.
+Mukana normaali A1->A2, nykyinen ja vanha TB1, paluu Phase 1:een, valintojen
+säilytys ja vaihto, TB2:n kaksi-/kolmitasapeli ja ratkeava tasapeli, tulos,
+RATKAISEMATON, kutsut, CSV, palaute ja reset. Jokainen polku aloitti videon
+käytöllä ennen kyselyä. Geometriatarkistuksia 7 041; kosketuspolkuja 72.
+Ei JavaScript-, konsoli-, resurssi- tai PHP-virheitä eikä testikehyksen virheitä.
+
+Phase 2 -selainnavigointi: PASS 36/36 = 3 moottoria x 3 näkymää x 4 rataa.
+A2/B2/C2/D2, kaikki viisi valintaa, takaisin/eteen, vastausten korvaus,
+valitun vastauksen näkyvyys, TB2:n palautus/mitätöinti, kolme->kaksi->yksi,
+workflow-tokenit, kaksoispainallukset, näppäimistö, CSV ja kutsun valmistuminen.
+Geometriatarkistuksia 2 556; kosketuspolkuja 24. Ei odottamattomia virheitä.
+Yhteensä 144 kokonaista selainpolkua, 9 597 geometriatarkistusta ja 96 kosketuspolkua.
+Kaikki sarjat päättyivät exit 0 -tilaan. PHP/JS-syntaksi ja git diff --check: PASS.
+Lopulliset tulokset ja tapausmatriisit: browser/restored-video/regressions.json,
+workflow-matrix.json, navigation-matrix.json, http-phase1.json ja http-phase2.json.
+Kuvat: browser/restored-video/*-thumbnail.png, *-player.png sekä workflow-*-intro.png.
+
+ERISTYS, AJURI JA RAJAT
+Käytetty nykyisiä isolated_app.php/fixture.php-apureita: oikea nykyinen PHP-koodi
+ja kysymys-CSV:t, satunnaiset loopback-portit, omat PHPSESSID-evästeet ja
+session.save_pathit, tekaistut kutsut sekä stubattu sähköpostin toimitus.
+Tuotanto-URL:eja, oikeita kutsuja tai historiallisia tutkimuslokeja ei käytetty.
+Vain erillinen videotesti käytti aitoa YouTubea; kyselyn selainregressioissa
+ulkoinen media on korvattu paikallisella vastauksella kuten aiemmin.
+
+PHP 8.4.13, Playwright 1.57.0. Erillinen node.exe ei ollut PATHissa; käytettiin
+asennetun VS Coden mukana tulevaa Node v24.21.0 -ajoympäristöä asetuksella
+ELECTRON_RUN_AS_NODE=1. Ajurit käynnistettiin piilotettuina, tulosteet tiedostoon
+ohjaten ja loppuun odottaen. Tuotanto- tai testiriippuvuuksia ei asennettu/muutettu.
+Ensimmäinen ilman odottavaa käynnistystä tehty probe jäi kesken; sitä ei lasketa
+hyväksytyksi. Uuden ajurin siivous palautti tyhjän vastauksen; JSON-jäsennyksen
+virhe korjattiin vain ajuriin ja koko 9 tapauksen testi uusittiin onnistuneesti.
+Myös ensimmäisen proben tunnistetut kolme tilapäiskopiota siivottiin turvallisesti.
+Kaikki omat PHP-testipalvelimet ja aktiiviset selainajon manifestit poistettiin.
+
+Fyysiset iOS/Android-laitteet, ääni ja fullscreen vaativat manuaalisen tarkistuksen.
+Autoplay riippuu edelleen käyttäjän selaimen käytännöstä ja YouTuben saatavuudesta.
+Muita sovellusvikoja tai ratkaisemattomia sovellusmuutoksia ei havaittu.
+
+MUUTETUT TIEDOSTOT
+index.php — vain videon alkuperäisen esitystavan palautus.
+video-thumbnail.png — käyttäjän toimittama alkuperäinen kuva versionhallintaan.
+test/browser/acceptance.cjs — nykyinen videoesitys ja kyselyn aloitus sen käytön jälkeen.
+test/browser/restore-video.cjs — 9 aidon YouTuben selain-/kosketus-/näppäimistötestiä.
+test/browser/README.txt — nykyisen esitystavan testiohje.
+test/browser/restored-video/ — uudet tulokset, matriisit ja edustavat kuvat.
+test/YOUTUBE_RESTORATION_REPORT.txt — tämä raportti.
+Aiemmat raportit, lokit ja niiden kuvakaappaukset säilyvät historiallisena aineistona.
+
+UUSINTA REPOJUURESTA (Node/PHP PATHissa, PLAYWRIGHT_BROWSERS_PATH tarvittaessa)
+  node test/browser/restore-video.cjs
+  node test/browser/acceptance.cjs --output=.runtime/restored-workflows
+  node test/browser/acceptance.cjs --phase2-navigation --output=.runtime/restored-navigation
+  php test/http_workflow_test.php
+  php test/http_workflow_test.php --navigation-only --matrix=temporary-phase1.json
+  php test/phase2_navigation_http.php --matrix=temporary-phase2.json
+  php test/a2_regression_test.php

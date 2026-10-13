@@ -67,15 +67,24 @@ ruudunlukijat ja oikea videotoisto jäävät manuaalisesti tarkistettaviksi.
 Tarkemmat tulokset, kattavuusmatriisi ja pilotin rajat:
   ../BROWSER_ACCEPTANCE_REPORT.txt
 
-Suoran YouTube-upotuksen regressio (13.10.2026):
-  node video.cjs
-Tämä käyttää aitoa ulkoista YouTube-upotusta eikä korvaa sen verkkopyyntöjä.
-Sovellus, kutsut ja sähköpostit eristetään samalla fixturellä. Desktop 1440x900,
-portrait 390x844 ja small 320x700: näkyvä iframe heti ilman klikkausta,
-YouTuben soitin/esikatselu/toistopainike, 16:9, ei peitettä/ylivuotoa tai virheitä.
-Tulokset ja kuvat: video/after/. --baseline toistaa alkuperäisen vian vain,
-jos vanha sovellusversio on erikseen käytössä; se ei vaihda Git-versiota.
-Tarkempi raportti: ../YOUTUBE_EMBED_REPORT.txt.
+Palautetun alkuperäisen YouTube-esityksen regressio (13.10.2026):
+  node restore-video.cjs
+Chromium (asennettu Chrome), Firefox ja WebKit; 1440x900, 390x844 ja 320x700.
+Alkuperäinen video-thumbnail.png, 80 px toistopainike, keskitys, hover, 16:9,
+todellinen tap mobiilissa, dynaaminen iframe/autoplay, vakaa asettelu, CSP,
+näppäimistö desktopilla ja kyselyn käynnistys videon käytön jälkeen.
+Käyttää aitoa ulkoista YouTubea; verkkopyyntöjä ei korvata. Toisto raportoidaan
+varmistetuksi vain, kun videoaika etenee ja paused=false; muutoin rajoite kirjataan.
+Firefoxin tunnetut YouTuben __Secure-BUCKET/YEC SameSite-ilmoitukset kirjataan
+erikseen. Muut konsolivirheet hylkäävät testin. Todellinen ääni/fullscreen ja
+fyysiset iOS/Android-laitteet tarkistetaan erikseen manuaalisesti.
+Tulokset ja kuvakaappaukset: restored-video/. --output ja --engines ovat valinnaisia.
+Sovellus, kutsut, sessiot ja sähköpostit eristetään nykyisellä fixturellä.
+Työnkulkusarjan acceptance.cjs jokainen polku käyttää videota ennen kyselyn aloitusta;
+siinä ulkoinen media edelleen korvataan paikallisella vastauksella.
+Tarkempi raportti: ../YOUTUBE_RESTORATION_REPORT.txt.
+video.cjs sekä video/ ja phase2-video/ ovat aiemman suoran upotuksen historiallista
+testinäyttöä. Sen heti näkyvän iframen odotus ei vastaa palautettua esitystapaa.
 
 Phase 2 -navigoinnin selainregressio:
   npm test -- --phase2-navigation --output=.runtime/phase2-navigation

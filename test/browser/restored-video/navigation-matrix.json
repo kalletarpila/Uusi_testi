@@ -1,0 +1,2084 @@
+{
+  "initial_head": "1751925f410aad9026000d1c5b591b6033a61740",
+  "playwright": "1.57.0",
+  "baseline": false,
+  "cases": [
+    {
+      "name": "webkit-desktop-navigation-A2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-desktop-navigation-A2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 7
+    },
+    {
+      "name": "firefox-desktop-navigation-A2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-desktop-navigation-B2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-desktop-navigation-B2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-desktop-navigation-B2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-desktop-navigation-C2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-desktop-navigation-C2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-desktop-navigation-D2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-desktop-navigation-D2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-desktop-navigation-C2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-portrait-navigation-A2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-portrait-navigation-A2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 173,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-desktop-navigation-D2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900,
+        "touch": false,
+        "index": 0
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-portrait-navigation-B2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-portrait-navigation-B2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 173,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-portrait-navigation-C2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 171,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-portrait-navigation-A2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 7
+    },
+    {
+      "name": "firefox-portrait-navigation-C2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 173,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-portrait-navigation-D2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-portrait-navigation-D2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-portrait-navigation-B2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-small-navigation-A2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 7
+    },
+    {
+      "name": "firefox-small-navigation-A2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 171,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-small-navigation-B2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-portrait-navigation-C2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-small-navigation-B2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 173,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-small-navigation-C2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-small-navigation-C2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 173,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-portrait-navigation-D2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true,
+        "index": 2
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "chrome-small-navigation-D2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "firefox-small-navigation-D2",
+      "engine": "firefox",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 171,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-small-navigation-A2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "9",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-small-navigation-B2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "B1",
+      "track": "B2",
+      "invited": true,
+      "expected_final": "7",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-small-navigation-C2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "C1",
+      "track": "C2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    },
+    {
+      "name": "webkit-small-navigation-D2",
+      "engine": "webkit",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": true,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "D1",
+      "track": "D2",
+      "invited": true,
+      "expected_final": "6",
+      "geometry_audits": 71,
+      "navigation_choices": [
+        "left-2",
+        "left-1",
+        "neutral-0",
+        "right-1",
+        "right-2"
+      ],
+      "navigation_transitions": [
+        "three-way-review-restored",
+        "three-way-to-two-way",
+        "two-way-to-unique"
+      ],
+      "touch_events": 172,
+      "states": [
+        "intro",
+        "quiz1",
+        "phase2_intro",
+        "phase2",
+        "phase2_tb",
+        "done2"
+      ],
+      "ui_issues": [],
+      "screenshots_captured_count": 0
+    }
+  ],
+  "engines": [
+    {
+      "engine": "webkit",
+      "version": "26.0",
+      "php_diagnostics": []
+    },
+    {
+      "engine": "chrome",
+      "version": "155.0.8059.40",
+      "php_diagnostics": []
+    },
+    {
+      "engine": "firefox",
+      "version": "144.0.2",
+      "php_diagnostics": []
+    }
+  ],
+  "external_requests": [
+    {
+      "case": "chrome-desktop-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-desktop-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-desktop-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-desktop-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-desktop-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-desktop-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-desktop-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-desktop-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-desktop-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-desktop-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-desktop-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-portrait-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-portrait-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-desktop-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-portrait-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-portrait-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-portrait-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-portrait-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-portrait-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-portrait-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-portrait-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-portrait-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-small-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-small-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-small-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-portrait-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-small-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-small-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-small-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-portrait-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "chrome-small-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "firefox-small-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-small-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-small-navigation-B2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-small-navigation-C2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    },
+    {
+      "case": "webkit-small-navigation-D2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1"
+    }
+  ],
+  "started_at": "2026-10-13T14:22:41.793Z",
+  "node": "v24.21.0",
+  "platform": "win32",
+  "modes": [
+    "navigation"
+  ],
+  "workers_per_engine": 1,
+  "inputs": {
+    "index.php": "fe620591d7d00eb25538ca41cf97a45f3e776fdfde76694bf2f713c1a4e64bc5",
+    "InsideBlockQuestions.csv": "a06bbc0d3bc58b6f35a8be33326d7d2e217cb298647582313ab71a2ebe0b8c60",
+    "SeparateBlocksQuestions.csv": "fad1038e97f0889c62025c9b24f77e3f8f4e82c8e766e77a3f6b6b4773ebf4f7",
+    "SeparateBlocksQuestionsTiebreak.csv": "1f021ae3c2a018cd52243822f1c76f48f4ac931208f3bbab03ccfdafb7097483",
+    "TypeDescriptions.csv": "cf177422eac1e8621288168b19e3295e6c81ae99023327c1d6353c6974d97ed2"
+  },
+  "harness_errors": [],
+  "finished_at": "2026-10-13T14:54:52.387Z",
+  "passed": true,
+  "screenshot_archive_note": "Only representative intro screenshots are archived here; all raw screenshots remain in the ignored local runtime directory. Other states are unchanged and covered by the existing historical screenshot archive."
+}
