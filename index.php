@@ -4870,7 +4870,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
 <?php endif; ?>
 
-  <div class="credits">Suomen Enneagrammiyhdistys, 2025</div>
+  <div class="credits">Suomen Enneagrammiyhdistys, 2025-2026</div>
 </div>
 
 </body>

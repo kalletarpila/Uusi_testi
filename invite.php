@@ -932,7 +932,7 @@ textarea {
     <p class="small">Kutsu sisältää suoran linkin testiin sekä varakoodin. Kutsuttavalle kerrotaan kutsujan nimi.</p>
   </form>
 
-  <div class="credits">Suomen Enneagrammiyhdistys, 2025</div>
+  <div class="credits">Suomen Enneagrammiyhdistys, 2025-2026</div>
 </div>
 
 <script>
