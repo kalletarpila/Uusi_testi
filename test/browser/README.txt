@@ -66,3 +66,13 @@ ruudunlukijat ja oikea videotoisto jäävät manuaalisesti tarkistettaviksi.
 
 Tarkemmat tulokset, kattavuusmatriisi ja pilotin rajat:
   ../BROWSER_ACCEPTANCE_REPORT.txt
+
+Suoran YouTube-upotuksen regressio (13.10.2026):
+  node video.cjs
+Tämä käyttää aitoa ulkoista YouTube-upotusta eikä korvaa sen verkkopyyntöjä.
+Sovellus, kutsut ja sähköpostit eristetään samalla fixturellä. Desktop 1440x900,
+portrait 390x844 ja small 320x700: näkyvä iframe heti ilman klikkausta,
+YouTuben soitin/esikatselu/toistopainike, 16:9, ei peitettä/ylivuotoa tai virheitä.
+Tulokset ja kuvat: video/after/. --baseline toistaa alkuperäisen vian vain,
+jos vanha sovellusversio on erikseen käytössä; se ei vaihda Git-versiota.
+Tarkempi raportti: ../YOUTUBE_EMBED_REPORT.txt.

@@ -1,0 +1,89 @@
+YOUTUBE-UPOTUKSEN KORJAUS — 13.10.2026
+
+TILA: PASS. Yksi kohdennettu commit; ei pushia tai julkaisua.
+Alku-HEAD: 2a915adc860baba1a5e42ce294a1a3e8b9f8b026 (dev, puhdas).
+Loppu-HEAD: tämän raportin sisältävä commit, tarkka SHA loppuviestissä.
+  git log -1 --format=%H -- test/YOUTUBE_EMBED_REPORT.txt
+Raportin oma commit-SHA ei voi sisältyä raporttiin muuttamatta SHA:ta.
+
+JUURISYY
+Intro ei sisältänyt iframea sivun latautuessa. Sen sijaan harmaa, itse tehty
+video-thumbnail-painike peitti koko 16:9-alueen. Tyhjä video-iframe-säiliö oli
+display:none. Klikkauskäsittelijä loi YouTube-iframen ja näytti sen vasta
+painalluksen jälkeen. Oikea /embed/-osoite oli jo käsittelijässä; vika ei ollut
+watch?v=-osoite. Aiempi neutraali tausta korvasi repossa puuttuvan thumbnail-kuvan,
+mutta klikkauslataus ei täyttänyt nyt pyydettyä suoraan näkyvän soittimen vaatimusta.
+
+RAJATTU KORJAUS
+index.php: iframe on nyt suoraan HTML:ssä, src:
+  https://www.youtube.com/embed/X2fGUT1MzM0
+Poistettu harmaa painike/peite, piilotettu säiliö sekä sen luonti-/hover-JavaScript.
+loading=eager, kuvaava title, allowfullscreen ja tavalliset mediatoiston allow-
+ominaisuudet. Ei automaattista toistoa. Nykyinen 100 %:n leveys, 16:9-kehys,
+kahdeksan pikselin kulmat ja muu sivutyyli säilyvät.
+Iframen referrerpolicy=strict-origin-when-cross-origin välittää upotukselle
+alkuperän. Muun sivun nykyinen no-referrer-otsikko säilyy. Nykyinen CSP sallii
+www.youtube.com-kehykset jo ennestään, eikä sitä tai muita suojausotsikoita avata.
+Kysymykset, pisteytys, kutsut ja tutkimus-CSV eivät muutu.
+
+TOISTO JA OIKEA SELAINVALIDOINTI
+Alku-HEADin desktop-toisto: odotettu FAIL, iframeja 0, ei YouTube-pyyntöä.
+  browser/video/before/results.json ja desktop.png.
+Lopullinen todellinen YouTube-ajo: PASS 3/3, Chrome 155.0.8059.40 / Playwright 1.57.0.
+  Desktop 1440x900: iframe 732 x 411,75 CSS px.
+  Mobile portrait 390x844: iframe 326,27 x 183,52 CSS px.
+  Small mobile 320x700: iframe 267,63 x 150,53 CSS px.
+Kaikissa iframe on näkyvissä DOMContentLoaded-vaiheessa, ilman ensimmäistäkään
+klikkausta. YouTuben oma soitin, näkyvä Toista video -kontrolli sekä ytimg-
+esikatselukuva tarkistettiin iframe-DOMista. Embed vastasi HTTP 200.
+Keskipistettä ei peitä muu elementti, suhde on 16:9, ei vaakaylivuotoa.
+Desktop- ja mobiilikuvat tarkistettiin myös silmämääräisesti.
+  browser/video/after/results.json ja desktop.png, portrait.png, small.png.
+Lopullisessa ajossa: 0 konsolivirhettä, 0 JavaScript-poikkeusta,
+0 epäonnistunutta verkkopyyntöä, 0 YouTube-soittimen virhepaneelia,
+0 PHP-diagnostiikkaa. Ulkoisia YouTube-pyyntöjä EI stubattu tässä ajossa.
+
+Kuuden näkymäkoon normal-työnkulku: PASS 6/6, sama Chrome.
+  1440x900, 1366x768, 390x844, 844x390, 320x700, 768x1024.
+  Intro -> 36 Phase 1 -kysymystä -> Phase 2 -> tulos -> palaute -> reset.
+  browser/video/workflow/matrix.json. Tämän erillisen työnkulkuregression
+  ulkoinen media stubataan, kuten aiemmassa ajurissa; se ei osoita YouTube-toistoa.
+  Kuvaviitteet on jätetty tästä arkistosta pois; aidon soittimen kuvat ovat after/.
+Funktio-/tilakone-/renderointiregressio: PASS 3 857 tarkistusta.
+PHP-syntaksi sekä molempien selainajurien JavaScript-syntaksi: PASS.
+git diff --check: PASS. Testattu index.php SHA-256:
+  ef7027d7212f1c7f8257c127d121408045aa15ceef1050bb47c8ff744b2b5e24
+
+Testit käyttivät nykyisen sovelluksen ja CSV:iden omaa järjestelmän Temp-kopiota,
+satunnaista localhost-porttia, eristettyä session.save_pathia ja stubattuja
+sähköpostifunktioita. Oikeita kutsuja tai sovelluksen tuotanto-URL:eja ei käytetty.
+Testin omat PHP-palvelimet ja tilapäiskopiot siivottiin.
+
+TESTIAJURIN HAVAINNOT JA RAJAT
+YouTube tarjosi ytm-soittimen: vanhat ytp-large-play-button- ja
+ytp-cued-thumbnail-overlay-image-valitsimet eivät sopineet siihen, vaikka soitin
+näkyi kuvissa. Ajuri tarkistaa nyt toistopainikkeen saavutettavalla nimellä ja
+esikatselukuvan näkyvistä elementeistä; näitä ajurivirheitä ei lasketa sovellusvioiksi.
+Yhdessä kehitysvaiheen ajossa YouTube tuotti compute-pressure-käyttöoikeusviestin.
+Lopullisessa ajossa viestiä ei tullut; iframeen ei lisätty tätä ylimääräistä oikeutta.
+Node-ajurin alkuperäinen fetch-valmiuskoe kaatui Undicin sisäiseen assertioon;
+valmiuskoe korvattiin TCP-yhteyskokeella. Vain testiajuri muuttui tämän vuoksi.
+Varsinaista videon toistoa, ääntä, fullscreen-siirtymää tai fyysisiä iOS/Android-
+laitteita ei testattu. Tässä hyväksyttiin pyydetty heti näkyvä upotettu soitin ja
+responsiivinen asettelu. Muut selainmoottorit eivät kuuluneet tähän rajattuun uusintaan.
+YouTuben ulkoisen palvelun tulevaa käytettävyyttä ei voi taata paikallisella muutoksella.
+
+MUUTETUT TIEDOSTOT
+index.php — staattinen näkyvä YouTube-iframe, tarpeettoman peitteen/JS:n poisto.
+test/browser/acceptance.cjs — introassertiot vastaamaan suoraa iframea.
+test/browser/video.cjs — todellisen YouTuben selainregressio.
+test/browser/README.txt — uuden ajon ohje.
+test/browser/video/before/ ja after/ — toisto, tulokset ja kuvakaappaukset.
+test/browser/video/workflow/matrix.json — kuuden näkymän työnkulkuregressio.
+test/YOUTUBE_EMBED_REPORT.txt — tämä raportti.
+Vanhat hyväksyntäraportit ja niiden kuvat säilyvät historiallisena ajonäyttönä.
+
+UUSINTA REPOJUURESTA (TEST_PHP annetaan ympäristömuuttujana tarvittaessa)
+  node test/browser/video.cjs
+  node test/browser/acceptance.cjs --engines=chrome --modes=normal --output=.runtime/video-workflow
+  php test/a2_regression_test.php

@@ -3830,45 +3830,13 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
   </p>
   <div class="block" role="region" aria-label="Esittelyvideo">
     <div style="position: relative; width: 100%; height: 0; padding-bottom: 56.25%; margin: 0 auto;">
-      <button id="video-thumbnail" type="button" aria-label="Katso ohjevideo" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; padding: 0; background: #e5e5e5; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-        <div style="width: 80px; height: 80px; background: rgba(0,0,0,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-          <div style="width: 0; height: 0; border-left: 25px solid #fff; border-top: 15px solid transparent; border-bottom: 15px solid transparent; margin-left: 5px;"></div>
-        </div>
-      </button>
-      <div id="video-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: none;">
-      </div>
+      <iframe id="video-iframe" src="https://www.youtube.com/embed/X2fGUT1MzM0"
+        title="Enneagrammitesti esittelyvideo" loading="eager"
+        referrerpolicy="strict-origin-when-cross-origin"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px;"></iframe>
     </div>
-    <script nonce="<?= $nonce ?>">
-    document.getElementById('video-thumbnail').addEventListener('click', function() {
-      var thumbnail = document.getElementById('video-thumbnail');
-      var iframeContainer = document.getElementById('video-iframe');
-      
-      // Luo iframe autoplay-parametrilla
-      var iframe = document.createElement('iframe');
-      iframe.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; border-radius: 8px;';
-      iframe.src = 'https://www.youtube.com/embed/X2fGUT1MzM0?autoplay=1';
-      iframe.title = 'Enneagrammitesti esittelyvideo';
-      iframe.allowFullscreen = true;
-      
-      // Piilota thumbnail ja näytä video
-      thumbnail.style.display = 'none';
-      iframeContainer.appendChild(iframe);
-      iframeContainer.style.display = 'block';
-    });
-    
-    // Hover-efekti play-napille
-    document.getElementById('video-thumbnail').addEventListener('mouseenter', function() {
-      var playBtn = this.querySelector('div');
-      playBtn.style.transform = 'scale(1.1)';
-      playBtn.style.background = 'rgba(255,255,255,0.2)';
-    });
-    
-    document.getElementById('video-thumbnail').addEventListener('mouseleave', function() {
-      var playBtn = this.querySelector('div');
-      playBtn.style.transform = 'scale(1)';
-      playBtn.style.background = 'rgba(0,0,0,0.8)';
-    });
-    </script>
   </div>
 
   <?php if ($TEST_MODE): 

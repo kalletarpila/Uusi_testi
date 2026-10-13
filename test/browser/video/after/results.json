@@ -1,0 +1,173 @@
+{
+  "initial_head": "2a915adc860baba1a5e42ce294a1a3e8b9f8b026",
+  "application_sha256": "ef7027d7212f1c7f8257c127d121408045aa15ceef1050bb47c8ff744b2b5e24",
+  "baseline": false,
+  "real_youtube": true,
+  "started_at": "2026-10-13T12:15:10.234Z",
+  "cases": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "passed": true,
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0",
+          "status": 200
+        }
+      ],
+      "iframes_at_load": 1,
+      "geometry": {
+        "x": 354,
+        "y": 355.6875,
+        "width": 732,
+        "height": 411.75,
+        "overflow": false,
+        "center_uncovered": true
+      },
+      "player_controls": [
+        {
+          "label": "Toista video",
+          "class": "ytmCuedOverlayPlayButton"
+        },
+        {
+          "label": "Piilota soittimen säätimet",
+          "class": "ytmA11yStylesHiddenButton"
+        },
+        {
+          "label": null,
+          "class": "ytmVideoInfoLink ytmVideoInfoChannelAvatar"
+        },
+        {
+          "label": "Close",
+          "class": "ytSpecButtonShapeNextHost ytSpecButtonShapeNextText ytSpecButtonShapeNextOverlay ytSpecButtonShapeNextSizeM ytSpecButtonShapeNextIconOnlyDefault"
+        },
+        {
+          "label": "Jaa",
+          "class": "ytSpecButtonShapeNextHost ytSpecButtonShapeNextText ytSpecButtonShapeNextOverlay ytSpecButtonShapeNextSizeM ytSpecButtonShapeNextIconOnlyDefault"
+        }
+      ],
+      "poster_images": [
+        "url(\"https://i.ytimg.com/vi/X2fGUT1MzM0/maxresdefault.jpg?sqp=-oaymwEmCIAKENAF8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgWShBMA8=&rs=AOn4CLBZ9lxTGGYNR5AkjcZNyXhtFu5rbg\")"
+      ],
+      "player_visible": true,
+      "player_error": []
+    },
+    {
+      "name": "portrait",
+      "viewport": {
+        "name": "portrait",
+        "width": 390,
+        "height": 844,
+        "touch": true
+      },
+      "passed": true,
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0",
+          "status": 200
+        }
+      ],
+      "iframes_at_load": 1,
+      "geometry": {
+        "x": 31.859375,
+        "y": 350.34375,
+        "width": 326.265625,
+        "height": 183.515625,
+        "overflow": false,
+        "center_uncovered": true
+      },
+      "player_controls": [
+        {
+          "label": "Toista video",
+          "class": "ytmCuedOverlayPlayButton"
+        },
+        {
+          "label": "Piilota soittimen säätimet",
+          "class": "ytmA11yStylesHiddenButton"
+        },
+        {
+          "label": null,
+          "class": "ytmVideoInfoLink ytmVideoInfoChannelAvatar"
+        },
+        {
+          "label": "Close",
+          "class": "ytSpecButtonShapeNextHost ytSpecButtonShapeNextText ytSpecButtonShapeNextOverlay ytSpecButtonShapeNextSizeM ytSpecButtonShapeNextIconOnlyDefault"
+        },
+        {
+          "label": "Jaa",
+          "class": "ytSpecButtonShapeNextHost ytSpecButtonShapeNextText ytSpecButtonShapeNextOverlay ytSpecButtonShapeNextSizeM ytSpecButtonShapeNextIconOnlyDefault"
+        }
+      ],
+      "poster_images": [
+        "url(\"https://i.ytimg.com/vi/X2fGUT1MzM0/sddefault.jpg?sqp=-oaymwEmCIAFEOAD8quKqQMa8AEB-AH-CYAC0AWKAgwIABABGGUgWShBMA8=&rs=AOn4CLDOyzV5g1fGKUZDGCTjsmJX4bjTJQ\")"
+      ],
+      "player_visible": true,
+      "player_error": []
+    },
+    {
+      "name": "small",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true
+      },
+      "passed": true,
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [],
+      "embed_responses": [
+        {
+          "url": "https://www.youtube.com/embed/X2fGUT1MzM0",
+          "status": 200
+        }
+      ],
+      "iframes_at_load": 1,
+      "geometry": {
+        "x": 26.1875,
+        "y": 435.65625,
+        "width": 267.625,
+        "height": 150.53125,
+        "overflow": false,
+        "center_uncovered": true
+      },
+      "player_controls": [
+        {
+          "label": "Toista video",
+          "class": "ytmCuedOverlayPlayButton"
+        },
+        {
+          "label": "Piilota soittimen säätimet",
+          "class": "ytmA11yStylesHiddenButton"
+        },
+        {
+          "label": null,
+          "class": "ytmVideoInfoLink ytmVideoInfoChannelAvatar"
+        },
+        {
+          "label": "Close",
+          "class": "ytSpecButtonShapeNextHost ytSpecButtonShapeNextText ytSpecButtonShapeNextOverlay ytSpecButtonShapeNextSizeM ytSpecButtonShapeNextIconOnlyDefault"
+        }
+      ],
+      "poster_images": [
+        "url(\"https://i.ytimg.com/vi/X2fGUT1MzM0/default.jpg?sqp=-oaymwEkCHgQWvKriqkDGvABAfgB_gmAAtAFigIMCAAQARhlIFkoQTAP&rs=AOn4CLD39I3YwmlsROfAHA5HlGpFdG6L-A\")"
+      ],
+      "player_visible": true,
+      "player_error": []
+    }
+  ],
+  "browser": "155.0.8059.40",
+  "php_diagnostics": [],
+  "finished_at": "2026-10-13T12:15:15.384Z",
+  "passed": true
+}

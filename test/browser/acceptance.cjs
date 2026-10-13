@@ -95,8 +95,7 @@ class User {
   form(field,value){return this.page.locator('form').filter({has:this.page.locator(`input[name="${field}"][value="${value}"]`)}).locator('button');}
   async begin(code,legacy=false){await this.page.goto(this.site.base+'/index.php'+(legacy?'?oldTB1=1':''));await this.audit('intro');
     if(this.view.name==='small'||this.view.name==='desktop')await this.screenshot('intro');
-    const video=this.page.locator('#video-thumbnail');if(await video.evaluate(e=>e.tabIndex<0))this.issue('video-not-keyboard-accessible',{tag:await video.evaluate(e=>e.tagName)});
-    if(this.view.name==='desktop'){await video.focus();if(await video.evaluate(e=>document.activeElement===e)){await this.page.keyboard.press('Enter');await this.page.locator('#video-iframe iframe').waitFor();}}
+    const video=this.page.locator('iframe#video-iframe');assert.equal(await video.count(),1,'Embed exists immediately');assert(await video.isVisible(),'Embed visible without a click');assert.equal(await video.getAttribute('src'),'https://www.youtube.com/embed/X2fGUT1MzM0');assert.equal(await this.page.locator('#video-thumbnail').count(),0,'No video placeholder overlay');
     const before=this.posts;await this.page.locator('button[name=start]').click();assert.equal(this.posts,before,'Incomplete introduction rejected in browser');assert.equal(this.dialogs.length,1);assert.equal(await this.page.locator('#ennea').evaluate(e=>document.activeElement===e),true);
     await this.page.locator('#ennea').selectOption('4');assert.equal(await this.page.locator('#confidence').isVisible(),true);await this.audit('intro-confidence',true);
     await this.page.locator('button[name=start]').click();assert.equal(this.posts,before);assert.equal(this.dialogs.length,2);await this.page.locator('#confidence').selectOption('2');

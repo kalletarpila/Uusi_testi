@@ -1,0 +1,28 @@
+{
+  "initial_head": "2a915adc860baba1a5e42ce294a1a3e8b9f8b026",
+  "application_sha256": "457f75a77acbee313912205a36d701a485eff812e49cb71ce67acbf1197c5fff",
+  "baseline": true,
+  "real_youtube": true,
+  "started_at": "2026-10-13T12:05:19.745Z",
+  "cases": [
+    {
+      "name": "desktop",
+      "viewport": {
+        "name": "desktop",
+        "width": 1440,
+        "height": 900
+      },
+      "passed": false,
+      "javascript_errors": [],
+      "console_errors": [],
+      "failed_requests": [],
+      "embed_responses": [],
+      "iframes_at_load": 0,
+      "error": "AssertionError [ERR_ASSERTION]: YouTube iframe missing on initial page load\n    at D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\video.cjs:69:18"
+    }
+  ],
+  "browser": "155.0.8059.40",
+  "php_diagnostics": [],
+  "finished_at": "2026-10-13T12:05:22.251Z",
+  "passed": false
+}
