@@ -1,0 +1,47 @@
+PHASE 2 NAVIGATION — COVERAGE PLAN, prepared before implementation 2026-10-13
+Base HEAD: ac2462707616e69c70deaa47f15088d9c060e8cf, clean origin/dev.
+The immediately visible YouTube iframe from this HEAD must remain intact.
+
+HTTP rows (each reaches Phase 2 through actual intro/Phase 1 forms):
+* A2/B2/C2/D2 ordinary review/edit: first/middle/last, both directions,
+  all five answers, strength/side/neutral replacements, repeated edits,
+  stable question mapping, progress, cannot skip unanswered, PRG/refresh.
+* Every pair, each winner and unresolved:
+  A2 4-7/4-9/7-9; B2 3-7/3-8/7-8;
+  C2 1-5/1-6/5-6; D2 2-6/2-9/6-9.
+  Review/edit TB2, all questions, all five choices, latest scores/CSV/log.
+* Three-way for every track: each of three winners, two remaining leaders,
+  three remaining leaders. Every configured pair must be included.
+* Every track: TB2 return/reentry unchanged, same answer submission unchanged,
+  actual edit still same tie, eliminate tie, different pair, two->three,
+  three->two, repeated cycles. Old answers/codes/points must be cleared.
+* Every track: no Phase 1 return, wrong-state actions, forged targets,
+  stale/duplicate answer and navigation tokens, invalid side/value, refresh.
+* Every track: missing ordinary questions, missing TB pair, invalid mapping,
+  corrupted/out-of-range/incomplete answer state, interrupted session,
+  failed CSV write, replay final answer. No valid-looking technical result.
+* Current and legacy TB1, invited/uninvited, all four tracks, Phase 1 review
+  followed by Phase 2 review, result/CSV/invitation/feedback/reset.
+* Legacy in-progress Phase 2/TB2 sessions: validated migration from existing
+  answer codes, no loss or double counting. Explicit isolated fault fixtures
+  are separate from complete user workflows and labelled in result matrix.
+
+All meaningful scoring assertions use an independent calculation from latest
+rendered-question answer records. Successful flows use no session patches.
+Fault injection is explicitly labelled. Current CSV identifiers/text/mappings
+drive selections; shuffled order is never assumed. Research schema stays 136.
+
+Browser plan: existing 108 workflows (3 engines x 6 views x 6 modes), plus
+new navigation interactions on Chrome/Firefox/WebKit at 1440x900, 390x844,
+320x700. Review/edit strong/mild/neutral, visible selected style/aria-pressed,
+next/previous, TB restoration/invalidation, phase boundary, actual touch and
+keyboard, geometry/no overlaps, JS errors, representative screenshots.
+External media is stubbed for questionnaire browser runs. The static iframe
+URL/visibility is asserted. The dedicated real-YouTube test is rerun separately.
+
+Required reruns: PHP syntax, existing 110 HTTP, existing 318 Phase 1 navigation,
+new Phase 2 HTTP, existing A2/functions, TB2 subset, browser acceptance and new
+browser navigation, diff checks. Run relevant concurrency checks if shared
+storage or completion logic changes. Never change production data or send mail.
+Final counts and reachable/unreachable transitions go in the final report and
+machine-readable matrices. One focused commit after validation; no push/deploy.

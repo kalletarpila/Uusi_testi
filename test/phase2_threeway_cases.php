@@ -21,7 +21,7 @@ function start_threeway(array $cache, string $track, array $types, int $points):
     seed($cache);
     handle_single_winner($track[0] . '1');
     $_SESSION['state'] = 'phase2';
-    $_SESSION['varPoints'] = array_fill_keys($types, $points);
+    phase2_seed_scores(array_fill_keys($types, $points));
     handle_phase2_completion();
     check($_SESSION['state'] === 'phase2_tb', "$track three-way entered through completion");
     check($_SESSION['varPoints'] === array_fill_keys($types, $points), 'Initial scores preserved');
@@ -169,6 +169,7 @@ foreach ($groups as $track => $types) {
             invited_unresolved_fixture($invited);
             $_SESSION['varPoints'] = array_fill_keys($types, 0);
             foreach ($pair as $type) $_SESSION['varPoints'][$type] = 10;
+            phase2_seed_scores($_SESSION['varPoints']);
             initialize_phase2_tiebreak(array_reverse($pair));
             check(count($_SESSION['tb2_set']) === $expectedCounts[$key], 'Two-way loads configured pair count');
             foreach ($_SESSION['tb2_set'] as $i => $b) {
@@ -189,6 +190,7 @@ foreach ($groups as $track => $types) {
             $_SESSION['InviteId'] = 'unresolved-fixture';
             $_SESSION['varPoints'] = array_fill_keys($types, 0);
             foreach ($leaders as $type) $_SESSION['varPoints'][$type] = 6;
+            phase2_seed_scores($_SESSION['varPoints']);
             $_SESSION['cached_quiz_data']['phase2_tiebreaks']['T'.$track] = array_values(array_filter($configured, fn($b) => pair_key($b['pair']) !== $missingKey));
             $before = $_SESSION['varPoints'];
             $csvBefore = hash_file('sha256', log_path());
@@ -212,7 +214,7 @@ foreach ($groups as $track => $types) {
 
     // Pair headers with mismatched scoring tags are not valid comparison questions.
     seed($cache); handle_single_winner($track[0].'1');
-    $_SESSION['varPoints'] = array_fill_keys($types, 8);
+    phase2_seed_scores(array_fill_keys($types, 8));
     $badKey = array_key_first($expectedCounts);
     foreach ($_SESSION['cached_quiz_data']['phase2_tiebreaks']['T'.$track] as &$b) {
         if (pair_key($b['pair']) === $badKey) $b['left_var'] = 'INVALID';
@@ -226,6 +228,7 @@ foreach ($groups as $track => $types) {
 
 // Participant output does not expose implementation details.
 seed($cache); handle_single_winner('A1'); $_SESSION['varPoints'] = [4=>0,7=>0,9=>0];
+phase2_seed_scores($_SESSION['varPoints']);
 handle_phase2_completion();
 foreach ($_SESSION['tb2_set'] as $b) handle_phase2_tiebreak_answer(0, 'neutral');
 $html = render_state($sandbox);

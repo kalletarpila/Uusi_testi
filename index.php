@@ -890,6 +890,9 @@ function generate_phase2_button(int $value, string $side, string $text, bool $is
  */
 function generate_phase2_form(int $value, string $side, string $text, string $formType = 'choice2', bool $isRipple = true, string $customClass = ''): string {
     $cssClass = 'btn';
+    $answers = $_SESSION[$formType === 'tb2' ? 'tb2_answers' : 'answers2'] ?? [];
+    $index = $_SESSION[$formType === 'tb2' ? 'tb2_index' : 'q2_index'] ?? 0;
+    $selected = ($answers[$index] ?? null) === ['side' => $side, 'value' => $value];
     if ($customClass !== '') {
         $cssClass .= ' ' . $customClass;
     } elseif ($side === 'neutral') {
@@ -906,6 +909,7 @@ function generate_phase2_form(int $value, string $side, string $text, string $fo
     if ($isRipple && $side !== 'zero') {
         $cssClass .= ' choice2-btn ripple';
     }
+    if ($selected) $cssClass .= ' selected';
     
     $valueField = $formType . '_value';
     $sideField = $formType . '_side';
@@ -915,7 +919,7 @@ function generate_phase2_form(int $value, string $side, string $text, string $fo
     return '<form method="post" style="' . $formStyle . '" class="' . $formClass . '">' .
            '<input type="hidden" name="' . $valueField . '" value="' . $value . '">' .
            '<input type="hidden" name="' . $sideField . '" value="' . $side . '">' .
-           '<button class="' . $cssClass . '" type="submit" aria-label="Valinta ' . $value . '">' . 
+           '<button class="' . $cssClass . '" type="submit" aria-pressed="' . ($selected ? 'true' : 'false') . '" aria-label="Valinta ' . $value . '">' .
            htmlspecialchars($text) . '</button></form>';
 }/**
  * Generoi kortti-divven sisällölle
@@ -1054,6 +1058,8 @@ function session_validate_state(): void {
          ($_SESSION['state'] === 'phase2_tb' && empty($_SESSION['tb2_set'])))) {
         quiz_technical_error('missing_or_invalid_phase2_session');
     }
+    if (in_array($_SESSION['state'], ['phase2_intro','phase2','phase2_tb'], true) &&
+        !recalculate_phase2_answers(true)) quiz_technical_error('invalid_phase2_answer_state');
     if (in_array($_SESSION['state'], ['quiz1','tb1_new_intro','tb1_new','tiebreak_intro','tiebreak'], true)) {
         if (!recalculate_phase1_answers()) { quiz_technical_error('invalid_phase1_session'); return; }
         if ($_SESSION['state'] === 'quiz1') {
@@ -1784,9 +1790,11 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST') {
         $actions = ['start','choice','navigate','return_to_phase1','return_to_tiebreak',
                     'tb_choice','tiebreak_navigate','tb1_new_choice','tb1_new_navigate',
                     'continue_tiebreak','continue_tb1_new','continue_phase2',
-                    'choice2_value','tb2_value','show_feedback','send_feedback'];
+                    'choice2_value','tb2_value','phase2_navigate','tb2_navigate','return_to_phase2','show_feedback','send_feedback'];
         if (count(array_intersect_key($_POST, array_flip($actions))) > 1 ||
-            array_intersect_key($_POST, array_flip(['question_index','q1_index','tiebreak_index','tb1_new_index','target_index']))) {
+            array_intersect_key($_POST, array_flip(['question_index','q1_index','q2_index','tb2_index','tiebreak_index','tb1_new_index','target_index'])) ||
+            (isset($_POST['choice2_side']) && (!is_string($_POST['choice2_side']) || !in_array($_POST['choice2_side'], ['left','right','neutral'], true))) ||
+            (isset($_POST['tb2_side']) && (!is_string($_POST['tb2_side']) || !in_array($_POST['tb2_side'], ['left','right','neutral'], true)))) {
             index_log('POST_REJECTED: multiple actions or forged question index');
             $_POST = [];
         }
@@ -2257,11 +2265,11 @@ function initialize_phase2(string $winner): void {
     }
     
     $_SESSION['q2_index']  = 0;
+    $_SESSION['phase2_order_signature'] = hash('sha256', json_encode($_SESSION['blocks2']));
     $_SESSION['answers2']  = [];
     $_SESSION['varPoints'] = [];
     $_SESSION['pairs2']    = [];
-    $_SESSION['tb2_pairs'] = [];
-    unset($_SESSION['tb2_context']);
+    clear_phase2_tiebreak();
     $_SESSION['log_row']['track'] = $track;
 
     $codes = []; 
@@ -2810,76 +2818,204 @@ function handle_tiebreak_completion(): void {
  * @param int $choice Käyttäjän valinta (-2 = vahvasti vasemmalle, 0 = neutraali, 2 = vahvasti oikealle)
  * @return void
  */
-function handle_phase2_answer(int $value, string $side = ''): void {
-    // Jos side on tyhjä, käsitellään vanha choice-järjestelmä (taaksepäin yhteensopivuus)
-    if ($side === '' && ($value >= -2 && $value <= 2)) {
-        $side = ($value < 0) ? 'left' : (($value > 0) ? 'right' : 'neutral');
-        $value = abs($value);
-    }
-    
-    if ($value < 0 || $value > 2 || !in_array($side, ['left', 'right', 'neutral'], true) ||
-        (($side === 'neutral') !== ($value === 0))) {
-        index_log('PHASE2: Invalid choice value=' . $value . ' side=' . $side);
-        return;
-    }
-    
-    $index = (int)($_SESSION['q2_index'] ?? 0);
-    $block = $_SESSION['blocks2'][$index] ?? null;
-    
-    if (!$block) {
-        quiz_technical_error('missing_phase2_block');
-        return;
-    } else {
-        index_log('PHASE2 DISPLAY: Q' . ($index + 1) . '/' . count($_SESSION['blocks2']) . 
-                 ' - Left:' . ($block['left_var'] ?? '?') . ' Right:' . ($block['right_var'] ?? '?'));
-    }
-    
-  // Ensure varPoints array exists
-  if (!isset($_SESSION['varPoints']) || !is_array($_SESSION['varPoints'])) {
-    $_SESSION['varPoints'] = [];
-  }
+/** Latest indexed answers are authoritative; scores and research codes are derived. */
+function phase2_valid_choice(array $answer): bool {
+    return isset($answer['side'], $answer['value']) && is_int($answer['value']) &&
+        in_array($answer['side'], ['left','right','neutral'], true) &&
+        $answer['value'] >= 0 && $answer['value'] <= 2 &&
+        (($answer['side'] === 'neutral') === ($answer['value'] === 0));
+}
 
-  // Tallennetaan vastaus
-    $entry = '';
-    $question_number = $block['question_number'] ?? 'unknown';
-    
-    if ($side !== 'neutral' && $value > 0) {
-    $variable = ($side === 'left') ? ($block['left_var'] ?? '') : ($block['right_var'] ?? '');
-    // Normalize variable key to avoid mismatches (trim, uppercase)
-    $variable = is_string($variable) ? strtoupper(trim($variable)) : '';
-    if ($variable === '') {
-      index_log('PHASE2: WARNING - empty variable for block at index ' . $index . ' (question_number=' . $question_number . ')');
-    } else {
-      $_SESSION['varPoints'][$variable] = (int)(($_SESSION['varPoints'][$variable] ?? 0)) + (int)$value;
+function phase2_collect_answers(array $set, array $answers, array $codes, int $limit, array &$scores, array &$records): bool {
+    if (!$set || !array_is_list($set) || count($set) > $limit || !array_is_list($answers) || count($answers) > count($set)) return false;
+    $scores = array_fill_keys($codes, 0); $records = []; $ids = [];
+    foreach ($set as $i => $q) {
+        if (!is_array($q) || !isset($q['question_number'], $q['pair'], $q['left_var'], $q['right_var'], $q['desc'], $q['left_text'], $q['right_text']) ||
+            !is_string($q['question_number']) || $q['question_number'] === '' || isset($ids[$q['question_number']]) ||
+            !is_string($q['left_var']) || !is_string($q['right_var']) ||
+            !is_array($q['pair']) || !array_is_list($q['pair']) || count($q['pair']) !== 2 ||
+            !is_string($q['pair'][0]) || !is_string($q['pair'][1]) ||
+            !is_string($q['desc']) || trim($q['desc']) === '' ||
+            !is_string($q['left_text']) || trim($q['left_text']) === '' || !is_string($q['right_text']) || trim($q['right_text']) === '') return false;
+        $ids[$q['question_number']] = true;
+        $mapped = [(string)$q['left_var'], (string)$q['right_var']];
+        $pair = array_map('strval', array_values($q['pair'])); sort($mapped); sort($pair);
+        if ($mapped !== $pair || $mapped[0] === $mapped[1] || array_diff($mapped, $codes)) return false;
+        if (!isset($answers[$i])) continue;
+        $a = $answers[$i]; if (!is_array($a) || !phase2_valid_choice($a)) return false;
+        $type = $a['side'] === 'neutral' ? 'NEUTRAL' : (string)$q[$a['side'].'_var'];
+        if ($a['value']) $scores[$type] += $a['value'];
+        $records[] = 'x'.$type.'-'.$q['question_number'].'-'.$a['value'];
     }
-    $entry = 'x' . $variable . '-' . $question_number . '-' . $value; // Format: xVARIABLE-questionnumber-value
-    } elseif ($side === 'neutral') {
-        // Neutral vastaukset tallennetaan myös
-        $entry = 'xNEUTRAL-' . $question_number . '-0'; // Format: xNEUTRAL-questionnumber-0
+    return true;
+}
+
+function phase2_answer_signature(): string {
+    return hash('sha256', json_encode([$_SESSION['track'], $_SESSION['blocks2'], $_SESSION['answers2']]));
+}
+
+function phase2_matches_catalog(array $set, $catalog, array $codes, int $limit): bool {
+    $scores = $records = [];
+    if (!is_array($catalog) || !phase2_collect_answers($catalog, [], $codes, $limit, $scores, $records) || count($set) !== count($catalog)) return false;
+    $byId = array_column($catalog, null, 'question_number');
+    foreach ($set as $q) {
+        $original = $byId[$q['question_number']] ?? null;
+        if (!$original || $q['desc'] !== $original['desc']) return false;
+        $mapped = [$q['left_var']=>$q['left_text'], $q['right_var']=>$q['right_text']];
+        $expected = [$original['left_var']=>$original['left_text'], $original['right_var']=>$original['right_text']];
+        if ($mapped != $expected) return false;
     }
-    
-    $_SESSION['pairs2'][] = $entry;
-    $_SESSION['answers2'][] = ['side' => $side, 'value' => $value];
-    $_SESSION['q2_index'] = $index + 1;
-    
-    index_log('PHASE2 ANSWER: case' . ($index + 1) . '/' . count($_SESSION['blocks2']) . 
-              ' side=' . $side . ' value=' . $value . ' left=' . $block['left_var'] . ' right=' . $block['right_var'] . 
-              ' (next_index=' . $_SESSION['q2_index'] . ')');
-  // Log current varPoints for debugging
-  index_log('PHASE2 STATE: varPoints=' . json_encode($_SESSION['varPoints'] ?? []));
-    
-    // Tarkistetaan onko vaihe 2 valmis
-    if ($_SESSION['q2_index'] >= count($_SESSION['blocks2'])) {
-        handle_phase2_completion();
+    return true;
+}
+
+function clear_phase2_tiebreak(): void {
+    foreach (['tb2_index','tb2_set','tb2_pair','tb2_context','tb2_source_signature','tb2_set_signature','tb2_review','tb2_points'] as $key) unset($_SESSION[$key]);
+    $_SESSION['tb2_answers'] = $_SESSION['tb2_pairs'] = [];
+    unset($_SESSION['log_row']['tied_types']);
+}
+
+function recalculate_phase2_answers(bool $validateIndex = false): bool {
+    $tracks = ['A2'=>['4','7','9'], 'B2'=>['3','7','8'], 'C2'=>['1','5','6'], 'D2'=>['2','6','9']];
+    $codes = $tracks[$_SESSION['track'] ?? ''] ?? [];
+    if (!$codes || !is_array($_SESSION['varCodes'] ?? null) || array_filter($_SESSION['varCodes'], fn($v) => !is_int($v) && !is_string($v)) || array_map('strval', $_SESSION['varCodes']) !== $codes ||
+        !is_array($_SESSION['blocks2'] ?? null) || !is_array($_SESSION['answers2'] ?? null)) return false;
+    $ordinary = $pairs = [];
+    if (!phase2_collect_answers($_SESSION['blocks2'], $_SESSION['answers2'], $codes, 36, $ordinary, $pairs)) return false;
+    if (!phase2_matches_catalog($_SESSION['blocks2'], get_cached_phase2_blocks()[$_SESSION['track']] ?? [], $codes, 36)) return false;
+    $orderSignature = hash('sha256', json_encode($_SESSION['blocks2']));
+    if (isset($_SESSION['phase2_order_signature']) && $_SESSION['phase2_order_signature'] !== $orderSignature) return false;
+    $ordinaryPairs = [];
+    foreach ($_SESSION['blocks2'] as $q) { $pair = array_map('strval', $q['pair']); sort($pair); $ordinaryPairs[implode('-', $pair)] = true; }
+    if (count($ordinaryPairs) !== 3) return false;
+    $state = $_SESSION['state'] ?? '';
+    $i = $_SESSION['q2_index'] ?? null;
+    if ($validateIndex && (!is_int($i) || $i < 0 || $i > count($_SESSION['answers2']) ||
+        ($state !== 'phase2_tb' && $i >= count($_SESSION['blocks2'])))) return false;
+    $tbScores = array_fill_keys($codes, 0); $tbPairs = []; $tbAnswers = [];
+    $hasRound = !empty($_SESSION['tb2_set']);
+    $migrate = false;
+    if ($hasRound) {
+        if (count($_SESSION['answers2']) !== count($_SESSION['blocks2']) || !is_array($_SESSION['tb2_set']) ||
+            !is_array($_SESSION['tb2_context'] ?? null) || !is_array($_SESSION['tb2_pairs'] ?? null) ||
+            !is_array($_SESSION['tb2_pair'] ?? null) || array_filter($_SESSION['tb2_pair'], fn($v) => !is_int($v) && !is_string($v))) return false;
+        $leaders = array_map('strval', array_keys(array_filter($ordinary, fn($v) => $v === max($ordinary))));
+        $candidates = array_map('strval', $_SESSION['tb2_pair'] ?? []); sort($leaders); sort($candidates);
+        if (count($leaders) < 2 || $leaders !== $candidates || ($_SESSION['tb2_context']['scores_before'] ?? null) != $ordinary ||
+            ($_SESSION['tb2_context']['track'] ?? null) !== $_SESSION['track'] ||
+            !is_array($_SESSION['tb2_context']['candidates'] ?? null) || array_filter($_SESSION['tb2_context']['candidates'], fn($v) => !is_string($v) && !is_int($v)) || array_map('strval', $_SESSION['tb2_context']['candidates']) !== $leaders) return false;
+        $catalog = array_values(array_filter(get_cached_phase2_tiebreaks()['T'.$_SESSION['track']] ?? [],
+            fn($q) => is_array($q['pair'] ?? null) && count($q['pair']) === 2 &&
+                !array_filter($q['pair'], fn($v) => !is_string($v) && !is_int($v)) && !array_diff(array_map('strval', $q['pair']), $leaders)));
+        $tbSignature = hash('sha256', json_encode($_SESSION['tb2_set']));
+        if (isset($_SESSION['tb2_set_signature']) && $_SESSION['tb2_set_signature'] !== $tbSignature) return false;
+        $tbAnswers = $_SESSION['tb2_answers'] ?? null;
+        // Safely upgrade an in-progress pre-navigation session from its existing codes.
+        if (!isset($_SESSION['tb2_source_signature'])) {
+            $migrate = true; $tbAnswers = [];
+            if (!array_is_list($_SESSION['tb2_pairs'])) return false;
+            foreach ($_SESSION['tb2_pairs'] as $n => $code) {
+                $q = $_SESSION['tb2_set'][$n] ?? null;
+                if (!$q || !is_string($code) || !preg_match('/^x(NEUTRAL|[1-9])-([0-9]+)-([012])$/D', $code, $m) || $m[2] !== $q['question_number']) return false;
+                $side = $m[1] === 'NEUTRAL' ? 'neutral' : ($m[1] === (string)$q['left_var'] ? 'left' : ($m[1] === (string)$q['right_var'] ? 'right' : 'invalid'));
+                $tbAnswers[] = ['side'=>$side, 'value'=>(int)$m[3]];
+            }
+        } elseif ($_SESSION['tb2_source_signature'] !== phase2_answer_signature()) return false;
+        if (!is_array($tbAnswers) || !phase2_collect_answers($_SESSION['tb2_set'], $tbAnswers, $codes, 10, $tbScores, $tbPairs)) return false;
+        if (!phase2_matches_catalog($_SESSION['tb2_set'], $catalog, $codes, 10)) return false;
+        $used = [];
+        foreach ($_SESSION['tb2_set'] as $q) {
+            $pair = array_map('strval', $q['pair']); sort($pair);
+            if (array_diff($pair, $leaders)) return false;
+            $used[implode('-', $pair)] = true;
+        }
+        if (count($used) !== (count($leaders) === 3 ? 3 : 1)) return false;
+        $ti = $_SESSION['tb2_index'] ?? null;
+        if ($validateIndex && (!is_int($ti) || $ti < 0 || $ti >= count($_SESSION['tb2_set']) || $ti > count($tbAnswers) ||
+            ($state === 'phase2' && ($_SESSION['tb2_review'] ?? false) !== true))) return false;
+    } elseif ($state === 'phase2_tb' || !empty($_SESSION['tb2_answers']) || !empty($_SESSION['tb2_pairs']) || !empty($_SESSION['tb2_review'])) return false;
+    $total = $ordinary;
+    foreach ($tbScores as $code => $score) $total[$code] += $score;
+    if ($migrate && ($_SESSION['varPoints'] ?? null) != $total) return false;
+    $_SESSION['phase2_points'] = $ordinary;
+    $_SESSION['phase2_order_signature'] = $orderSignature;
+    $_SESSION['tb2_points'] = $tbScores;
+    $_SESSION['varPoints'] = $total;
+    $_SESSION['pairs2'] = $pairs;
+    $_SESSION['tb2_pairs'] = $tbPairs;
+    if ($hasRound) {
+        $_SESSION['tb2_answers'] = $tbAnswers;
+        $_SESSION['tb2_source_signature'] = phase2_answer_signature();
+        $_SESSION['tb2_set_signature'] = $tbSignature;
+    }
+    return true;
+}
+
+function handle_phase2_navigation(bool $tiebreak = false): void {
+    $state = $tiebreak ? 'phase2_tb' : 'phase2';
+    if (($_SESSION['state'] ?? '') !== $state) return;
+    if (!recalculate_phase2_answers(true)) { quiz_technical_error('invalid_phase2_navigation'); return; }
+    $direction = $_POST[$tiebreak ? 'tb2_navigate' : 'phase2_navigate'] ?? '';
+    $key = $tiebreak ? 'tb2_index' : 'q2_index'; $i = $_SESSION[$key];
+    if ($direction === 'prev') {
+        if ($i > 0) $_SESSION[$key] = $i - 1;
+        elseif ($tiebreak) handle_return_to_phase2();
+    } elseif ($direction === 'next' && isset($_SESSION[$tiebreak ? 'tb2_answers' : 'answers2'][$i])) {
+        if ($i + 1 < count($_SESSION[$tiebreak ? 'tb2_set' : 'blocks2'])) $_SESSION[$key] = $i + 1;
+        elseif ($tiebreak) handle_phase2_tiebreak_completion();
+        else handle_phase2_completion();
     }
 }
 
+function handle_return_to_phase2(): void {
+    if (($_SESSION['state'] ?? '') !== 'phase2_tb') return;
+    if (!recalculate_phase2_answers(true)) { quiz_technical_error('invalid_phase2_review'); return; }
+    $_SESSION['tb2_review'] = true;
+    $_SESSION['q2_index'] = count($_SESSION['blocks2']) - 1;
+    $_SESSION['state'] = 'phase2';
+}
+
+function generate_phase2_navigation(bool $tiebreak = false): string {
+    $index = $_SESSION[$tiebreak ? 'tb2_index' : 'q2_index'];
+    $name = $tiebreak ? 'tb2_navigate' : 'phase2_navigate';
+    $html = '<div class="navigation-controls" style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:20px 0">';
+    if ($index > 0 || $tiebreak) $html .= '<form method="post"><input type="hidden" name="'.$name.'" value="prev"><button class="btn" type="submit">← Edellinen</button></form>';
+    else $html .= '<div></div>';
+    if (isset($_SESSION[$tiebreak ? 'tb2_answers' : 'answers2'][$index])) $html .= '<form method="post"><input type="hidden" name="'.$name.'" value="next"><button class="btn" type="submit">Seuraava →</button></form>';
+    return $html.'</div>';
+}
+
+function handle_phase2_answer(int $value, string $side = ''): void {
+    if ($side === '' && $value >= -2 && $value <= 2) { $side = $value < 0 ? 'left' : ($value > 0 ? 'right' : 'neutral'); $value = abs($value); }
+    $answer = ['side'=>$side, 'value'=>$value];
+    if (!phase2_valid_choice($answer)) return;
+    if (!recalculate_phase2_answers(true)) { quiz_technical_error('invalid_phase2_answers'); return; }
+    if (($_SESSION['state'] ?? '') !== 'phase2') return;
+    $i = $_SESSION['q2_index'];
+    $previous = $_SESSION['answers2'][$i] ?? null;
+    if ($previous !== null && $previous !== $answer) {
+        clear_phase2_tiebreak();
+        index_log('PHASE2 EDIT: invalidated previous tiebreak at question '.($i + 1));
+    }
+    $_SESSION['answers2'][$i] = $answer;
+    if (!recalculate_phase2_answers()) { quiz_technical_error('invalid_phase2_replacement'); return; }
+    $_SESSION['q2_index'] = $i + 1;
+    index_log('PHASE2 ANSWER: case'.($i + 1).' side='.$side.' value='.$value.' scores='.json_encode($_SESSION['varPoints']));
+    if ($_SESSION['q2_index'] === count($_SESSION['blocks2'])) handle_phase2_completion();
+}
 /**
  * Käsittelee vaiheen 2 valmistumisen ja siirtymisen tulossivulle tai tiebreakiin
  * 
  * @return void
  */
 function handle_phase2_completion(): void {
+  if (!recalculate_phase2_answers() || count($_SESSION['answers2']) !== count($_SESSION['blocks2'])) { quiz_technical_error('incomplete_phase2_answers'); return; }
+  if (!empty($_SESSION['tb2_review']) && isset($_SESSION['tb2_source_signature']) &&
+      $_SESSION['tb2_source_signature'] === phase2_answer_signature()) {
+      unset($_SESSION['tb2_review']);
+      $_SESSION['state'] = 'phase2_tb';
+      index_log('PHASE2 REVIEW: restored same tiebreak questions, answers and progress');
+      return;
+  }
   $varPoints = $_SESSION['varPoints'] ?? [];
   if (empty($varPoints)) { quiz_technical_error('missing_phase2_scores'); return; }
   // Ensure numeric values
@@ -2923,6 +3059,8 @@ function handle_phase2_completion(): void {
  * @return void
  */
 function initialize_phase2_tiebreak(array $leaders): void {
+    if (!recalculate_phase2_answers() || count($_SESSION['answers2']) !== count($_SESSION['blocks2'])) { quiz_technical_error('incomplete_phase2_tiebreak_source'); return; }
+    clear_phase2_tiebreak();
     $leaders = array_values(array_unique(array_map('strval', $leaders)));
     natsort($leaders);
     $leaders = array_values($leaders);
@@ -2970,6 +3108,8 @@ function initialize_phase2_tiebreak(array $leaders): void {
         'comparison_pairs' => array_values($requiredPairs),
     ];
     $_SESSION['tb2_pairs'] = [];
+    $_SESSION['tb2_answers'] = [];
+    $_SESSION['tb2_source_signature'] = phase2_answer_signature();
     $_SESSION['tb2_index'] = 0;
     $_SESSION['tb2_set'] = [];
     $missingPairs = array_keys(array_filter($counts, fn($count) => $count === 0));
@@ -2988,6 +3128,7 @@ function initialize_phase2_tiebreak(array $leaders): void {
 
     shuffle($filtered);
     $_SESSION['tb2_set'] = $filtered;
+    $_SESSION['tb2_set_signature'] = hash('sha256', json_encode($filtered));
     $_SESSION['state'] = 'phase2_tb';
     index_log('PHASE2_TB START: ' . json_encode(array_merge($_SESSION['tb2_context'], [
         'question_counts' => $counts,
@@ -3001,66 +3142,25 @@ function initialize_phase2_tiebreak(array $leaders): void {
  * @return void
  */
 function handle_phase2_tiebreak_answer(int $value, string $side = ''): void {
-    // Jos side on tyhjä, käsitellään vanha choice-järjestelmä (taaksepäin yhteensopivuus)
-    if ($side === '' && ($value >= -2 && $value <= 2)) {
-        $side = ($value < 0) ? 'left' : (($value > 0) ? 'right' : 'neutral');
-        $value = abs($value);
-    }
-    
-    if ($value < 0 || $value > 2 || !in_array($side, ['left', 'right', 'neutral'], true) ||
-        (($side === 'neutral') !== ($value === 0))) {
-        index_log('PHASE2_TB: Invalid choice value=' . $value . ' side=' . $side);
-        return;
-    }
-    
-    $index = (int)($_SESSION['tb2_index'] ?? 0);
-    $block = $_SESSION['tb2_set'][$index] ?? null;
-    
-    if (!$block) {
-        index_log('PHASE2_TB: Missing block at index ' . $index);
-        return;
-    }
-    
-    index_log('PHASE2_TB DISPLAY: Q' . ($index + 1) . '/' . count($_SESSION['tb2_set']) . 
-             ' - Left:' . ($block['left_var'] ?? '?') . ' Right:' . ($block['right_var'] ?? '?'));
-    
-    $question_number = $block['question_number'] ?? 'unknown';
-    
-    // Tallennetaan vastaus
-    $entry = '';
-    if ($side !== 'neutral' && $value > 0) {
-    $variable = ($side === 'left') ? ($block['left_var'] ?? '') : ($block['right_var'] ?? '');
-    $variable = is_string($variable) ? strtoupper(trim($variable)) : '';
-    if ($variable === '') {
-      index_log('PHASE2_TB: WARNING - empty variable for tb block at index ' . $index . ' (question_number=' . $question_number . ')');
-    } else {
-      $_SESSION['varPoints'][$variable] = (int)(($_SESSION['varPoints'][$variable] ?? 0)) + (int)$value;
-    }
-    $entry = 'x' . $variable . '-' . $question_number . '-' . $value; // Format: xVARIABLE-questionnumber-value
-    } elseif ($side === 'neutral') {
-        // Neutral vastaukset tallennetaan myös
-        $entry = 'xNEUTRAL-' . $question_number . '-0'; // Format: xNEUTRAL-questionnumber-0
-    }
-    
-    $_SESSION['tb2_pairs'][] = $entry;
-    $_SESSION['tb2_index'] = $index + 1;
-    
-    index_log('PHASE2_TB ANSWER: tb' . ($index + 1) . '/' . count($_SESSION['tb2_set']) . 
-              ' side=' . $side . ' value=' . $value . ' left=' . $block['left_var'] . ' right=' . $block['right_var'] . 
-              ' (next_index=' . $_SESSION['tb2_index'] . ')');
-    
-    // Tarkistetaan onko tiebreak valmis
-    if ($_SESSION['tb2_index'] >= count($_SESSION['tb2_set'])) {
-        handle_phase2_tiebreak_completion();
-    }
+    if ($side === '' && $value >= -2 && $value <= 2) { $side = $value < 0 ? 'left' : ($value > 0 ? 'right' : 'neutral'); $value = abs($value); }
+    $answer = ['side'=>$side, 'value'=>$value];
+    if (!phase2_valid_choice($answer)) return;
+    if (!recalculate_phase2_answers(true)) { quiz_technical_error('invalid_phase2_tiebreak_answers'); return; }
+    if (($_SESSION['state'] ?? '') !== 'phase2_tb') return;
+    $i = $_SESSION['tb2_index'];
+    $_SESSION['tb2_answers'][$i] = $answer;
+    if (!recalculate_phase2_answers()) { quiz_technical_error('invalid_phase2_tiebreak_replacement'); return; }
+    $_SESSION['tb2_index'] = $i + 1;
+    index_log('PHASE2_TB ANSWER: tb'.($i + 1).' side='.$side.' value='.$value.' scores='.json_encode($_SESSION['varPoints']));
+    if ($_SESSION['tb2_index'] === count($_SESSION['tb2_set'])) handle_phase2_tiebreak_completion();
 }
-
 /**
  * Käsittelee vaiheen 2 tiebreak-kierroksen valmistumisen
  * 
  * @return void
  */
 function handle_phase2_tiebreak_completion(): void {
+    if (!recalculate_phase2_answers() || count($_SESSION['tb2_answers']) !== count($_SESSION['tb2_set'] ?? [])) { quiz_technical_error('incomplete_phase2_tiebreak_answers'); return; }
     $varPoints = $_SESSION['varPoints'] ?? [];
     if (empty($varPoints)) { quiz_technical_error('missing_phase2_tiebreak_scores'); return; }
     $leaders = [];
@@ -3166,11 +3266,16 @@ if (!empty($_SESSION['pending_redirect'])) {
 /* Vaihe 2 vastauksen käsittely */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'phase2') && isset($_POST['choice2_value']) && isset($_POST['choice2_side'])) {
     handle_phase2_answer((int)$_POST['choice2_value'], $_POST['choice2_side']);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'phase2') && isset($_POST['phase2_navigate'])) {
+    handle_phase2_navigation();
 }
 
 /* Vaihe 2 tiebreak vastauksen käsittely */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'phase2_tb') && isset($_POST['tb2_value']) && isset($_POST['tb2_side'])) {
     handle_phase2_tiebreak_answer((int)$_POST['tb2_value'], $_POST['tb2_side']);
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST' && (($_SESSION['state'] ?? '') === 'phase2_tb')) {
+    if (isset($_POST['tb2_navigate'])) handle_phase2_navigation(true);
+    elseif (($_POST['return_to_phase2'] ?? '') === '1') handle_return_to_phase2();
 }
 
 /* ====== INVITE token auto-claim URL-parametrilla (intro-tilassa) ====== */
@@ -3660,6 +3765,9 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;margin
 .card input[type="text"],.card textarea{width:100%}
 button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,a:focus-visible{outline:3px solid #005b97;outline-offset:3px}
 .tiebreak-options .btn{margin:0}
+.choice2-form .selected,.tb2-form .selected{transform:none}
+.case-wrap>.navigation-controls{grid-column:1/-1;order:4}
+.choice2-form .btn-eos.selected,.tb2-form .btn-eos.selected{-webkit-text-fill-color:#222!important}
 .btn-left-mild,.btn-left-strong,.btn-right-mild,.btn-right-strong{font-size:14px}
 @media(min-width:481px) and (max-width:768px){
   .choice-btn,.tb-choice-btn{min-width:44px!important;margin:0 2px 8px!important}
@@ -4631,6 +4739,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <div class="phase2-instructions" style="grid-column: 1 / -1; color: #555; font-size: 13px; line-height: 1.4; max-width: 100%; margin: 20px 0 10px 0; text-align: center;">
         Mieti kuvaako sinua vasemman vai oikean laidan kuvaus sinua enemmän ja sen jölkeen valitse oletko selvästi vai lievästi samaa mieltä kuvauksen kanssa. Jos et osaa valita, valitse En osaa sanoa -vaihtoehto.
       </div>
+      <?= generate_phase2_navigation() ?>
       <div class="mobile-hint">
         Vinkki: Jos haluat nähdä vaihtoehdot rinnakkain, käännä puhelin vaakasuoraan
       </div>
@@ -4694,7 +4803,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
             e.preventDefault();
             if (submitting) return;
             submitting = true;
+            forms.forEach(function(other) {
+              other.querySelectorAll('button').forEach(function(button) { button.classList.remove('selected'); button.setAttribute('aria-pressed', 'false'); });
+            });
             if (btn) {
+              btn.setAttribute('aria-pressed', 'true');
               btn.classList.add('selected');
             }
             // Viive ennen lomakkeen lähettämistä (350ms)
@@ -4718,6 +4831,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
     $pct   = ($total>0) ? (int)floor(($i/$total)*100) : 0;
     $pair  = $_SESSION['tb2_pair'] ?? [];
 ?>
+  <form method="post"><button class="btn" type="submit" name="return_to_phase2" value="1">← Takaisin vaiheen 2 kysymyksiin</button></form>
   <div class="row"><h2>Vaihe 2</h2>
     <div style="flex:1 1 100%"><div class="progress" aria-label="Vaihe 2 eteneminen" title="<?= $pct ?>%"><div class="progress-bar" style="width:<?= $pct ?>%"></div></div></div>
   </div>
@@ -4767,6 +4881,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
       <div class="phase2-instructions" style="grid-column: 1 / -1; color: #555; font-size: 13px; line-height: 1.4; max-width: 100%; margin: 20px 0 10px 0; text-align: center;">
         Mieti kuvaako sinua vasemman vai oikean laidan kuvaus sinua enemmän ja sen jölkeen valitse oletko selvästi vai lievästi samaa mieltä kuvauksen kanssa. Jos et osaa valita, valitse En osaa sanoa -vaihtoehto.
       </div>
+      <?= generate_phase2_navigation(true) ?>
       <div class="mobile-hint">
         Vinkki: Jos haluat nähdä vaihtoehdot rinnakkain, käännä puhelin vaakasuoraan
       </div>
@@ -4840,6 +4955,22 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 
   <div class="credits">Suomen Enneagrammiyhdistys, 2025-2026</div>
 </div>
+
+<?php if (in_array($_SESSION['state'] ?? '', ['phase2','phase2_tb'], true)): ?>
+<script nonce="<?= $nonce ?>">
+document.addEventListener('DOMContentLoaded', function() {
+  var phase2Submitting = false;
+  document.addEventListener('submit', function(event) {
+    if (phase2Submitting) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      return;
+    }
+    phase2Submitting = true;
+  }, true);
+});
+</script>
+<?php endif; ?>
 
 </body>
 </html>

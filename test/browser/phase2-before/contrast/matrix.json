@@ -1,0 +1,73 @@
+{
+  "initial_head": "ac2462707616e69c70deaa47f15088d9c060e8cf",
+  "playwright": "1.57.0",
+  "baseline": false,
+  "cases": [
+    {
+      "name": "chrome-small-navigation-A2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": false,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [
+        "chrome-small-navigation-A2-phase2-selected-strong.png",
+        "chrome-small-navigation-A2-phase2-selected-mild.png",
+        "chrome-small-navigation-A2-exception.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "4",
+      "geometry_audits": 40,
+      "error": "AssertionError [ERR_ASSERTION]: Neutral selected text uses readable intended dark color\n+ actual - expected\n\n+ 'rgb(255, 255, 255)'\n- 'rgb(34, 34, 34)'\n       ^\n\n    at User.p2selected (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:196:626)\n    at async User.phase2Navigation (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:208:86)\n    at async runCase (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:258:39)\n    at async D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:267:93\n    at async Promise.allSettled (index 0)\n    at async engineRun (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:267:16)\n    at async Promise.allSettled (index 0)\n    at async D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:273:26",
+      "ui_issues": []
+    }
+  ],
+  "engines": [
+    {
+      "engine": "chrome",
+      "version": "155.0.8059.40",
+      "php_diagnostics": []
+    }
+  ],
+  "external_requests": [
+    {
+      "case": "chrome-small-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0"
+    }
+  ],
+  "started_at": "2026-10-13T13:11:19.728Z",
+  "node": "v24.20.0",
+  "platform": "win32",
+  "modes": [
+    "navigation"
+  ],
+  "workers_per_engine": 1,
+  "inputs": {
+    "index.php": "a695e1869e7c18a8d58516ffc5caa078654f22e7516b52f1d0d4a2cfa5deccf0",
+    "InsideBlockQuestions.csv": "a06bbc0d3bc58b6f35a8be33326d7d2e217cb298647582313ab71a2ebe0b8c60",
+    "SeparateBlocksQuestions.csv": "fad1038e97f0889c62025c9b24f77e3f8f4e82c8e766e77a3f6b6b4773ebf4f7",
+    "SeparateBlocksQuestionsTiebreak.csv": "1f021ae3c2a018cd52243822f1c76f48f4ac931208f3bbab03ccfdafb7097483",
+    "TypeDescriptions.csv": "cf177422eac1e8621288168b19e3295e6c81ae99023327c1d6353c6974d97ed2"
+  },
+  "harness_errors": [],
+  "finished_at": "2026-10-13T13:11:43.834Z",
+  "passed": false
+}

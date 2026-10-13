@@ -1,0 +1,1742 @@
+{
+    "initial_head": "ac2462707616e69c70deaa47f15088d9c060e8cf",
+    "source_sha256": "f7a3de7333b1ca3f3d8db88f37ff75a3e05a2f6bb6cbf6764c4625ec1bc7bf1f",
+    "kind": "real HTTP / PHP sessions / rendered forms",
+    "cases": [
+        {
+            "name": "ordinary A2 all choices and positions",
+            "track": "A2",
+            "category": "ordinary",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2800,
+            "requests": 310
+        },
+        {
+            "name": "pair A2 4-7 -> 4",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1235,
+            "requests": 161
+        },
+        {
+            "name": "pair A2 4-7 -> 7",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1238,
+            "requests": 161
+        },
+        {
+            "name": "pair A2 4-7 -> RATKAISEMATON",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1244,
+            "requests": 161
+        },
+        {
+            "name": "pair A2 4-9 -> 4",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1244,
+            "requests": 161
+        },
+        {
+            "name": "pair A2 4-9 -> 9",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1247,
+            "requests": 161
+        },
+        {
+            "name": "pair A2 4-9 -> RATKAISEMATON",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1253,
+            "requests": 161
+        },
+        {
+            "name": "pair A2 7-9 -> 7",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1253,
+            "requests": 161
+        },
+        {
+            "name": "pair A2 7-9 -> 9",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1256,
+            "requests": 161
+        },
+        {
+            "name": "pair A2 7-9 -> RATKAISEMATON",
+            "track": "A2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1262,
+            "requests": 161
+        },
+        {
+            "name": "three-way A2 -> 4",
+            "track": "A2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1351,
+            "requests": 169
+        },
+        {
+            "name": "three-way A2 -> 7",
+            "track": "A2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1354,
+            "requests": 169
+        },
+        {
+            "name": "three-way A2 -> 9",
+            "track": "A2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1357,
+            "requests": 169
+        },
+        {
+            "name": "three-way A2 -> two-leaders",
+            "track": "A2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1363,
+            "requests": 169
+        },
+        {
+            "name": "three-way A2 -> three-leaders",
+            "track": "A2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1365,
+            "requests": 169
+        },
+        {
+            "name": "transition A2 unchanged",
+            "track": "A2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1695,
+            "requests": 199
+        },
+        {
+            "name": "transition A2 same-answer",
+            "track": "A2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 950,
+            "requests": 131
+        },
+        {
+            "name": "transition A2 same-pair",
+            "track": "A2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1677,
+            "requests": 197
+        },
+        {
+            "name": "transition A2 unique",
+            "track": "A2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1632,
+            "requests": 193
+        },
+        {
+            "name": "transition A2 different-pair",
+            "track": "A2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1683,
+            "requests": 197
+        },
+        {
+            "name": "transition A2 two-to-three",
+            "track": "A2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1774,
+            "requests": 205
+        },
+        {
+            "name": "transition A2 three-to-two",
+            "track": "A2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1689,
+            "requests": 197
+        },
+        {
+            "name": "transition A2 repeated",
+            "track": "A2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2565,
+            "requests": 277
+        },
+        {
+            "name": "security A2 tokens and boundary",
+            "track": "A2",
+            "category": "security",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1531,
+            "requests": 187
+        },
+        {
+            "name": "full A2 current invited=0",
+            "track": "A2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1559,
+            "requests": 201
+        },
+        {
+            "name": "full A2 current invited=1",
+            "track": "A2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1563,
+            "requests": 201
+        },
+        {
+            "name": "full A2 legacy invited=0",
+            "track": "A2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1563,
+            "requests": 200
+        },
+        {
+            "name": "full A2 legacy invited=1",
+            "track": "A2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1567,
+            "requests": 200
+        },
+        {
+            "name": "fault A2 missing-file",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 357,
+            "requests": 75
+        },
+        {
+            "name": "fault A2 missing-blocks",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 276,
+            "requests": 79
+        },
+        {
+            "name": "fault A2 bad-mapping",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 276,
+            "requests": 79
+        },
+        {
+            "name": "fault A2 bad-index",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 276,
+            "requests": 79
+        },
+        {
+            "name": "fault A2 bad-answers",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 276,
+            "requests": 79
+        },
+        {
+            "name": "fault A2 hole",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 276,
+            "requests": 79
+        },
+        {
+            "name": "fault A2 missing-pair",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 657,
+            "requests": 115
+        },
+        {
+            "name": "fault A2 interrupted",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 215,
+            "requests": 78
+        },
+        {
+            "name": "fault A2 csv-write",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 653,
+            "requests": 113
+        },
+        {
+            "name": "fault A2 legacy-migration",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 1032,
+            "requests": 137
+        },
+        {
+            "name": "fault A2 bad-tb-index",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 697,
+            "requests": 117
+        },
+        {
+            "name": "fault A2 bad-tb-answers",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 697,
+            "requests": 117
+        },
+        {
+            "name": "fault A2 missing-tb-data",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 697,
+            "requests": 117
+        },
+        {
+            "name": "fault A2 bad-tb-mapping",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 697,
+            "requests": 117
+        },
+        {
+            "name": "fault A2 incomplete-ordinary-before-tb",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 697,
+            "requests": 117
+        },
+        {
+            "name": "fault A2 corrupt-old-codes",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 697,
+            "requests": 117
+        },
+        {
+            "name": "fault A2 derived-repair",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 1035,
+            "requests": 137
+        },
+        {
+            "name": "fault A2 truncated-blocks",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 280,
+            "requests": 79
+        },
+        {
+            "name": "fault A2 truncated-tb-set",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 699,
+            "requests": 117
+        },
+        {
+            "name": "fault A2 changed-order",
+            "track": "A2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 280,
+            "requests": 79
+        },
+        {
+            "name": "ordinary B2 all choices and positions",
+            "track": "B2",
+            "category": "ordinary",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2890,
+            "requests": 310
+        },
+        {
+            "name": "pair B2 3-7 -> 3",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1325,
+            "requests": 161
+        },
+        {
+            "name": "pair B2 3-7 -> 7",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1328,
+            "requests": 161
+        },
+        {
+            "name": "pair B2 3-7 -> RATKAISEMATON",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1334,
+            "requests": 161
+        },
+        {
+            "name": "pair B2 3-8 -> 3",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1334,
+            "requests": 161
+        },
+        {
+            "name": "pair B2 3-8 -> 8",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1337,
+            "requests": 161
+        },
+        {
+            "name": "pair B2 3-8 -> RATKAISEMATON",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1343,
+            "requests": 161
+        },
+        {
+            "name": "pair B2 7-8 -> 7",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1343,
+            "requests": 161
+        },
+        {
+            "name": "pair B2 7-8 -> 8",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1346,
+            "requests": 161
+        },
+        {
+            "name": "pair B2 7-8 -> RATKAISEMATON",
+            "track": "B2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1352,
+            "requests": 161
+        },
+        {
+            "name": "three-way B2 -> 3",
+            "track": "B2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1441,
+            "requests": 169
+        },
+        {
+            "name": "three-way B2 -> 7",
+            "track": "B2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1444,
+            "requests": 169
+        },
+        {
+            "name": "three-way B2 -> 8",
+            "track": "B2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1447,
+            "requests": 169
+        },
+        {
+            "name": "three-way B2 -> two-leaders",
+            "track": "B2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1453,
+            "requests": 169
+        },
+        {
+            "name": "three-way B2 -> three-leaders",
+            "track": "B2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1455,
+            "requests": 169
+        },
+        {
+            "name": "transition B2 unchanged",
+            "track": "B2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1785,
+            "requests": 199
+        },
+        {
+            "name": "transition B2 same-answer",
+            "track": "B2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1040,
+            "requests": 131
+        },
+        {
+            "name": "transition B2 same-pair",
+            "track": "B2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1767,
+            "requests": 197
+        },
+        {
+            "name": "transition B2 unique",
+            "track": "B2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1722,
+            "requests": 193
+        },
+        {
+            "name": "transition B2 different-pair",
+            "track": "B2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1773,
+            "requests": 197
+        },
+        {
+            "name": "transition B2 two-to-three",
+            "track": "B2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1864,
+            "requests": 205
+        },
+        {
+            "name": "transition B2 three-to-two",
+            "track": "B2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1779,
+            "requests": 197
+        },
+        {
+            "name": "transition B2 repeated",
+            "track": "B2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2655,
+            "requests": 277
+        },
+        {
+            "name": "security B2 tokens and boundary",
+            "track": "B2",
+            "category": "security",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1621,
+            "requests": 187
+        },
+        {
+            "name": "full B2 current invited=0",
+            "track": "B2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1649,
+            "requests": 201
+        },
+        {
+            "name": "full B2 current invited=1",
+            "track": "B2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1653,
+            "requests": 201
+        },
+        {
+            "name": "full B2 legacy invited=0",
+            "track": "B2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1653,
+            "requests": 200
+        },
+        {
+            "name": "full B2 legacy invited=1",
+            "track": "B2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1657,
+            "requests": 200
+        },
+        {
+            "name": "fault B2 missing-file",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 417,
+            "requests": 75
+        },
+        {
+            "name": "fault B2 missing-blocks",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 336,
+            "requests": 79
+        },
+        {
+            "name": "fault B2 bad-mapping",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 336,
+            "requests": 79
+        },
+        {
+            "name": "fault B2 bad-index",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 336,
+            "requests": 79
+        },
+        {
+            "name": "fault B2 bad-answers",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 336,
+            "requests": 79
+        },
+        {
+            "name": "fault B2 hole",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 336,
+            "requests": 79
+        },
+        {
+            "name": "fault B2 missing-pair",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 717,
+            "requests": 115
+        },
+        {
+            "name": "fault B2 interrupted",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 215,
+            "requests": 78
+        },
+        {
+            "name": "fault B2 csv-write",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 713,
+            "requests": 113
+        },
+        {
+            "name": "fault B2 legacy-migration",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 1122,
+            "requests": 137
+        },
+        {
+            "name": "fault B2 bad-tb-index",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 757,
+            "requests": 117
+        },
+        {
+            "name": "fault B2 bad-tb-answers",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 757,
+            "requests": 117
+        },
+        {
+            "name": "fault B2 missing-tb-data",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 757,
+            "requests": 117
+        },
+        {
+            "name": "fault B2 bad-tb-mapping",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 757,
+            "requests": 117
+        },
+        {
+            "name": "fault B2 incomplete-ordinary-before-tb",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 757,
+            "requests": 117
+        },
+        {
+            "name": "fault B2 corrupt-old-codes",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 757,
+            "requests": 117
+        },
+        {
+            "name": "fault B2 derived-repair",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 1125,
+            "requests": 137
+        },
+        {
+            "name": "fault B2 truncated-blocks",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 340,
+            "requests": 79
+        },
+        {
+            "name": "fault B2 truncated-tb-set",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 759,
+            "requests": 117
+        },
+        {
+            "name": "fault B2 changed-order",
+            "track": "B2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 340,
+            "requests": 79
+        },
+        {
+            "name": "ordinary C2 all choices and positions",
+            "track": "C2",
+            "category": "ordinary",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2980,
+            "requests": 310
+        },
+        {
+            "name": "pair C2 1-5 -> 1",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1437,
+            "requests": 163
+        },
+        {
+            "name": "pair C2 1-5 -> 5",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1440,
+            "requests": 163
+        },
+        {
+            "name": "pair C2 1-5 -> RATKAISEMATON",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1446,
+            "requests": 163
+        },
+        {
+            "name": "pair C2 1-6 -> 1",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1446,
+            "requests": 163
+        },
+        {
+            "name": "pair C2 1-6 -> 6",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1449,
+            "requests": 163
+        },
+        {
+            "name": "pair C2 1-6 -> RATKAISEMATON",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1455,
+            "requests": 163
+        },
+        {
+            "name": "pair C2 5-6 -> 5",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1455,
+            "requests": 163
+        },
+        {
+            "name": "pair C2 5-6 -> 6",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1458,
+            "requests": 163
+        },
+        {
+            "name": "pair C2 5-6 -> RATKAISEMATON",
+            "track": "C2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1464,
+            "requests": 163
+        },
+        {
+            "name": "three-way C2 -> 1",
+            "track": "C2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1597,
+            "requests": 175
+        },
+        {
+            "name": "three-way C2 -> 5",
+            "track": "C2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1600,
+            "requests": 175
+        },
+        {
+            "name": "three-way C2 -> 6",
+            "track": "C2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1603,
+            "requests": 175
+        },
+        {
+            "name": "three-way C2 -> two-leaders",
+            "track": "C2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1609,
+            "requests": 175
+        },
+        {
+            "name": "three-way C2 -> three-leaders",
+            "track": "C2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1611,
+            "requests": 175
+        },
+        {
+            "name": "transition C2 unchanged",
+            "track": "C2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1897,
+            "requests": 201
+        },
+        {
+            "name": "transition C2 same-answer",
+            "track": "C2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1152,
+            "requests": 133
+        },
+        {
+            "name": "transition C2 same-pair",
+            "track": "C2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1879,
+            "requests": 199
+        },
+        {
+            "name": "transition C2 unique",
+            "track": "C2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1812,
+            "requests": 193
+        },
+        {
+            "name": "transition C2 different-pair",
+            "track": "C2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1885,
+            "requests": 199
+        },
+        {
+            "name": "transition C2 two-to-three",
+            "track": "C2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2020,
+            "requests": 211
+        },
+        {
+            "name": "transition C2 three-to-two",
+            "track": "C2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1891,
+            "requests": 199
+        },
+        {
+            "name": "transition C2 repeated",
+            "track": "C2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2745,
+            "requests": 277
+        },
+        {
+            "name": "security C2 tokens and boundary",
+            "track": "C2",
+            "category": "security",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1777,
+            "requests": 193
+        },
+        {
+            "name": "full C2 current invited=0",
+            "track": "C2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1805,
+            "requests": 207
+        },
+        {
+            "name": "full C2 current invited=1",
+            "track": "C2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1809,
+            "requests": 207
+        },
+        {
+            "name": "full C2 legacy invited=0",
+            "track": "C2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1809,
+            "requests": 206
+        },
+        {
+            "name": "full C2 legacy invited=1",
+            "track": "C2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1813,
+            "requests": 206
+        },
+        {
+            "name": "fault C2 missing-file",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 477,
+            "requests": 75
+        },
+        {
+            "name": "fault C2 missing-blocks",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 396,
+            "requests": 79
+        },
+        {
+            "name": "fault C2 bad-mapping",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 396,
+            "requests": 79
+        },
+        {
+            "name": "fault C2 bad-index",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 396,
+            "requests": 79
+        },
+        {
+            "name": "fault C2 bad-answers",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 396,
+            "requests": 79
+        },
+        {
+            "name": "fault C2 hole",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 396,
+            "requests": 79
+        },
+        {
+            "name": "fault C2 missing-pair",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 777,
+            "requests": 115
+        },
+        {
+            "name": "fault C2 interrupted",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 215,
+            "requests": 78
+        },
+        {
+            "name": "fault C2 csv-write",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 773,
+            "requests": 113
+        },
+        {
+            "name": "fault C2 legacy-migration",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 1278,
+            "requests": 143
+        },
+        {
+            "name": "fault C2 bad-tb-index",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 817,
+            "requests": 117
+        },
+        {
+            "name": "fault C2 bad-tb-answers",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 817,
+            "requests": 117
+        },
+        {
+            "name": "fault C2 missing-tb-data",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 817,
+            "requests": 117
+        },
+        {
+            "name": "fault C2 bad-tb-mapping",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 817,
+            "requests": 117
+        },
+        {
+            "name": "fault C2 incomplete-ordinary-before-tb",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 817,
+            "requests": 117
+        },
+        {
+            "name": "fault C2 corrupt-old-codes",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 817,
+            "requests": 117
+        },
+        {
+            "name": "fault C2 derived-repair",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 1281,
+            "requests": 143
+        },
+        {
+            "name": "fault C2 truncated-blocks",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 400,
+            "requests": 79
+        },
+        {
+            "name": "fault C2 truncated-tb-set",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 819,
+            "requests": 117
+        },
+        {
+            "name": "fault C2 changed-order",
+            "track": "C2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 400,
+            "requests": 79
+        },
+        {
+            "name": "ordinary D2 all choices and positions",
+            "track": "D2",
+            "category": "ordinary",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 3070,
+            "requests": 310
+        },
+        {
+            "name": "pair D2 2-6 -> 2",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1527,
+            "requests": 163
+        },
+        {
+            "name": "pair D2 2-6 -> 6",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1530,
+            "requests": 163
+        },
+        {
+            "name": "pair D2 2-6 -> RATKAISEMATON",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1536,
+            "requests": 163
+        },
+        {
+            "name": "pair D2 2-9 -> 2",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1536,
+            "requests": 163
+        },
+        {
+            "name": "pair D2 2-9 -> 9",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1539,
+            "requests": 163
+        },
+        {
+            "name": "pair D2 2-9 -> RATKAISEMATON",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1545,
+            "requests": 163
+        },
+        {
+            "name": "pair D2 6-9 -> 6",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1545,
+            "requests": 163
+        },
+        {
+            "name": "pair D2 6-9 -> 9",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1548,
+            "requests": 163
+        },
+        {
+            "name": "pair D2 6-9 -> RATKAISEMATON",
+            "track": "D2",
+            "category": "pair",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1554,
+            "requests": 163
+        },
+        {
+            "name": "three-way D2 -> 2",
+            "track": "D2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1687,
+            "requests": 175
+        },
+        {
+            "name": "three-way D2 -> 6",
+            "track": "D2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1690,
+            "requests": 175
+        },
+        {
+            "name": "three-way D2 -> 9",
+            "track": "D2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1693,
+            "requests": 175
+        },
+        {
+            "name": "three-way D2 -> two-leaders",
+            "track": "D2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1699,
+            "requests": 175
+        },
+        {
+            "name": "three-way D2 -> three-leaders",
+            "track": "D2",
+            "category": "three-way",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1701,
+            "requests": 175
+        },
+        {
+            "name": "transition D2 unchanged",
+            "track": "D2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1987,
+            "requests": 201
+        },
+        {
+            "name": "transition D2 same-answer",
+            "track": "D2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1242,
+            "requests": 133
+        },
+        {
+            "name": "transition D2 same-pair",
+            "track": "D2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1969,
+            "requests": 199
+        },
+        {
+            "name": "transition D2 unique",
+            "track": "D2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1902,
+            "requests": 193
+        },
+        {
+            "name": "transition D2 different-pair",
+            "track": "D2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1975,
+            "requests": 199
+        },
+        {
+            "name": "transition D2 two-to-three",
+            "track": "D2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2110,
+            "requests": 211
+        },
+        {
+            "name": "transition D2 three-to-two",
+            "track": "D2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1981,
+            "requests": 199
+        },
+        {
+            "name": "transition D2 repeated",
+            "track": "D2",
+            "category": "transition",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 2835,
+            "requests": 277
+        },
+        {
+            "name": "security D2 tokens and boundary",
+            "track": "D2",
+            "category": "security",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1867,
+            "requests": 193
+        },
+        {
+            "name": "full D2 current invited=0",
+            "track": "D2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1895,
+            "requests": 207
+        },
+        {
+            "name": "full D2 current invited=1",
+            "track": "D2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1899,
+            "requests": 207
+        },
+        {
+            "name": "full D2 legacy invited=0",
+            "track": "D2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1899,
+            "requests": 206
+        },
+        {
+            "name": "full D2 legacy invited=1",
+            "track": "D2",
+            "category": "full-workflow",
+            "fixture_injection": false,
+            "passed": true,
+            "assertions": 1903,
+            "requests": 206
+        },
+        {
+            "name": "fault D2 missing-file",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 537,
+            "requests": 75
+        },
+        {
+            "name": "fault D2 missing-blocks",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 456,
+            "requests": 79
+        },
+        {
+            "name": "fault D2 bad-mapping",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 456,
+            "requests": 79
+        },
+        {
+            "name": "fault D2 bad-index",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 456,
+            "requests": 79
+        },
+        {
+            "name": "fault D2 bad-answers",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 456,
+            "requests": 79
+        },
+        {
+            "name": "fault D2 hole",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 456,
+            "requests": 79
+        },
+        {
+            "name": "fault D2 missing-pair",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 837,
+            "requests": 115
+        },
+        {
+            "name": "fault D2 interrupted",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 215,
+            "requests": 78
+        },
+        {
+            "name": "fault D2 csv-write",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 833,
+            "requests": 113
+        },
+        {
+            "name": "fault D2 legacy-migration",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 1368,
+            "requests": 143
+        },
+        {
+            "name": "fault D2 bad-tb-index",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 877,
+            "requests": 117
+        },
+        {
+            "name": "fault D2 bad-tb-answers",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 877,
+            "requests": 117
+        },
+        {
+            "name": "fault D2 missing-tb-data",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 877,
+            "requests": 117
+        },
+        {
+            "name": "fault D2 bad-tb-mapping",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 877,
+            "requests": 117
+        },
+        {
+            "name": "fault D2 incomplete-ordinary-before-tb",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 877,
+            "requests": 117
+        },
+        {
+            "name": "fault D2 corrupt-old-codes",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 877,
+            "requests": 117
+        },
+        {
+            "name": "fault D2 derived-repair",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 1371,
+            "requests": 143
+        },
+        {
+            "name": "fault D2 truncated-blocks",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 460,
+            "requests": 79
+        },
+        {
+            "name": "fault D2 truncated-tb-set",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 879,
+            "requests": 117
+        },
+        {
+            "name": "fault D2 changed-order",
+            "track": "D2",
+            "category": "failure-injection",
+            "fixture_injection": true,
+            "passed": true,
+            "assertions": 460,
+            "requests": 79
+        }
+    ],
+    "summary": {
+        "passed": 192,
+        "failed": 0,
+        "assertions": 236812,
+        "requests": 29076,
+        "skipped": 0
+    }
+}

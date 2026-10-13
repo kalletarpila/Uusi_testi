@@ -13,9 +13,12 @@ const args = process.argv.slice(2);
 const baseline = args.includes('--baseline');
 const stress = args.includes('--stress-all-controls');
 const arg = (key, fallback) => args.find(x => x.startsWith(key+'='))?.slice(key.length+1) || fallback;
+const p2Navigation = args.includes('--phase2-navigation');
+const navigationTracks = arg('--tracks','A2,B2,C2,D2').split(',');
+assert(navigationTracks.every(t=>['A2','B2','C2','D2'].includes(t)),'Known navigation tracks');
 const out = path.resolve(__dirname, arg('--output', baseline ? '.runtime/baseline' : '.runtime/results'));
 const engineNames = arg('--engines','chrome,firefox,webkit').split(',');
-const modes=arg('--modes','normal,pairwise,legacy,two-way,three-way,decisive').split(',');
+const modes=p2Navigation?['navigation']:arg('--modes','normal,pairwise,legacy,two-way,three-way,decisive').split(',');
 const workers=Number(arg('--workers','2'));
 assert(Number.isInteger(workers)&&workers>=1&&workers<=3,'Use 1–3 isolated browser contexts per engine');
 const views = [
@@ -25,7 +28,7 @@ const views = [
   {name:'landscape',width:844,height:390,touch:true},
   {name:'small',width:320,height:700,touch:true},
   {name:'tablet',width:768,height:1024,touch:true}
-].map((v,index)=>({...v,index})).filter(v=>!arg('--viewport','')||v.name===arg('--viewport',''));
+].map((v,index)=>({...v,index})).filter(v=>(!p2Navigation||['desktop','portrait','small'].includes(v.name))&&(!arg('--viewport','')||v.name===arg('--viewport','')));
 const pairs = ['AB','AC','AD','BC','BD','CD'];
 const types = {A:'4',B:'3',C:'1',D:'2'};
 const tracks = {A:['4','7','9'],B:['3','7','8'],C:['1','5','6'],D:['2','6','9']};
@@ -59,8 +62,9 @@ class User {
   async screenshot(label){
     if(this.screens.has(label))return;this.screens.add(label);
     const representative=(this.result.engine==='chrome'&&['desktop','small'].includes(this.view.name))||(this.result.engine==='webkit'&&this.view.name==='portrait');
+    if(this.result.mode==='navigation'&&this.result.track!=='A2'&&!/failure|exception/.test(label))return;
     if(!representative&&!/failure|exception/.test(label)&&!baseline)return;
-    const labels={normal:['intro','phase2','result','feedback'],pairwise:['selected','tb-question'],legacy:['selected','tb2','result'],'two-way':['tb2','result'],'three-way':['result'],decisive:['tb2','result']};
+    const labels={normal:['intro','phase2','result','feedback'],pairwise:['selected','tb-question'],legacy:['selected','tb2','result'],'two-way':['tb2','result'],'three-way':['result'],decisive:['tb2','result'],navigation:['phase2-selected-strong','phase2-selected-mild','phase2-selected-neutral','tb2-selected','restored','invalidated','result']};
     if(!baseline&&!/failure|exception/.test(label)&&!labels[this.result.mode].includes(label))return;
     const name=`${this.name}-${label}.png`;await this.page.screenshot({path:path.join(out,name),fullPage:true,animations:'disabled'});this.result.screenshots.push(name);
   }
@@ -189,6 +193,38 @@ class User {
     else assert.match(await this.page.locator('body').innerText(),new RegExp('TYYLI '+types[winner]));
     return this.sid;
   }
+  p2form(side,value){const prefix=this.s.state==='phase2_tb'?'tb2':'choice2';return this.page.locator('form').filter({has:this.page.locator(`input[name=${prefix}_side][value=${side}]`)}).filter({has:this.page.locator(`input[name=${prefix}_value][value="${value}"]`)}).locator('button');}
+  async p2selected(side,value){const button=this.p2form(side,value).filter({visible:true});assert.equal(await button.getAttribute('aria-pressed'),'true');assert.match(await button.getAttribute('class'),/selected/);assert.equal(await this.page.locator('button[aria-pressed=true]').filter({visible:true}).count(),1);const color=await button.evaluate(e=>getComputedStyle(e).backgroundColor);const other=await this.page.locator('button[aria-pressed=false]').filter({visible:true}).first().evaluate(e=>getComputedStyle(e).backgroundColor);assert.notEqual(color,other,'Selected answer visibly distinct');if(side==='neutral')assert.equal(await button.evaluate(e=>getComputedStyle(e).webkitTextFillColor),'rgb(34, 34, 34)','Neutral selected text uses readable intended dark color');}
+  async p2next(){await this.press(this.form(this.s.state==='phase2_tb'?'tb2_navigate':'phase2_navigate','next'));}
+  async p2prev(twice=false){await this.press(this.form(this.s.state==='phase2_tb'?'tb2_navigate':'phase2_navigate','prev'),{twice});}
+  async p2go(target){const key=this.s.state==='phase2_tb'?'tb2_index':'q2_index';let guard=0;while(this.s[key]!==target){if(this.s[key]>target)await this.p2prev();else await this.p2next();assert(++guard<40);}}
+  async phase2Navigation(winner){
+    await this.press(this.page.locator('button[name=continue_phase2]'));
+    const ordinary=structuredClone(this.s.blocks2),phase1=structuredClone(this.s.points1);
+    const navBelowOptions=async()=>{const layout=await this.page.locator('.case-wrap').evaluate(e=>({nav:e.querySelector('.navigation-controls').getBoundingClientRect().top,options:Math.max(...[...e.querySelectorAll('.opt-left,.opt-right')].map(box=>box.getBoundingClientRect().bottom))}));assert(layout.nav>=layout.options-1,'Navigation appears after the answer options');};
+    const integrity=async()=>{assert.deepEqual(this.s.points1,phase1);assert.deepEqual(this.s.blocks2,ordinary);assert(['phase2','phase2_tb','done2'].includes(this.s.state));assert.equal(await this.page.locator('[name=return_to_phase1]').count(),0);const scores=Object.fromEntries(this.s.varCodes.map(c=>[c,0]));for(const [set,answers] of [['blocks2','answers2'],['tb2_set','tb2_answers']])for(const [i,a] of (this.s[answers]||[]).entries())if(a.value)scores[this.s[set][i][a.side+'_var']]+=a.value;assert.deepEqual(this.s.varPoints,scores);if(this.s.state!=='done2'){const tb=this.s.state==='phase2_tb',i=this.s[tb?'tb2_index':'q2_index'],total=this.s[tb?'tb2_set':'blocks2'].length;assert.equal(await this.page.locator('.progress').getAttribute('title'),(tb?Math.floor(i/total*100):Math.round((i+1)/total*100))+'%');}await this.audit('p2-navigation',true);if(this.s.state!=='done2')await navBelowOptions();};
+    assert.equal(await this.page.locator('input[name=phase2_navigate][value=prev]').count(),0,'First question cannot go back to Phase1');
+    assert.equal(await this.page.locator('input[name=phase2_navigate][value=next]').count(),0,'Unanswered question has no Next');
+    for(const [side,value,label] of [['left',2,'strong'],['left',1,'mild'],['neutral',0,'neutral'],['right',1,'mild'],['right',2,'strong'],['neutral',0,'neutral']]){
+      await this.press(this.p2form(side,value),{twice:true});await this.p2prev(true);await this.p2selected(side,value);await integrity();await this.screenshot('phase2-selected-'+label);
+      // Native keyboard focus/Enter on a navigation control, with the real form token.
+      if(value===1&&side==='left'){const next=this.form('phase2_navigate','next');await next.focus();assert.equal(await next.evaluate(e=>document.activeElement===e),true);await Promise.all([this.page.waitForNavigation({waitUntil:'load'}),this.page.keyboard.press('Enter')]);await this.state();await this.p2prev();await this.p2selected(side,value);}
+    }
+    await this.p2next();while(this.s.state==='phase2'){await integrity();await this.press(this.p2form('neutral',0));}
+    assert.equal(this.s.state,'phase2_tb');assert.equal(this.s.tb2_pair.length,3);
+    for(const [side,value] of [['left',2],['right',1],['neutral',0],['left',1],['right',2],['neutral',0]]){await this.press(this.p2form(side,value),{twice:true});await this.p2prev(true);await this.p2selected(side,value);await integrity();}
+    await this.screenshot('tb2-selected');await this.p2next();const saved=structuredClone(this.s);
+    await this.press(this.page.locator('button[name=return_to_phase2]'));assert.equal(this.s.q2_index,17);await this.p2selected('neutral',0);await this.p2prev();await this.p2next();await this.p2next();
+    for(const key of ['tb2_answers','tb2_pairs','tb2_set','tb2_index','varPoints'])assert.deepEqual(this.s[key],saved[key]);await integrity();await this.screenshot('restored');
+    await this.p2go(0);await this.p2prev();assert.equal(this.s.state,'phase2','First TB previous returns to ordinary Phase2');await this.p2next();assert.equal(this.s.state,'phase2_tb');await this.p2next();
+    await this.press(this.page.locator('button[name=return_to_phase2]'));await this.p2go(0);
+    const firstText=normalize(await this.page.locator('.case-desc').innerText()),firstLeft=normalize(await this.page.locator('.opt-left .opt-box-content').innerText());const first=this.catalog.phase2[winner+'2'].find(q=>normalize(q.desc)===firstText);assert(first);const target=normalize(first.left_text)===firstLeft?first.left_var:first.right_var;
+    await this.press(this.p2form('left',1));assert.equal(this.s.tb2_answers.length,0);assert.equal(this.s.tb2_pairs.length,0);assert(!this.s.tb2_set);await this.p2prev();await this.p2selected('left',1);await integrity();await this.screenshot('invalidated');await this.p2next();
+    // A second type receives one point: a real three-way -> two-way change.
+    let second=null;while(this.s.q2_index<17){const text=normalize(await this.page.locator('.case-desc').innerText()),left=normalize(await this.page.locator('.opt-left .opt-box-content').innerText());const q=this.catalog.phase2[winner+'2'].find(q=>normalize(q.desc)===text);const lv=normalize(q.left_text)===left?q.left_var:q.right_var,rv=lv===q.left_var?q.right_var:q.left_var;if(!second){second=lv!==target?lv:rv;await this.press(this.p2form(lv===second?'left':'right',1));}else await this.p2next();}
+    await this.p2next();assert.equal(this.s.state,'phase2_tb');assert.deepEqual([...this.s.tb2_pair].sort(),[target,second].sort());assert.equal(this.s.tb2_answers.length,0);await integrity();
+    await this.press(this.p2form('neutral',0));await this.press(this.page.locator('button[name=return_to_phase2]'));await this.p2go(0);await this.p2selected('left',1);await this.press(this.p2form('left',2));assert(!this.s.tb2_set);await this.p2go(17);await this.p2next();assert.equal(this.s.state,'done2');assert.equal(String(this.s.log_row.finalVar),target);assert.equal(this.s.tb2_pairs.length,0);await integrity();await this.screenshot('result');this.result.expected_final=target;this.result.navigation_choices=['left-2','left-1','neutral-0','right-1','right-2'];this.result.navigation_transitions=['three-way-review-restored','three-way-to-two-way','two-way-to-unique'];return this.sid;
+  }
   async feedbackReset(){await this.press(this.page.locator('input[name=show_feedback]'));await this.page.locator('#feedback_text').fill('Eristetty selaintestin palaute Ää.');await this.audit('feedback');await this.screenshot('feedback');await this.press(this.page.locator('button[name=send_feedback]'));assert.equal(this.s.feedback_given,true);
     await this.press(this.page.getByRole('link',{name:'Aloita alusta',exact:true}));assert.equal(this.s.state,'intro');assert(!this.s.result_saved);await this.audit('reset');}
 }
@@ -206,21 +242,21 @@ async function engineRun(engine){
     const options={headless:true};if(engine==='chrome')options.executablePath=process.env.TEST_CHROME||'C:/Program Files/Google/Chrome/Application/chrome.exe';
     browsers=await Promise.all(Array.from({length:workers},()=>({chrome:chromium,firefox,webkit}[engine]).launch(options)));
     report.engines.push({engine,version:browsers[0].version()});
-    const jobs=views.flatMap(view=>modes.map(mode=>({view,mode}))).map((job,id)=>({...job,id}));
-    async function runCase({view,mode,id},browser){
-      const name=`${engine}-${view.name}-${mode}`,result={name,engine,viewport:view,mode,passed:false,checked_states:[],screenshots:[],javascript_errors:[],console_errors:[],http_errors:[],dialog_errors:[]};report.cases.push(result);
+    const jobs=views.flatMap(view=>p2Navigation?navigationTracks.map(track=>({view,mode:'navigation',track})):modes.map(mode=>({view,mode}))).map((job,id)=>({...job,id}));
+    async function runCase({view,mode,id,track},browser){
+      const name=`${engine}-${view.name}-${mode}${track?'-'+track:''}`,result={name,engine,viewport:view,mode,passed:false,checked_states:[],screenshots:[],javascript_errors:[],console_errors:[],http_errors:[],dialog_errors:[]};report.cases.push(result);
       const context=await browser.newContext({viewport:{width:view.width,height:view.height},hasTouch:view.touch,isMobile:engine!=='firefox'&&view.touch,deviceScaleFactor:view.touch?2:1});
       await context.route('**/*',route=>{const url=route.request().url();if(url.startsWith(site.base+'/'))return route.continue();report.external_requests.push({case:name,url});return route.fulfill({status:200,contentType:'text/html',body:'<!doctype html><title>External media isolated</title>'});});
       await context.addInitScript(()=>{document.addEventListener('touchstart',()=>sessionStorage.setItem('acceptanceTouches',String(Number(sessionStorage.getItem('acceptanceTouches')||0)+1)),{capture:true,passive:true});});
       const page=await context.newPage();const user=new User(page,context,site,view,name,catalog,result);
       try{
-        const index=view.index,pair=pairs[index],direct=['normal','two-way','three-way','decisive'].includes(mode),winner=direct?'ABCD'[index%4]:pair[0];
-        const code=mode==='pairwise'||(mode==='legacy'&&view.touch)||mode==='two-way'?'UI'+id:'';const invitationId=code?'browser-'+id:null;
+        const index=view.index,pair=pairs[index],direct=['normal','two-way','three-way','decisive','navigation'].includes(mode),winner=mode==='navigation'?track[0]:direct?'ABCD'[index%4]:pair[0];
+        const code=mode==='pairwise'||(mode==='legacy'&&view.touch)||mode==='two-way'||mode==='navigation'?'UI'+id:'';const invitationId=code?'browser-'+id:null;
         const unresolved=mode==='two-way'?'two':mode==='decisive'?'decisive':mode==='legacy'||mode==='three-way';
         Object.assign(result,{phase1_pair:direct?null:pair,winner:winner+'1',track:winner+'2',invited:!!code,expected_final:unresolved&&unresolved!=='decisive'?'RATKAISEMATON':types[winner]});
         await user.begin(code,mode==='legacy');const values=Object.fromEntries(['A','B','C','D'].map(g=>[g+'1',direct?(g===winner?6:1):(pair.includes(g)?4:3)]));
         await user.ordinary(values);if(!direct){await user.enterTB(mode==='legacy');await user.navigation(winner,mode==='legacy');}else {assert.equal(user.s.state,'phase2_intro');assert.equal(user.s.track,winner+'2');}
-        const sid=await user.phase2(winner,unresolved);const data=fixture('inspect',site.dir),rows=data.rows.filter(r=>r.session_id===sid);assert.equal(data.columns,136);assert.equal(rows.length,1);assert.equal(rows[0].final_type,String(user.s.log_row.finalVar));assert.equal(rows[0].user_confidence,'','Unknown type has no obsolete confidence in research CSV');assert.equal(rows[0].invite_id,invitationId||'');if(invitationId)assert.equal(data.invites.find(i=>i.id===invitationId).status,'completed');
+        const sid=mode==='navigation'?await user.phase2Navigation(winner):await user.phase2(winner,unresolved);const data=fixture('inspect',site.dir),rows=data.rows.filter(r=>r.session_id===sid);assert.equal(data.columns,136);assert.equal(rows.length,1);assert.equal(rows[0].final_type,String(user.s.log_row.finalVar));assert.equal(rows[0].user_confidence,'','Unknown type has no obsolete confidence in research CSV');assert.equal(rows[0].invite_id,invitationId||'');if(invitationId)assert.equal(data.invites.find(i=>i.id===invitationId).status,'completed');
         if(view.touch){result.touch_events=Number(await page.evaluate(()=>sessionStorage.getItem('acceptanceTouches')));assert(result.touch_events>0,'Actual emulated touch events observed');}
         if(mode==='normal')await user.feedbackReset();
         result.states=[...user.states];result.ui_issues=user.issues;assert.equal(result.javascript_errors.length,0,'No JS exceptions');assert.equal(result.dialog_errors.length,0,'No dialog transport errors');if(!baseline){assert.equal(result.console_errors.length,0,'No console errors');assert.equal(result.http_errors.length,0,'No HTTP resource errors');assert.equal(user.issues.length,0,'No UI geometry/interaction defects: '+JSON.stringify(user.issues));}
@@ -235,4 +271,4 @@ async function engineRun(engine){
     assert.equal(report.engines.find(e=>e.engine===engine).php_diagnostics.length,0,'No PHP diagnostics');
   }finally{await Promise.allSettled(browsers.map(browser=>browser.close()));if(worker.exitCode===null){const stopped=new Promise(r=>worker.once('exit',r));worker.kill();await stopped;}cp.execFileSync(php,[path.join(__dirname,'fixture.php'),'cleanup',site.dir]);fs.unlinkSync(manifest);}
 }
-(async()=>{const results=await Promise.allSettled(engineNames.map(engineRun));report.harness_errors=results.flatMap((r,i)=>r.status==='rejected'?[{engine:engineNames[i],error:r.reason.stack}]:[]);for(const r of report.harness_errors)console.error(r);report.finished_at=new Date().toISOString();report.passed=report.cases.length===engineNames.length*views.length*modes.length&&report.cases.every(c=>c.passed)&&report.harness_errors.length===0;fs.writeFileSync(path.join(out,'matrix.json'),JSON.stringify(report,null,2)+'\n');console.log(`Browser cases: ${report.cases.filter(c=>c.passed).length}/${report.cases.length} passed`);process.exitCode=report.passed?0:1;})();
+(async()=>{const results=await Promise.allSettled(engineNames.map(engineRun));report.harness_errors=results.flatMap((r,i)=>r.status==='rejected'?[{engine:engineNames[i],error:r.reason.stack}]:[]);for(const r of report.harness_errors)console.error(r);report.finished_at=new Date().toISOString();report.passed=report.cases.length===engineNames.length*views.length*(p2Navigation?navigationTracks.length:modes.length)&&report.cases.every(c=>c.passed)&&report.harness_errors.length===0;fs.writeFileSync(path.join(out,'matrix.json'),JSON.stringify(report,null,2)+'\n');console.log(`Browser cases: ${report.cases.filter(c=>c.passed).length}/${report.cases.length} passed`);process.exitCode=report.passed?0:1;})();

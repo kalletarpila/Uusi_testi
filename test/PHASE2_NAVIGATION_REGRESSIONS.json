@@ -1,0 +1,61 @@
+{
+  "initial_head": "ac2462707616e69c70deaa47f15088d9c060e8cf",
+  "application_source_sha256": "f7a3de7333b1ca3f3d8db88f37ff75a3e05a2f6bb6cbf6764c4625ec1bc7bf1f",
+  "http_full_workflow": {
+    "assertions": 69727,
+    "skipped": 0,
+    "failed": 0,
+    "requests": 12061,
+    "passed": 110
+  },
+  "phase1_navigation": {
+    "assertions": 520675,
+    "requests": 71516,
+    "passed": 318,
+    "tested_source_sha256": "500002132007f466c758fca79fe6a2ac17554412dd46a69e1ed8475759aacb77",
+    "failed": 0,
+    "skipped": 0,
+    "final_difference": "Two Phase2-only CSS rules and one trailing whitespace removed; all server/HTML/JS logic verified equal"
+  },
+  "phase2_navigation": {
+    "passed": 192,
+    "failed": 0,
+    "assertions": 236812,
+    "requests": 29076,
+    "skipped": 0
+  },
+  "function_regression": {
+    "passed_checks": 4577
+  },
+  "tiebreak_subset": {
+    "passed_checks": 3063,
+    "overlaps_full_function_suite": true
+  },
+  "browser_existing": {
+    "geometry_audits": 7041,
+    "skipped": 0,
+    "failed": 0,
+    "touch_workflows": 72,
+    "passed": 108
+  },
+  "browser_navigation": {
+    "geometry_audits": 2556,
+    "skipped": 0,
+    "failed": 0,
+    "touch_workflows": 24,
+    "passed": 36
+  },
+  "real_youtube": {
+    "failed": 0,
+    "passed": 3
+  },
+  "concurrency": {
+    "profiles_passed": 2,
+    "assertions": 15822,
+    "profiles_failed": 0,
+    "requests": 2500,
+    "participants_completed": 20
+  },
+  "expected_before_fix_browser_failures": 2,
+  "research_csv_columns": 136
+}

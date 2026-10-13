@@ -5,6 +5,7 @@
 // and result email. No historical data, repository logs, or mail are touched.
 $root = dirname(__DIR__);
 require_once __DIR__ . '/isolated_app.php';
+require_once __DIR__ . '/phase2_answer_plan.php';
 $original = file_get_contents($root . '/index.php');
 $sandbox = create_isolated_app($root);
 chdir($sandbox);
@@ -198,7 +199,7 @@ try {
             foreach (['left','right'] as $side) {
                 seed($cache); handle_single_winner($track[0].'1');
                 $pair = $candidate['pair'];
-                $_SESSION['varPoints'] = array_fill_keys($pair, 10);
+                phase2_seed_scores(array_fill_keys($pair, 10));
                 initialize_phase2_tiebreak($pair);
                 check($_SESSION['state'] === 'phase2_tb', "$track tiebreak entered");
                 $set = $_SESSION['tb2_set'];
@@ -226,7 +227,7 @@ try {
     foreach ($_SESSION['tb2_set'] as $b) handle_phase2_tiebreak_answer(0, 'neutral');
     check($_SESSION['log_row']['finalVar'] === 'RATKAISEMATON', 'Unresolved tie retained as completed test');
     seed($cache); handle_single_winner('A1');
-    $_SESSION['varPoints'] = ['4'=>5,'9'=>5];
+    phase2_seed_scores(['4'=>5,'9'=>5]);
     $_SESSION['cached_quiz_data']['phase2_tiebreaks']['TA2'] = [];
     initialize_phase2_tiebreak(['4','9']);
     check($_SESSION['state'] === 'phase2_unresolved' && $_SESSION['log_row']['finalVar'] === '', 'Missing TB explicitly unresolved');
@@ -269,7 +270,7 @@ try {
     render_state($sandbox, [], ['choice2_value'=>2,'choice2_side'=>'left']);
     $_SESSION = json_decode(file_get_contents($sandbox . '/render-session.json'), true);
     check($_SESSION['q2_index'] === 1 && $_SESSION['varPoints'][$b['left_var']] === 2, 'Phase 2 answer POST');
-    $_SESSION['varPoints'] = ['4'=>10,'7'=>10,'9'=>0];
+    phase2_seed_scores(['4'=>10,'7'=>10,'9'=>0]);
     initialize_phase2_tiebreak(['4','7']);
     $b = $_SESSION['tb2_set'][0];
     render_state($sandbox, [], ['tb2_value'=>1,'tb2_side'=>'right']);

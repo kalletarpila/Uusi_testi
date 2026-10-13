@@ -76,3 +76,15 @@ YouTuben soitin/esikatselu/toistopainike, 16:9, ei peitettä/ylivuotoa tai virhe
 Tulokset ja kuvat: video/after/. --baseline toistaa alkuperäisen vian vain,
 jos vanha sovellusversio on erikseen käytössä; se ei vaihda Git-versiota.
 Tarkempi raportti: ../YOUTUBE_EMBED_REPORT.txt.
+
+Phase 2 -navigoinnin selainregressio:
+  npm test -- --phase2-navigation --output=.runtime/phase2-navigation
+Oletuksena 3 moottoria x 3 näkymää (desktop/portrait/small) x 4 rataa = 36.
+Yksittäinen rata: --tracks=A2. Muut --engines/--viewport/--workers-rajaukset
+toimivat kuten aiemmin. Mukana kaikki viisi valintaa, aria-pressed ja näkyvä
+korostus, korvaaminen, kaksoisklikkaus, näppäimistön Enter, kosketus, TB2:n
+palautus ja mitätöinti, kolme->kaksi->yksittäinen tulos, CSV/kutsu ja raja Phase1:een.
+Uusi HTTP-sarja repojuuresta: php test/phase2_navigation_http.php
+  --matrix=polku.json ja --match=regex ovat valinnaisia rajauksia.
+Suunnitelma: ../PHASE2_NAVIGATION_PLAN.txt.
+Lopulliset kattavuudet ja rajat: ../PHASE2_NAVIGATION_REPORT.txt.

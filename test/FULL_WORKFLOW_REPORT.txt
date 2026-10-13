@@ -285,3 +285,14 @@ Taman raportin alkuperainen NOT EXECUTED -selainmerkinta kuvaa silloista HTTP-aj
 Uusi oikean selaimen, JavaScriptin ja kosketusemuloinnin kattavuus on raportoitu
 erikseen test/BROWSER_ACCEPTANCE_REPORT.txt:ssa ja test/browser/acceptance/matrix.jsonissa.
 Testit kayttavat samaa eristettya PHP/CSV-kehysta; tuotantoa ei julkaista.
+
+PHASE 2 NAVIGOINTILAAJENNUS 2026-10-13
+Tavallisen Phase 2:n ja TB2:n muokkaus/navigointi ac24627:n paalle:
+  test/PHASE2_NAVIGATION_PLAN.txt
+  test/PHASE2_NAVIGATION_REPORT.txt
+  test/PHASE2_NAVIGATION_HTTP.json
+  test/browser/phase2-navigation/matrix.json
+  test/browser/phase2-acceptance/matrix.json
+Vanhojen HTTP-, Phase 1- ja selainmatriisien uusinnat erotellaan raportissa.
+YouTube-upotuksen sailyminen tarkistetaan aidolla ulkoisella soittimella erikseen.
+Ei pushia, julkaisua tai tuotantodatan muutoksia.

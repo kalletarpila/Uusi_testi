@@ -1,0 +1,71 @@
+{
+  "initial_head": "ac2462707616e69c70deaa47f15088d9c060e8cf",
+  "playwright": "1.57.0",
+  "baseline": false,
+  "cases": [
+    {
+      "name": "chrome-small-navigation-A2",
+      "engine": "chrome",
+      "viewport": {
+        "name": "small",
+        "width": 320,
+        "height": 700,
+        "touch": true,
+        "index": 4
+      },
+      "mode": "navigation",
+      "passed": false,
+      "checked_states": [
+        "intro",
+        "intro-confidence",
+        "phase1",
+        "p2-navigation"
+      ],
+      "screenshots": [
+        "chrome-small-navigation-A2-exception.png"
+      ],
+      "javascript_errors": [],
+      "console_errors": [],
+      "http_errors": [],
+      "dialog_errors": [],
+      "phase1_pair": null,
+      "winner": "A1",
+      "track": "A2",
+      "invited": true,
+      "expected_final": "4",
+      "geometry_audits": 39,
+      "error": "AssertionError [ERR_ASSERTION]: Navigation appears after the answer options\n    at navBelowOptions (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:203:261)\n    at async integrity (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:204:885)\n    at async User.phase2Navigation (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:208:120)\n    at async runCase (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:258:39)\n    at async D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:267:93\n    at async Promise.allSettled (index 0)\n    at async engineRun (D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:267:16)\n    at async Promise.allSettled (index 0)\n    at async D:\\DevPhp\\EG uusi testi\\Uusi_testi\\test\\browser\\acceptance.cjs:273:26",
+      "ui_issues": []
+    }
+  ],
+  "engines": [
+    {
+      "engine": "chrome",
+      "version": "155.0.8059.40",
+      "php_diagnostics": []
+    }
+  ],
+  "external_requests": [
+    {
+      "case": "chrome-small-navigation-A2",
+      "url": "https://www.youtube.com/embed/X2fGUT1MzM0"
+    }
+  ],
+  "started_at": "2026-10-13T13:09:41.122Z",
+  "node": "v24.20.0",
+  "platform": "win32",
+  "modes": [
+    "navigation"
+  ],
+  "workers_per_engine": 1,
+  "inputs": {
+    "index.php": "500002132007f466c758fca79fe6a2ac17554412dd46a69e1ed8475759aacb77",
+    "InsideBlockQuestions.csv": "a06bbc0d3bc58b6f35a8be33326d7d2e217cb298647582313ab71a2ebe0b8c60",
+    "SeparateBlocksQuestions.csv": "fad1038e97f0889c62025c9b24f77e3f8f4e82c8e766e77a3f6b6b4773ebf4f7",
+    "SeparateBlocksQuestionsTiebreak.csv": "1f021ae3c2a018cd52243822f1c76f48f4ac931208f3bbab03ccfdafb7097483",
+    "TypeDescriptions.csv": "cf177422eac1e8621288168b19e3295e6c81ae99023327c1d6353c6974d97ed2"
+  },
+  "harness_errors": [],
+  "finished_at": "2026-10-13T13:10:04.863Z",
+  "passed": false
+}

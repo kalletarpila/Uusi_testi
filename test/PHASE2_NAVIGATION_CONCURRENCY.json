@@ -1,0 +1,214 @@
+{
+  "initial_head": "ac2462707616e69c70deaa47f15088d9c060e8cf",
+  "profiles": [
+    {
+      "participants": 10,
+      "pattern": "ramp",
+      "workers": 10,
+      "completed": 10,
+      "workflow_failures": 0,
+      "assertions": 7911,
+      "integrity": {
+        "csv_rows": 10,
+        "unique_sessions": 10,
+        "invited_completed": 4,
+        "unresolved_completed": 2,
+        "stub_notifications": 10,
+        "php_diagnostics": 0
+      },
+      "overlap": {
+        "executed_php_workers": 10,
+        "maximum_overlapping_php_requests": 7,
+        "traced_intervals": 1250,
+        "overlap_witness": [
+          {
+            "id": "user-2-34",
+            "pid": 42672,
+            "start": 1791897235.89399,
+            "end": 1791897235.895797,
+            "sid": "0cf851202e1ded68cf364b97926110c7"
+          },
+          {
+            "id": "user-0-34",
+            "pid": 49900,
+            "start": 1791897235.894087,
+            "end": 1791897235.895864,
+            "sid": "13798449d32bf87f3d987e6a079134dc"
+          },
+          {
+            "id": "user-7-35",
+            "pid": 45180,
+            "start": 1791897235.893439,
+            "end": 1791897235.896668,
+            "sid": "c507be5c1c44b01a653c88aadbd4ee6c"
+          },
+          {
+            "id": "user-1-34",
+            "pid": 45288,
+            "start": 1791897235.894383,
+            "end": 1791897235.896642,
+            "sid": "4c45b8dacba209bf3f6c95696eff085f"
+          },
+          {
+            "id": "user-5-35",
+            "pid": 10740,
+            "start": 1791897235.893516,
+            "end": 1791897235.897083,
+            "sid": "4d5bd8a6b45f254c1a7f0f6e6ae6adbb"
+          },
+          {
+            "id": "user-9-34",
+            "pid": 51148,
+            "start": 1791897235.89351,
+            "end": 1791897235.896923,
+            "sid": "cf1000871f810ff688b9526435ef3be7"
+          },
+          {
+            "id": "user-4-34",
+            "pid": 32144,
+            "start": 1791897235.893554,
+            "end": 1791897235.896974,
+            "sid": "a8ad78013cc89839dfc618d4c0edfd8d"
+          }
+        ],
+        "maximum_php_memory_peak_bytes": 4194304
+      },
+      "completed_per_minute": 132.55285704601633,
+      "http": {
+        "requests": 1250,
+        "http_success": 1250,
+        "http_failed": 0,
+        "statuses": {
+          "200": 630,
+          "303": 568,
+          "302": 52
+        },
+        "latency_seconds": {
+          "p50": 0.024837017059326172,
+          "p95": 0.044740915298461914,
+          "p99": 0.05282783508300781
+        },
+        "elapsed_seconds": 4.526496171951294,
+        "requests_per_second": 276.151785512534
+      },
+      "passed": true
+    },
+    {
+      "participants": 10,
+      "pattern": "burst",
+      "workers": 10,
+      "completed": 10,
+      "workflow_failures": 0,
+      "assertions": 7911,
+      "integrity": {
+        "csv_rows": 10,
+        "unique_sessions": 10,
+        "invited_completed": 4,
+        "unresolved_completed": 2,
+        "stub_notifications": 10,
+        "php_diagnostics": 0
+      },
+      "overlap": {
+        "executed_php_workers": 10,
+        "maximum_overlapping_php_requests": 10,
+        "traced_intervals": 1250,
+        "overlap_witness": [
+          {
+            "id": "user-8-0",
+            "pid": 10444,
+            "start": 1791897245.017163,
+            "end": 1791897245.020399,
+            "sid": "6735c201c1b158b4dc3b09ff8f32fa05"
+          },
+          {
+            "id": "user-2-0",
+            "pid": 43164,
+            "start": 1791897245.017603,
+            "end": 1791897245.022712,
+            "sid": "1d12901bd5bc7aebc56184a8057fecd6"
+          },
+          {
+            "id": "user-9-0",
+            "pid": 48096,
+            "start": 1791897245.016348,
+            "end": 1791897245.02289,
+            "sid": "f91bfa02b3b68835f5f85e76fb4a8778"
+          },
+          {
+            "id": "user-7-0",
+            "pid": 51352,
+            "start": 1791897245.016527,
+            "end": 1791897245.022378,
+            "sid": "f2bbf539b20e79f760024042d8eebea6"
+          },
+          {
+            "id": "user-3-0",
+            "pid": 44140,
+            "start": 1791897245.015693,
+            "end": 1791897245.02233,
+            "sid": "1ae47c3808aa09639425a4c919795ebc"
+          },
+          {
+            "id": "user-5-0",
+            "pid": 6912,
+            "start": 1791897245.016955,
+            "end": 1791897245.023036,
+            "sid": "ca6c4d9eb0ec833e1db4c9f21b1c9a06"
+          },
+          {
+            "id": "user-0-0",
+            "pid": 30824,
+            "start": 1791897245.016365,
+            "end": 1791897245.023171,
+            "sid": "8c4d12cbef3c4ca917d204d109579d6d"
+          },
+          {
+            "id": "user-6-0",
+            "pid": 50488,
+            "start": 1791897245.019495,
+            "end": 1791897245.023875,
+            "sid": "fc2f4d1d424384e8a96225dbbc8fec41"
+          },
+          {
+            "id": "user-1-0",
+            "pid": 38500,
+            "start": 1791897245.017226,
+            "end": 1791897245.023057,
+            "sid": "98fe11bc77f389e98216e03d0718e769"
+          },
+          {
+            "id": "user-4-0",
+            "pid": 44036,
+            "start": 1791897245.018469,
+            "end": 1791897245.023469,
+            "sid": "b6ab3866ca910afb98dd10143a11a57b"
+          }
+        ],
+        "maximum_php_memory_peak_bytes": 4194304
+      },
+      "completed_per_minute": 125.53569913363,
+      "http": {
+        "requests": 1250,
+        "http_success": 1250,
+        "http_failed": 0,
+        "statuses": {
+          "200": 630,
+          "303": 568,
+          "302": 52
+        },
+        "latency_seconds": {
+          "p50": 0.026216983795166016,
+          "p95": 0.04563093185424805,
+          "p99": 0.06014204025268555
+        },
+        "elapsed_seconds": 4.779516935348511,
+        "requests_per_second": 261.53270652839586
+      },
+      "passed": true
+    }
+  ],
+  "probes": [],
+  "historical_harness_head_constant": "03d4447d640eeb2e339ae1a34d8ae4ff136e5640",
+  "application_source_sha256": "f7a3de7333b1ca3f3d8db88f37ff75a3e05a2f6bb6cbf6764c4625ec1bc7bf1f",
+  "metadata_note": "The existing harness embeds an older head constant; initial_head here identifies the actual base of this execution. Real current application source was copied by the unchanged isolation helper."
+}

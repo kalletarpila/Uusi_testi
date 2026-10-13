@@ -1,0 +1,220 @@
+PHASE 2 — NAVIGOINTI, MUOKKAUS JA TILAN EHEYS — 13.10.2026
+TILA: PASS. 620/620 HTTP-skenaariota, 144/144 selainpolkua, 3/3 aitoa YouTube-koetta.
+
+GIT JA RAJAUS
+Alku-HEAD: ac2462707616e69c70deaa47f15088d9c060e8cf, dev/origin/dev puhdas.
+Loppu-HEAD: tämän raportin sisältävä yksi kohdennettu commit; SHA loppuviestissä.
+  git log -1 --format=%H -- test/PHASE2_NAVIGATION_REPORT.txt
+Oman commitin SHA ei voi sisältyä raporttiin muuttamatta kyseistä SHA:ta.
+Ei pushia eikä julkaisua. ac24627:n staattinen, näkyvä YouTube-iframe säilyy.
+Kysymystekstit, pistepainot, Phase 1:n ratkaisupolitiikka, 136 CSV-saraketta,
+historiallinen data, storage.php ja kutsujen transaktiot säilyvät.
+
+ALKUTARKASTUS JA SUUNNITELMA
+PHASE2_NAVIGATION_PLAN.txt laadittiin ennen tuotantokoodin muokkausta.
+Tarkastettiin Phase 1 -navigointi, session/POST-token/PRG, Phase 2 -alustus,
+vastaus-, TB2- ja completion-käsittely, CSV:n Case/TB2-koodit sekä nykyiset
+eristetyt HTTP-, selain- ja rinnakkaisuustestit. Nykyinen CSV sisältää 18
+tavallista kysymystä/rata; A2/B2 TB2:ssa 6, C2/D2:ssa 9, kussakin kolme paria.
+
+JUURISYY
+Phase 2:sta puuttuivat sekä navigointikäsittelijät että ohjaimet ja tallennetun
+valinnan renderöinti. answers2/pairs2 ja TB2-koodit olivat append-only-listoja;
+varPoints kasvoi jokaisesta vastauksesta. TB2:lla ei ollut muokattavia erillisiä
+vastaustietueita. Pelkkä indeksin siirtäminen takaisin olisi kahdentanut pisteitä.
+
+TOIMINTA JA YHTENÄINEN LASKENTA
+Tavalliset answers2 ja uudet tb2_answers sisältävät yhden viimeisimmän side/value-
+tietueen kysymyksen indeksissä. Järjestys ja puoleen liitetty tyyppi pysyvät samassa
+sessiossa. phase2_collect_answers on yhteinen 0/1/2-laskenta molemmille joukoille;
+recalculate_phase2_answers johtaa phase2_points-, tb2_points-, varPoints-, pairs2-
+ja tb2_pairs-arvot uudelleen. Ei vähennä/lisää vanhoja pisteitä eikä kopioi
+erillistä tuotannon pisteytysmoottoria. Neutral=0, mild=1, strong=2 ennallaan.
+Valinnalla automaattinen eteneminen; Edellinen ja Seuraava käsittelevät vain
+kiinteitä prev/next-suuntia. Seuraava sallitaan vain tallennetun vastauksen yli.
+Ensimmäinen tavallinen kysymys ei tarjoa paluuta Phase 1:een. Ensimmäinen TB2:n
+Edellinen palaa viimeiseen tavalliseen Phase 2 -kysymykseen; erillinen Takaisin
+vaiheen 2 kysymyksiin -painike säilyttää nykyisen TB2-indeksin myös kesken kierroksen.
+Kaikki viisi valintaa renderöidään selected-luokalla ja aria-pressed-tilalla.
+P2:n valinnan korostus ei skaalaa nappia ulos mobiilipalstasta. Nykyinen tyyli
+muuten säilyy. Natiivit painikkeet toimivat näppäimistöllä ja kosketuksella.
+
+TB2:N PALAUTUS JA MITÄTÖINTI
+Muuttamaton tarkastelu tai saman vastauksen uudelleenvalinta säilyttää TB2:n
+joukon/järjestyksen, vastaukset, pisteet ja etenemän. Tilan palautus perustuu
+tavallisten vastausten allekirjoitukseen ja yhteen review-lippuun, ei varmuuskopioketjuun.
+Jokainen todellinen tavallisen vastauksen muutos poistaa vanhan TB2:n vastaukset,
+koodit, joukon, ehdokkaat, indeksin ja kontekstin välittömästi. Kun tavallisen
+kierroksen loppuun palataan, nykyiset pisteet ratkaisevat yksilöllisen tuloksen
+tai alustavat uuden kahden/kolmen tyypin kierroksen. Vanha TB2 ei vaikuta siihen.
+Tulossivun jälkeen ei avata jo tallennettua testiä muokkaukseen.
+
+EHEYS JA VIRHEPOLUT
+Istunto validoi indeksit, yhtenäisen vastausprefiksin, side/value-yhdistelmät,
+ainutkertaiset kysymys-ID:t, täydellisen joukon suhteessa oikeaan CSV-katalogiin,
+tyyppi–teksti-kytkennät ja muuttumattoman järjestyksen. Vioittunut lähdevastaus
+tai kysymysjoukko tuottaa TECHNICAL_ERROR-polun; johdetut pisteet/koodit voidaan
+korjata viimeisistä kelvollisista vastauksista. Puuttuva vertailupari ei tuota
+puolittaista kierrosta tai satunnaista voittajaa. Tekninen virhe käyttää nykyistä
+phase2_unresolved-näkymää eikä tuota persoonallisuustulosta tai tutkimusriviä.
+Vanhat keskeneräiset TB2-istunnot voidaan siirtää nykyisistä xTYPE-ID-VALUE-koodeista
+vastaustietueiksi vain, kun ID:t, puolet, täydellinen tavallinen kierros,
+ehdokkaat ja tallennetut pisteet vastaavat toisiaan. Valmiit tulokset säilyvät.
+
+POST-kertatoken ja PRG säilyvät. Navigointitoiminnot kuuluvat samaan sallittujen
+toimintojen tarkistukseen; q2_index/tb2_index/target_index eivät kelpaa asiakkaalta.
+Samanaikaiset eri toiminnot, virheelliset puolet ja vanhat tokenit torjutaan.
+Phase 2 -näkymän yhteinen submit-varaus estää nopean toistolähetyksen myös uusista
+navigointilomakkeista. Palvelimen suojaus toimii myös ilman JavaScriptiä.
+Mikään Phase 2 -navigointitoiminto ei siirrä tilaan quiz1/tiebreak/tb1_new.
+
+HTTP-KATTAVUUS (todellinen PHP-palvelin, session-evästeet, HTML-lomakkeet, PRG)
+Uusi sarja: PASS, 192/192 tapausta = 48/rata, 0 hylättyä lopputestiä,
+236 812 assertiota, 29 076 oikeaa HTTP-pyyntöä, 0 suodatettua tapausta.
+Kategoriat / rata:
+  ordinary 1: kaikki viisi vastausta, korvaukset molempiin suuntiin/voimakkuuksiin,
+    ensimmäinen/keskimmäinen/viimeinen, toistot, next/prev/refresh/progress.
+  pair 9: kaikki kolme paria, kumpikin voittaja ja ratkaisematon.
+  three-way 5: kukin kolmesta voittajasta, kaksi ja kolme jäljelle jäävää johtajaa.
+  transition 8: unchanged, same-answer, same-pair, unique, different-pair,
+    two-to-three, three-to-two, repeated review/reentry.
+  security 1: useita torjuttuja pyyntöjä, replayt ja Phase 1 -raja.
+  full-workflow 4: current/legacy TB1 x invited/uninvited, Phase 1 -tarkastelu,
+    Phase 2 -tarkastelu, TB2, tallennus, palaute ja reset.
+  failure-injection 20: puuttuva tiedosto/joukko/pari, väärä kytkentä/indeksi,
+    korruptoituneet/aukolliset vastaukset, keskeytys, CSV-kirjoitusvirhe,
+    vanhan session migraatio, TB2:n indeksit/vastaukset/data/kytkentä,
+    keskeneräinen ordinary ennen TB2:ta, vialliset vanhat koodit, johdettujen
+    tietojen korjaus, katkenneet ordinary/TB2-joukot ja muuttunut järjestys.
+Parit: A2 4-7/4-9/7-9; B2 3-7/3-8/7-8; C2 1-5/1-6/5-6; D2 2-6/2-9/6-9.
+Onnistuneet 112 työnkulku-/turvallisuustapausta eivät siemennä vastaus/pistetilaa.
+80 erillistä häiriö-/migraatiotapausta on merkitty fixture_injection=true.
+Matriisi: PHASE2_NAVIGATION_HTTP.json, tapauskohtaiset pyynnöt ja assertiot.
+Suorat funktiokutsut raportoidaan erikseen, eivät ole HTTP end-to-end -testejä.
+
+SELAINKATTAVUUS
+Uusi navigointi: PASS 36/36, 3 moottoria x 3 näkymää x 4 rataa.
+                    Chrome       Firefox       WebKit
+1440x900 desktop     4/4          4/4           4/4
+390x844 portrait     4/4          4/4           4/4
+320x700 small        4/4          4/4           4/4
+Moottorit: Chrome 155.0.8059.40, Firefox 144.0.2, WebKit 26.0.
+24/24 mobiilipolussa havaittiin oikeat emuloidut kosketustapahtumat.
+2 556 asettelutarkistusta; 21 edustavaa A2-kuvaa, samat kontrollit kaikilla radoilla.
+Kaikki viisi valintaa näkyvästi valittuna, vastausten korvaaminen, back/forward,
+nopeat kaksoisklikkaukset, näppäimistön kohdistus/Enter, TB2:n palautus ja
+mitätöinti, kolme->kaksi->yksittäinen tulos, Phase 1:n muuttumattomuus,
+kosketustapahtumat ja geometria tarkistetaan oikeilla klikkauksilla/tap-toiminnoilla.
+Matriisi ja edustavat kuvat: browser/phase2-navigation/.
+Olemassa oleva koko selainmatriisi: PASS 108/108, erillinen uusinta
+browser/phase2-acceptance/. YouTube stubataan näissä kyselyajoissa.
+                    Chrome       Firefox       WebKit
+1440x900 desktop     6/6          6/6           6/6
+1366x768 laptop      6/6          6/6           6/6
+390x844 portrait     6/6          6/6           6/6
+844x390 landscape    6/6          6/6           6/6
+320x700 small        6/6          6/6           6/6
+768x1024 tablet      6/6          6/6           6/6
+Kuusi polkua/solu: normal/pairwise/legacy/two-way/three-way/decisive.
+Vanhassa matriisissa 7 041 asettelutarkistusta, 72 kosketuspolkua ja 41 kuvaa.
+Yhteensä 9 597 asettelutarkistusta ja 96 kosketuspolkua. Lopullisissa molemmissa
+matriiseissa 0 JS-, console-, HTTP-resource-, dialog-protokolla- tai PHP-virhettä;
+0 ajurivirhettä. Kaikki suunnitellut 108+36 tapausta suoritettiin, ei ohituksia.
+Erillinen aito YouTube-upotuskoe: PASS 3/3, browser/phase2-video/.
+
+MUUT REGRESSIOT JA RINNAKKAISUUS
+Nykyiset 110 HTTP-työnkulkua: PASS 110/110, 69 727 assertiota, 12 061 pyyntöä.
+Nykyiset 318 Phase 1 -navigointia: PASS 318/318, 520 675 assertiota, 71 516 pyyntöä.
+A2/funktio-/tilakone-/renderointisarja: PASS 4 577 tarkistusta.
+TB2-osajoukon uusinta: PASS 3 063 (päällekkäinen täyden funktiosarjan kanssa).
+HTTP yhteensä 620/620, 827 214 assertiota, 112 653 pyyntöä. Kaikki exit-koodit 0.
+Vanhat funktiofixturet asettivat varPoints-arvoja suoraan. Ne käyttävät nyt
+oikeisiin 18 kysymykseen sidottuja vastaustietueita samalla odotetulla pistemäärällä.
+Testi-only phase2_answer_plan hakee näitä vastauksia; se ei ole sovelluspisteytys.
+Siksi nykyiset tutkimus-CSV-vastaustarkistukset tarkistavat lisää tietueita.
+Shared storage / complete_quiz_result / kutsutransaktiot eivät muutu.
+Completion-käsittelijöiden muuttumisen vuoksi ajetaan rajattu rinnakkaisuuskoe:
+10 osallistujaa ramp ja burst: PASS 2/2 profiilia, 20/20 valmistui,
+2 500 pyyntöä, 15 822 tarkistusta, burstissa 10 päällekkäistä PHP-pyyntöä.
+20 eri tutkimusriviä, 8 valmistunutta kutsua, 4 ratkaisemattomana valmistunutta
+testiä, 0 PHP-diagnostiikkaa. PHASE2_NAVIGATION_CONCURRENCY.json.
+200 osallistujan koko kuormasarjaa ei uusita tämän navigointimuutoksen vuoksi.
+Syntaksi, diff/whitespace ja neljän kysymys-/kuvaus-CSV:n muuttumattomuus: PASS.
+Lopullinen index.php SHA-256:
+  f7a3de7333b1ca3f3d8db88f37ff75a3e05a2f6bb6cbf6764c4625ec1bc7bf1f
+318 tapauksen Phase 1 -sarja käynnistyi ennen kahta viimeistä Phase 2 -CSS-
+korjausta ja yhden loppuvälilyönnin poistoa (lähdehash 500002132007f466c758fca79fe6a2ac17554412dd46a69e1ed8475759aacb77).
+Ohjelmallinen vertailu varmisti, että muu PHP/HTML/JS-logiikka on täsmälleen sama.
+Sarja läpäisi kokonaan; näillä CSS-säännöillä ei ole Phase 1 -kohteita.
+110/192 HTTP-sarjat, funktiot, TB2, rinnakkaisuus ja 108/36 selaimet sekä YouTube
+uusittiin lopullisella f7a3de...-sisällöllä. Lähteitä ei muutettu näiden jälkeen.
+Tarkistetut loppusummat: PHASE2_NAVIGATION_REGRESSIONS.json.
+Phase 1:n uusi ajonäyttö: PHASE2_NAVIGATION_PHASE1_RECHECK.json.
+
+TUTKIMUSDATA JA LOKIT
+Case1–Case36 ja TB2_1–TB2_10 johdetaan vain nykyisistä vastauksista. Formaatti
+xTYPE-question_number-value / xNEUTRAL-question_number-0 säilyy. Vakaa ID riittää
+yhdistämään vastauksen alkuperäiseen kysymykseen ja tyyppeihin, satunnaisesta
+näyttöpuolesta riippumatta. Muokattu vastaus kirjataan kerran. Hylättyjen TB2-
+kierrosten koodeja ei ole lopullisessa tutkimusrivissä tai RESULT-tapahtumassa.
+Sovelluslokin aiemmat audit-tapahtumat säilyvät; muutos kirjaa mitätöinnin.
+Täsmälleen yksi lopullinen 136-sarakkeinen tutkimusrivi/session; final scores,
+RATKAISEMATON-tyypit, tyhjät käyttämättömät kentät, kutsun valmistuminen vasta
+onnistuneesta tallennuksesta, tuplafinaalipyyntö ja refresh tarkistetaan.
+Kaikki palvelimet/data/mailit ovat eristettyjä, tuotantodataa ei käytetä.
+
+LÖYDÖKSET JA RAJAT
+Alkuperäinen append-only-malli sekä puuttuva valintanäyttö/navigointi korjattu.
+Osittainen tai uudelleenkytketty session kysymysjoukko tarkistetaan nyt oikeaa
+katalogia vasten, jotta lyhentynyt kierros ei tuota kelvolliselta näyttävää tulosta.
+Kuvista löytyivät uuden navigoinnin väärä mobiilisijainti (gridin order) ja
+neutraalin valinnan valkoinen teksti keltaisella (yleinen -webkit-text-fill-color).
+Molemmat toistettiin punaisella selainassertiolla ennen korjausta. Rajatut Phase 2
+CSS-säännöt sijoittavat navigoinnin vaihtoehtojen jälkeen ja palauttavat neutraalin
+valinnan tarkoitetun #222-tekstin. Uusi selainajo tarkistaa nämä kaikilla moottoreilla.
+Toistonäyttö: browser/phase2-before/matrix.json ja contrast/matrix.json sekä kuvat.
+Ajurin kehitysvaiheessa korjattiin palautteen suoran HTTP 200 -vastauksen väärä
+PRG-odotus, toistuvan palautuksen indeksioletus ja PHP-taulun avainten lisäysjärjestyksen
+virheellinen vertailu migraatiossa. Ne eivät olleet sovelluksen pisteytysvikoja.
+Kaikki pyydetyt kahden/kolmen tyypin siirtymät toteutettiin oikeilla kysymyksillä;
+saavuttamattomia pyydettyjä siirtymiä ei löytynyt. Kaksi->kolme voi vaatia useita
+tavallisia muokkauksia. Epätodellista onnistumistilan siirtymäfixtureä ei tarvittu.
+Fyysiset iOS/Android-laitteet, ruudunlukijat ja koko testi vain näppäimistöllä,
+kaikki satunnaisjärjestykset, verkkokatkot/bfcache ja 200 käyttäjän uusi kuormamittaus
+eivät kuulu tähän uusintaan. Kosketus on emulointia; Firefox ei tue isMobilea.
+Session täydellinen menetys aloittaa intron, eikä vanha lomake voi jatkaa testiä.
+Valmiin testin muokkausta/tutkimusrivin uudelleenkirjoitusta ei tarjota.
+
+Kehitysvaiheen erilliset ajot (päällekkäisiä lopullisen kattavuuden kanssa):
+  HTTP-savukoe 16/16; A2:n uuden ajurin rajaus 21 PASS / 6 FAIL / 125 suodatettua.
+  Kuusi FAILia olivat yllä dokumentoidut ajuriodotukset; korjattu uusinta 6/6,
+  146 suodatettua. Lopullinen koko uusi sarja 192/192, 0 suodatettua.
+  Selainprobet desktop 1/1 ja small 3/3; ennen CSS-assertioita 36/36.
+  Kaksi tarkoituksellista CSS-toistoa 0/1 kumpikin, odotettu FAIL ennen korjausta.
+  Lopullinen 36/36 sisältää myös molemmat uudet regressioassertiot.
+  Ennen CSS:ää tehdyt 110/192 HTTP-, funktio-, TB2-, rinnakkaisuus- ja YouTube-
+  ajot läpäisivät myös. Niitä ei summata lopullisiin tuloksiin toista kertaa.
+200 osallistujan kuormamittaus sekä yllä luetellut manuaalitapaukset NOT EXECUTED.
+
+PILOTTIVALMIUS: paikallinen hyväksyntä läpäisty. Valvottu rajattu pilotti voi
+edetä, kun fyysisten iOS/Android-laitteiden smoke-tarkistus ja aiemman
+CONCURRENCY_REPORT.txt:n operatiiviset ehdot on täytetty. Ei tuotannon
+kapasiteetti-/käytettävyyslupausta, automaattista pushia tai julkaisua.
+
+MUUTETUT TIEDOSTOT
+index.php; test/a2_regression_test.php; test/phase2_threeway_cases.php;
+test/phase2_answer_plan.php; test/phase2_navigation_http.php;
+test/browser/acceptance.cjs; test/browser/README.txt; test/browser/video.cjs (tuloskansion valinta);
+PHASE2_NAVIGATION_PLAN/REPORT/HTTP sekä uudet selain-/rinnakkaisuustulokset.
+Lopullinen tarkka tiedostolista on commitin git show --stat -tulosteessa.
+
+UUSINTA
+php test/http_workflow_test.php
+php test/http_workflow_test.php --navigation-only --matrix=temporary-phase1.json
+php test/phase2_navigation_http.php
+php test/a2_regression_test.php
+php test/a2_regression_test.php --tiebreak-only
+node test/browser/acceptance.cjs --output=.runtime/acceptance
+node test/browser/acceptance.cjs --phase2-navigation --output=.runtime/navigation
+node test/browser/video.cjs --output=phase2-video
+php test/concurrent_workflow_test.php --levels=10 --report=temporary-concurrency.json
